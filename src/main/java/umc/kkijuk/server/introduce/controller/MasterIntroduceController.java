@@ -34,10 +34,10 @@ public class MasterIntroduceController {
 
     @PostMapping
     @Operation(summary = "마스터 자기소개서 생성")
-    public ResponseEntity<Object> saveMasterIntro(@Login LoginInfo loginInfo,
-                                                  @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
+    public ResponseEntity<Object> saveMasterIntro(@RequestBody IntroduceReqDto introduceReqDto) throws Exception {
+        LoginUser loginUser = LoginUser.get();
         MasterIntroduceResponse masterIntroduceResponse =
-                masterIntroduceService.saveMasterIntro(loginInfo.getMemberId(), introduceReqDto);
+                masterIntroduceService.saveMasterIntro(loginUser.getId(), introduceReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "마스터 자기소개서 생성 완료", masterIntroduceResponse));
@@ -45,8 +45,9 @@ public class MasterIntroduceController {
 
     @GetMapping
     @Operation(summary = "마스터 자기소개서 조회")
-    public ResponseEntity<Object> getMasterIntro(@Login LoginInfo loginInfo){
-        MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.getMasterIntro(loginInfo.getMemberId());
+    public ResponseEntity<Object> getMasterIntro(){
+        LoginUser loginUser = LoginUser.get();
+        MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.getMasterIntro(loginUser.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "마스터 자기소개서 조회 완료", masterIntroduceResponse));
@@ -55,8 +56,9 @@ public class MasterIntroduceController {
     @PatchMapping
     @Operation(summary = "마스터 자기소개서 수정")
     public ResponseEntity<Object> updateMasterIntro(
-            @Login LoginInfo loginInfo, @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
-        MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.updateMasterIntro(loginInfo.getMemberId(), introduceReqDto);
+            @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
+        LoginUser loginUser = LoginUser.get();
+        MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.updateMasterIntro(loginUser.getId(), introduceReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "마스터 자기소개서 수정 완료", masterIntroduceResponse));

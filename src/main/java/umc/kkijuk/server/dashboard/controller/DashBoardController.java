@@ -38,9 +38,9 @@ public class DashBoardController {
             description = "메인화면에 사용자이름, 가입한 기간, 활동, 지원현황 갯수 데이터를 응답합니다.")
     @GetMapping("/user-info")
     public ResponseEntity<DashBoardUserInfoResponse> getUserInfo(
-            @Login LoginInfo loginInfo
             ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        LoginUser loginUser = LoginUser.get();
+        Member requestMember = memberService.getById(loginUser.getId());
         DashBoardUserInfoResponse response = dashBoardService.getUserInfo(requestMember);
         return ResponseEntity
                 .ok()
@@ -53,9 +53,9 @@ public class DashBoardController {
     )
     @GetMapping("/remind/recruit")
     public ResponseEntity<RecruitRemindResponse> getRemindRecruits(
-            @Login LoginInfo loginInfo
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        LoginUser loginUser = LoginUser.get();
+        Member requestMember = memberService.getById(loginUser.getId());
         RecruitRemindResponse response = dashBoardService.getTopTwoRecruitsByEndTime(requestMember);
         return ResponseEntity
                 .ok()
@@ -65,9 +65,9 @@ public class DashBoardController {
     @GetMapping("/introduce")
     @Operation(summary = "홈 자기소개서 작성 알림")
     public ResponseEntity<Object> get(
-            @Login LoginInfo loginInfo
     ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        LoginUser loginUser = LoginUser.get();
+        Member requestMember = memberService.getById(loginUser.getId());
         List<IntroduceRemindResponse> homeIntroduceResDtos = dashBoardService.getHomeIntro(requestMember);
         return ResponseEntity
                 .status(HttpStatus.OK)

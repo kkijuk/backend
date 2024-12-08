@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.detail.controller.response.BaseCareerDetailResponse;
 import umc.kkijuk.server.detail.controller.response.CareerDetailResponse;
 import umc.kkijuk.server.detail.dto.CareerDetailReqDto;
@@ -32,11 +33,11 @@ public class BaseCareerDetailController {
             @Parameter(name = "careerId", description = "활동 Id, path variable 입니다."),
     })
     public CareerDetailResponse<BaseCareerDetailResponse> create(
-            @Login LoginInfo loginInfo,
             @PathVariable Long careerId,
             @RequestBody @Valid CareerDetailReqDto request
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        LoginUser loginUser = LoginUser.get();
+        Member requestMember = memberService.getById(loginUser.getId());
         return CareerDetailResponse.success(HttpStatus.CREATED, "활동 기록을 성공적으로 생성했습니다.",
                 careerDetailService.createDetail(requestMember, request, careerId)
         );
@@ -48,11 +49,11 @@ public class BaseCareerDetailController {
             @Parameter(name = "detailId", description = "활동 기록 Id, path variable 입니다.")
     })
     public CareerDetailResponse<Object> delete(
-            @Login LoginInfo loginInfo,
             @PathVariable Long careerId,
             @PathVariable Long detailId
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        LoginUser loginUser = LoginUser.get();
+        Member requestMember = memberService.getById(loginUser.getId());
         careerDetailService.deleteDetail(requestMember, careerId ,detailId);
         return CareerDetailResponse.success(HttpStatus.OK, "활동 기록을 성공적으로 삭제했습니다.",null);
     }
@@ -64,12 +65,12 @@ public class BaseCareerDetailController {
             @Parameter(name = "detailId", description = "활동 기록 Id, path variable 입니다. ")
     })
     public CareerDetailResponse<BaseCareerDetailResponse> update(
-            @Login LoginInfo loginInfo,
             @PathVariable Long careerId,
             @PathVariable Long detailId,
             @RequestBody @Valid CareerDetailUpdateReqDto request
     ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        LoginUser loginUser = LoginUser.get();
+        Member requestMember = memberService.getById(loginUser.getId());
         return CareerDetailResponse.success(
                 HttpStatus.OK,
                 "활동 기록을 성공적으로 수정했습니다.",
