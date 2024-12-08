@@ -9,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.introduce.common.BaseResponse;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.record.controller.response.FileResponse;
 import umc.kkijuk.server.record.dto.FileReqDto;
 import umc.kkijuk.server.record.dto.UrlReqDto;

@@ -10,9 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.common.LoginUser;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
-import umc.kkijuk.server.login.service.LoginService;
 import umc.kkijuk.server.member.controller.response.*;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.dto.*;
@@ -32,23 +29,22 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MailServiceImpl mailService;
-    private final LoginService loginService;
 
-    @Operation(
-            summary = "회원가입 요청",
-            description = "회원가입 요청을 받아 성공/실패 여부를 반환합니다.")
-    @PostMapping
-    public ResponseEntity<CreateMemberResponse> saveMember(
-            @RequestBody @Valid MemberJoinDto memberJoinDto,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        Member joinMember = memberService.join(memberJoinDto);
-
-        loginService.makeLoginSession(LoginInfo.from(joinMember), request, response);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new CreateMemberResponse(joinMember.getId(), "Member created successfully"));
-    }
+//    @Operation(
+//            summary = "회원가입 요청",
+//            description = "회원가입 요청을 받아 성공/실패 여부를 반환합니다.")
+//    @PostMapping
+//    public ResponseEntity<CreateMemberResponse> saveMember(
+//            @RequestBody @Valid MemberJoinDto memberJoinDto,
+//            HttpServletRequest request,
+//            HttpServletResponse response) {
+//        Member joinMember = memberService.join(memberJoinDto);
+//
+//        loginService.makeLoginSession(LoginInfo.from(joinMember), request, response);
+//        return ResponseEntity
+//                .status(HttpStatus.CREATED)
+//                .body(new CreateMemberResponse(joinMember.getId(), "Member created successfully"));
+//    }
 
 
     @Operation(
