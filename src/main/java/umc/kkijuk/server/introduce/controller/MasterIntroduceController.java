@@ -14,8 +14,6 @@ import umc.kkijuk.server.introduce.controller.response.MasterIntroduceResponse;
 import umc.kkijuk.server.introduce.dto.IntroduceReqDto;
 import umc.kkijuk.server.introduce.dto.MasterIntroduceReqDto;
 import umc.kkijuk.server.introduce.service.MasterIntroduceService;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 

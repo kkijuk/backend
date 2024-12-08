@@ -12,8 +12,6 @@ import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.dashboard.controller.port.DashBoardService;
 import umc.kkijuk.server.dashboard.controller.response.DashBoardUserInfoResponse;
 import umc.kkijuk.server.dashboard.controller.response.IntroduceRemindResponse;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 import umc.kkijuk.server.dashboard.controller.response.RecruitRemindResponse;

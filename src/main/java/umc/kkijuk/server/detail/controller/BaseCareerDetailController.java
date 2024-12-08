@@ -14,8 +14,6 @@ import umc.kkijuk.server.detail.controller.response.CareerDetailResponse;
 import umc.kkijuk.server.detail.dto.CareerDetailReqDto;
 import umc.kkijuk.server.detail.dto.CareerDetailUpdateReqDto;
 import umc.kkijuk.server.detail.service.BaseCareerDetailService;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 
