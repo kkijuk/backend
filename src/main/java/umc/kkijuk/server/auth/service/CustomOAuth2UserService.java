@@ -79,7 +79,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
   private String extractName(Map<String, Object> attributes) {
     if (attributes.containsKey("kakao_account")) {
       Map<String, Object> profile = (Map<String, Object>) ((Map<String, Object>) attributes.get("kakao_account")).get("profile");
-      return profile != null ? (String) profile.get("nickname") : null;
+      return profile != null ? (String) profile.get("name") : null;
     }
     return null;
   }
