@@ -34,9 +34,6 @@ public class Member extends BaseEntity {
     @NotNull
     private LocalDate birthDate;
 
-    @NotNull
-    private String password;
-
     @Convert(converter = StringListToStringConverter.class)
     private List<String> field;
 
@@ -53,13 +50,18 @@ public class Member extends BaseEntity {
     @Convert(converter = StringListToStringConverter.class)
     private List<String> recruitTags;
 
+    @Enumerated(EnumType.STRING)
+    private MemberJob memberJob;
 
-    public Member(String email, String name, String phoneNumber, LocalDate birthDate, String password, MarketingAgree marketingAgree, State userState) {
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public Member(String email, String name, String phoneNumber, LocalDate birthDate, MarketingAgree marketingAgree, State userState) {
         this.email = email;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
-        this.password = password;
         this.marketingAgree = marketingAgree;
         this.userState = userState;
     }
@@ -72,10 +74,6 @@ public class Member extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
         this.marketingAgree = marketingAgree;
-    }
-
-    public void changeMemberPassword(String password){
-        this.password = password;
     }
 
     public void inactivate() {
@@ -95,4 +93,5 @@ public class Member extends BaseEntity {
     public void deleteRecruitTag(String tag) {
         this.recruitTags.remove(tag);
     }
+
 }

@@ -38,4 +38,10 @@ public class FakeMemberRepository implements MemberRepository {
                 .filter(item -> item.getEmail().equals(email))
                 .findAny();
     }
+    @Override
+    public Optional<Member> findByPhoneNumber(String phoneNumber) {
+        return data.stream()
+                .filter(item -> item.getPhoneNumber().equals(phoneNumber))
+                .findAny();
+    }
 }

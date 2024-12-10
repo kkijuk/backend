@@ -98,15 +98,15 @@ public class MemberController {
         return ResponseEntity.ok(Boolean.TRUE);
     }
 
-    @Operation(
-            summary = "비밀번호 변경",
-            description = "비밀번호를 변경합니다.")
-    @PostMapping("myPage/password")
-    public ResponseEntity<Boolean> changeMemberPassword(@RequestBody @Valid MemberPasswordChangeDto memberPasswordChangeDto){
-        Long loginUser = LoginUser.get().getId();
-        memberService.changeMemberPassword(loginUser, memberPasswordChangeDto);
-        return ResponseEntity.ok(Boolean.TRUE);
-    }
+//    @Operation(
+//            summary = "비밀번호 변경",
+//            description = "비밀번호를 변경합니다.")
+//    @PostMapping("myPage/password")
+//    public ResponseEntity<Boolean> changeMemberPassword(@RequestBody @Valid MemberPasswordChangeDto memberPasswordChangeDto){
+//        Long loginUser = LoginUser.get().getId();
+//        memberService.changeMemberPassword(loginUser, memberPasswordChangeDto);
+//        return ResponseEntity.ok(Boolean.TRUE);
+//    }
 
     @Operation(
             summary = "내정보 조회 인증 화면 이메일 가져오기",
@@ -121,15 +121,15 @@ public class MemberController {
     }
 
 
-    @Operation(
-            summary = "내정보 조회용 비밀번호 인증",
-            description = "내 정보를 조회하기 위해 비밀번호를 인증합니다.")
-    @PostMapping("/myPage")
-    public ResponseEntity<Boolean> myPagePasswordAuth(@RequestBody @Valid MyPagePasswordAuthDto myPagePasswordAuthDto){
-        Long loginUser = LoginUser.get().getId();
-        memberService.myPagePasswordAuth(loginUser, myPagePasswordAuthDto);
-        return ResponseEntity.ok(Boolean.TRUE);
-    }
+//    @Operation(
+//            summary = "내정보 조회용 비밀번호 인증",
+//            description = "내 정보를 조회하기 위해 비밀번호를 인증합니다.")
+//    @PostMapping("/myPage")
+//    public ResponseEntity<Boolean> myPagePasswordAuth(@RequestBody @Valid MyPagePasswordAuthDto myPagePasswordAuthDto){
+//        Long loginUser = LoginUser.get().getId();
+//        memberService.myPagePasswordAuth(loginUser, myPagePasswordAuthDto);
+//        return ResponseEntity.ok(Boolean.TRUE);
+//    }
 
     @Operation(
             summary = "회원 탈퇴",

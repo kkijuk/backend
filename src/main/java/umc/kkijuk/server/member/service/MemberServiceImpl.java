@@ -16,6 +16,7 @@ import umc.kkijuk.server.member.domain.State;
 import umc.kkijuk.server.member.dto.*;
 import umc.kkijuk.server.member.repository.MemberRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,26 +35,26 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new ResourceNotFoundException("Member", memberId));
     }
 
-    @Override
-    @Transactional
-    public Member join(MemberJoinDto memberJoinDto) {
-        String passwordConfirm = memberJoinDto.getPasswordConfirm();
-        if (!passwordConfirm.equals(memberJoinDto.getPassword())) {
-            throw new ConfirmPasswordMismatchException();
-        }
-
-        Member joinMember = memberJoinDto.toEntity();
-
-        String encodedPassword = passwordEncoder.encode(memberJoinDto.getPassword());
-        joinMember.changeMemberPassword(encodedPassword);
-
-        Optional<Member> member = memberRepository.findByEmail(memberJoinDto.getEmail());
-        if (member.isPresent()){
-            throw new EmailAlreadyExistsException();
-        }
-
-        return memberRepository.save(joinMember);
-    }
+//    @Override
+//    @Transactional
+//    public Member join(MemberJoinDto memberJoinDto) {
+//        String passwordConfirm = memberJoinDto.getPasswordConfirm();
+//        if (!passwordConfirm.equals(memberJoinDto.getPassword())) {
+//            throw new ConfirmPasswordMismatchException();
+//        }
+//
+//        Member joinMember = memberJoinDto.toEntity();
+//
+//        String encodedPassword = passwordEncoder.encode(memberJoinDto.getPassword());
+//        joinMember.changeMemberPassword(encodedPassword);
+//
+//        Optional<Member> member = memberRepository.findByEmail(memberJoinDto.getEmail());
+//        if (member.isPresent()){
+//            throw new EmailAlreadyExistsException();
+//        }
+//
+//        return memberRepository.save(joinMember);
+//    }
 
     @Override
     public MemberInfoResponse getMemberInfo(Long memberId) {
@@ -106,33 +107,33 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
     }
 
-    @Override
-    @Transactional
-    public Member changeMemberPassword(Long memberId, MemberPasswordChangeDto memberPasswordChangeDto){
-        Member member = this.getById(memberId);
-        if(!memberPasswordChangeDto.getNewPassword().equals(memberPasswordChangeDto.getNewPasswordConfirm())){
-            throw new ConfirmPasswordMismatchException();
-        }
-        if(!passwordEncoder.matches(memberPasswordChangeDto.getCurrentPassword(), member.getPassword())){
-            throw new CurrentPasswordMismatchException();
-        }
+//    @Override
+//    @Transactional
+//    public Member changeMemberPassword(Long memberId, MemberPasswordChangeDto memberPasswordChangeDto){
+//        Member member = this.getById(memberId);
+//        if(!memberPasswordChangeDto.getNewPassword().equals(memberPasswordChangeDto.getNewPasswordConfirm())){
+//            throw new ConfirmPasswordMismatchException();
+//        }
+//        if(!passwordEncoder.matches(memberPasswordChangeDto.getCurrentPassword(), member.getPassword())){
+//            throw new CurrentPasswordMismatchException();
+//        }
+//
+//        String encodedPassword = passwordEncoder.encode(memberPasswordChangeDto.getNewPassword());
+//        member.changeMemberPassword(encodedPassword);
+//
+//        return memberRepository.save(member);
+//    }
 
-        String encodedPassword = passwordEncoder.encode(memberPasswordChangeDto.getNewPassword());
-        member.changeMemberPassword(encodedPassword);
-
-        return memberRepository.save(member);
-    }
-
-    @Override
-    public Member myPagePasswordAuth(Long memberId, MyPagePasswordAuthDto myPagePasswordAuthDto) {
-        Member member = this.getById(memberId);
-
-        if(!passwordEncoder.matches(myPagePasswordAuthDto.getCurrentPassword(), member.getPassword())){
-            throw new CurrentPasswordMismatchException();
-        }
-
-        return member;
-    }
+//    @Override
+//    public Member myPagePasswordAuth(Long memberId, MyPagePasswordAuthDto myPagePasswordAuthDto) {
+//        Member member = this.getById(memberId);
+//
+//        if(!passwordEncoder.matches(myPagePasswordAuthDto.getCurrentPassword(), member.getPassword())){
+//            throw new CurrentPasswordMismatchException();
+//        }
+//
+//        return member;
+//    }
 
     @Override
     @Transactional
@@ -152,20 +153,20 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    @Override
-    @Transactional
-    public Member resetMemberPassword(MemberPasswordResetDto memberPasswordResetDto){
-        Optional<Member> member = memberRepository.findByEmail(memberPasswordResetDto.getEmail());
-
-        if(!memberPasswordResetDto.getNewPassword().equals(memberPasswordResetDto.getNewPasswordConfirm())){
-            throw new ConfirmPasswordMismatchException();
-        }
-
-        String encodedPassword = passwordEncoder.encode(memberPasswordResetDto.getNewPassword());
-        member.get().changeMemberPassword(encodedPassword);
-
-        return memberRepository.save(member.get());
-    }
+//    @Override
+//    @Transactional
+//    public Member resetMemberPassword(MemberPasswordResetDto memberPasswordResetDto){
+//        Optional<Member> member = memberRepository.findByEmail(memberPasswordResetDto.getEmail());
+//
+//        if(!memberPasswordResetDto.getNewPassword().equals(memberPasswordResetDto.getNewPasswordConfirm())){
+//            throw new ConfirmPasswordMismatchException();
+//        }
+//
+//        String encodedPassword = passwordEncoder.encode(memberPasswordResetDto.getNewPassword());
+//        member.get().changeMemberPassword(encodedPassword);
+//
+//        return memberRepository.save(member.get());
+//    }
 
     @Override
     public Boolean confirmDupEmail(MemberEmailDto memberEmailDto) {
@@ -196,4 +197,31 @@ public class MemberServiceImpl implements MemberService {
         member.deleteRecruitTag(tag);
         return member.getRecruitTags();
     }
+
+    /**
+     * 아래부터 소셜로그인 이후 추가된 기능
+     */
+
+    @Override
+    @Transactional
+    public Member findByPhoneNumber(String phoneNumber) {
+        return memberRepository.findByPhoneNumber(phoneNumber).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public Member createMember(String email, String name, String phoneNumber, LocalDate birthDate) {
+
+        Member member = Member.builder()
+                .email(email)
+                .name(name)
+                .phoneNumber(phoneNumber)
+                .birthDate(birthDate)
+                .build();
+
+        memberRepository.save(member);
+        log.info("신규 사용자 생성: 이메일={}, 이름={}, 핸드폰 번호={}, 생년월일={}", email, name, phoneNumber, birthDate);
+        return member;
+    }
+
 }

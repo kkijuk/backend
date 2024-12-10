@@ -38,7 +38,7 @@ class ReviewServiceTest {
                 .name("test-name")
                 .phoneNumber("test-test-test")
                 .birthDate(LocalDate.of(2024, 7, 25))
-                .password("test-password")
+//                .password("test-password")
                 .userState(State.ACTIVATE)
                 .build();
 

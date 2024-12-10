@@ -47,7 +47,7 @@ public class MailServiceTest {
                 .name("홍길동")
                 .phoneNumber("01012345678")
                 .birthDate(LocalDate.of(1999, 3, 31))
-                .password("testpassword")
+//                .password("testpassword")
                 .marketingAgree(MarketingAgree.BOTH)
                 .userState(State.ACTIVATE)
                 .field(List.of("game", "computer"))

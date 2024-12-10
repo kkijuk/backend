@@ -8,4 +8,5 @@ public interface MemberRepository {
     Optional<Member> findById(Long id);
     Optional<Member> findByEmail(String email);
     Member save(Member member);
+    Optional<Member> findByPhoneNumber(String phoneNumber);
 }
