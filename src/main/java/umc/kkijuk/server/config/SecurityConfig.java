@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -47,21 +48,37 @@ public class SecurityConfig {
                                                 "/swagger-ui/**",
                                                 "/v3/api-docs/**",
                                                 "/health-check",
-                                                "/api/users/**",
-                                                "/api/users/home",
+                                                "/member/**",
+                                                "/member/home",
                                                 "/oauth2/**",
                                                 "/login/**",
-                                                "/api/auth/**")
+                                                "/userStatus/**",
+                                                "/auth/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new JwtCustomFilter(jwtFilter), OAuth2LoginAuthenticationFilter.class)
-                .oauth2Login(
-                        oauth2 ->
-                                oauth2
-                                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                                        .successHandler(customSuccessHandler));
+                .addFilterAfter(new JwtCustomFilter(jwtFilter), OAuth2LoginAuthenticationFilter.class);
+//                .oauth2Login(oauth2 ->oauth2
+//                        .successHandler(customSuccessHandler)
+//                                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)));
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000", "http://localhost:8080", "exp://*"));
+        configuration.setAllowedMethods(Collections.singletonList("*"));
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setAllowCredentials(true); // 중요한 설정
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Refresh-Token"));
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }

@@ -22,26 +22,28 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
+    private Long kakaoId;
+
     @NotNull
     private String email;
 
-    @NotNull
+//    @NotNull
     private String name;
 
-    @NotNull
+//    @NotNull
     private String phoneNumber;
 
-    @NotNull
+//    @NotNull
     private LocalDate birthDate;
 
     @Convert(converter = StringListToStringConverter.class)
     private List<String> field;
 
-    @NotNull
+//    @NotNull
     @Enumerated(EnumType.STRING)
     private MarketingAgree marketingAgree;
 
-    @NotNull
+//    @NotNull
     @Enumerated(EnumType.STRING)
     private State userState;
 
@@ -53,7 +55,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberJob memberJob;
 
-    @NotNull
+//    @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -92,6 +94,30 @@ public class Member extends BaseEntity {
 
     public void deleteRecruitTag(String tag) {
         this.recruitTags.remove(tag);
+    }
+
+    public void setKakaoId(Long kakaoId) {
+        this.kakaoId = kakaoId;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
 }

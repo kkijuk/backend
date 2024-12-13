@@ -28,4 +28,8 @@ public class MemberRepositoryImpl implements MemberRepository{
     public Optional<Member> findByPhoneNumber(String phoneNumber) {
         return memberJpaRepository.findByPhoneNumber(phoneNumber);
     }
+    @Override
+    public Optional<Member> findByKakaoId(Long kakaoId) {
+        return memberJpaRepository.findByKakaoId(kakaoId);
+    }
 }

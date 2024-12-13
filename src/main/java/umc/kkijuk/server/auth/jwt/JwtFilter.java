@@ -37,7 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
     String requestUri = request.getRequestURI();
 
     // 카카오 로그인 경로 제외
-    if (requestUri.startsWith("/api/auth/kakao/login")) {
+    if (requestUri.startsWith("/auth/kakao/login")) {
       chain.doFilter(request, response);
       return;
     }

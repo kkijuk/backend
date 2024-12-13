@@ -12,12 +12,14 @@ import umc.kkijuk.server.member.controller.response.MemberEmailResponse;
 import umc.kkijuk.server.member.controller.response.MemberInfoResponse;
 import umc.kkijuk.server.member.controller.response.MemberStateResponse;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.member.domain.Role;
 import umc.kkijuk.server.member.domain.State;
 import umc.kkijuk.server.member.dto.*;
 import umc.kkijuk.server.member.repository.MemberRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -204,24 +206,37 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member findByPhoneNumber(String phoneNumber) {
-        return memberRepository.findByPhoneNumber(phoneNumber).orElse(null);
-    }
+    public Member createUserWithKakaoId(Long kakaoId, Map<String, Object> kakaoUserInfo) {
+        // 카카오 사용자 정보에서 필요한 값 추출
+        Map<String, Object> kakaoAccount = (Map<String, Object>) kakaoUserInfo.get("kakao_account");
+        String email = (String) kakaoAccount.get("email");
+        String name = (String) kakaoAccount.get("name");
+        String phoneNumber = (String) kakaoAccount.get("phone_number");
+        String birthday = (String) kakaoAccount.get("birthday"); // MMDD 형식
+        String birthyear = (String) kakaoAccount.get("birthyear"); // YYYY 형식 (선택적)
+        LocalDate birthDate = null;
 
-    @Override
-    @Transactional
-    public Member createMember(String email, String name, String phoneNumber, LocalDate birthDate) {
+        if (birthday != null && !birthday.isEmpty()) {
+            int year = (birthyear != null && !birthyear.isEmpty())
+                    ? Integer.parseInt(birthyear)
+                    : LocalDate.now().getYear();
+            int month = Integer.parseInt(birthday.substring(0, 2));
+            int day = Integer.parseInt(birthday.substring(2, 4));
+            birthDate = LocalDate.of(year, month, day);
+        }
 
-        Member member = Member.builder()
-                .email(email)
-                .name(name)
-                .phoneNumber(phoneNumber)
-                .birthDate(birthDate)
-                .build();
+        // 새로운 사용자 생성 및 저장
+        Member newMember = new Member();
+        newMember.setKakaoId(kakaoId);
+        newMember.setEmail(email);
+        newMember.setName(name);
+        newMember.setPhoneNumber(phoneNumber);
+        newMember.setBirthDate(birthDate);
+        newMember.setRole(Role.ROLE_USER);
 
-        memberRepository.save(member);
-        log.info("신규 사용자 생성: 이메일={}, 이름={}, 핸드폰 번호={}, 생년월일={}", email, name, phoneNumber, birthDate);
-        return member;
+        log.info("신규 사용자 생성 - 카카오 ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", kakaoId, email, name, phoneNumber, birthDate);
+
+        return memberRepository.save(newMember);
     }
 
 }

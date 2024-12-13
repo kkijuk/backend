@@ -36,3 +36,4 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             "{\"authorizationCode\": \"%s\"}", authorizationCode));
   }
 }
+

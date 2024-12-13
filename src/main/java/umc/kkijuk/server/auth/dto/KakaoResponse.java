@@ -17,12 +17,10 @@ public class KakaoResponse implements OAuth2Response {
             ? (Map<String, Object>) kakaoAccountAttributes.get("profile")
             : null;
   }
-
   @Override
   public String getProvider() {
     return "kakao"; // 고정 값
   }
-
   @Override
   public String getProviderId() {
     return attributes.get("id").toString(); // 카카오 사용자 고유 ID

@@ -9,6 +9,8 @@ import umc.kkijuk.server.member.dto.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public interface MemberService {
     Member getById(Long memberId);
@@ -25,6 +27,6 @@ public interface MemberService {
     Boolean confirmDupEmail(MemberEmailDto memberEmailDto);
     List<String> addRecruitTag(Member member, String tag);
     List<String> deleteRecruitTag(Member Member, String tag);
-    Member findByPhoneNumber(String phoneNumber);
-    Member createMember(String email, String name, String phoneNumber, LocalDate birthDate);
+    Member createUserWithKakaoId(Long kakaoId, Map<String, Object> kakaoUserInfo);
+
 }

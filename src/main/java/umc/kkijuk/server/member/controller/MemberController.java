@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,10 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 
+
 @Tag(name = "member", description = "회원 관리 API")
 @Builder
+@Slf4j
 @RestController
 @RequestMapping("/member")
 @RequiredArgsConstructor
@@ -141,6 +144,17 @@ public class MemberController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(memberStateResponse);
+    }
+
+    /**
+     * 소셜로그인 이후 추가
+     */
+
+    @Operation(summary = "홈 화면", description = "로그인 성공 후 홈 화면으로 이동")
+    @GetMapping("/home")
+    public ResponseEntity<String> home() {
+        log.info("홈 화면 요청 처리 중");
+        return ResponseEntity.ok("로그인 성공!");
     }
 
 }
