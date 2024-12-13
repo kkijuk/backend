@@ -107,10 +107,12 @@ public class KakaoAuthService {
     }
 
     public Map<String, String> generateTokens(Member member) {
-        String accessToken = jwtUtil.createAccessToken(member.getEmail());
-        String refreshToken = jwtUtil.createRefreshToken(member.getEmail());
+        String kakaoId = String.valueOf(member.getKakaoId());
 
-        log.info("JWT 토큰 생성 완료 - 이메일: {}, accessToken: {}, refreshToken: {}", member.getEmail(), accessToken, refreshToken);
+        String accessToken = jwtUtil.createAccessToken(kakaoId);
+        String refreshToken = jwtUtil.createRefreshToken(kakaoId);
+
+        log.info("JWT 토큰 생성 완료 - 카카오 ID: {}, accessToken: {}, refreshToken: {}", kakaoId, accessToken, refreshToken);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
@@ -118,6 +120,7 @@ public class KakaoAuthService {
 
         return tokens;
     }
+
 
 
     public String extractEmail(Map<String, Object> kakaoUserInfo) {

@@ -44,21 +44,21 @@ public class JwtFilter extends OncePerRequestFilter {
 
     try {
       final String authorizationHeader = request.getHeader("Authorization");
-      String email = null;
+      Long kakaoId = null;
       String jwt = null;
 
       if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
         jwt = authorizationHeader.substring(7);
-        email = jwtUtil.extractEmail(jwt);
+        kakaoId = jwtUtil.extractKakaoId(jwt);
       }
 
-      if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-        Member member = memberRepository.findByEmail(email).orElse(null);
+      if (kakaoId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        Member member = memberRepository.findByKakaoId(kakaoId).orElse(null);
 
-        if (member != null && jwtUtil.validateToken(jwt, member.getEmail())) {
+        if (member != null && jwtUtil.validateToken(jwt, String.valueOf(member.getKakaoId()))) {
           UserDetails userDetails =
                   new org.springframework.security.core.userdetails.User(
-                          member.getEmail(),
+                          String.valueOf(member.getKakaoId()),
                           "",
                           Collections.singletonList(new SimpleGrantedAuthority(member.getRole().name())));
 
@@ -69,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
           SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-          log.warn("Invalid JWT Token for member: {}", email);
+          log.warn("Invalid JWT Token for member: {}", kakaoId);
         }
       }
     } catch (Exception e) {

@@ -25,38 +25,38 @@ public class JwtUtil {
     return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
   }
 
-  public String createAccessToken(String email) {
+  public String createAccessToken(String kakaoId) {
     Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS)); // 1시간 유효
     return Jwts.builder()
-        .setId(email)
-        .setIssuedAt(new Date())
-        .setExpiration(expiration)
-        .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-        .compact();
+            .setId(String.valueOf(kakaoId))
+            .setIssuedAt(new Date())
+            .setExpiration(expiration)
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
   }
 
-  public String createRefreshToken(String email) {
+  public String createRefreshToken(String kakaoId) {
     Date expiration = Date.from(Instant.now().plus(7, ChronoUnit.DAYS)); // 7일 유효
     return Jwts.builder()
-        .setId(email)
-        .setIssuedAt(new Date())
-        .setExpiration(expiration)
-        .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-        .compact();
+            .setId(String.valueOf(kakaoId))
+            .setIssuedAt(new Date())
+            .setExpiration(expiration)
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
   }
 
-  public boolean validateToken(String token, String email) {
+  public boolean validateToken(String token, String kakaoId) {
     try {
       Claims claims =
-          Jwts.parserBuilder()
-              .setSigningKey(getSigningKey())
-              .build()
-              .parseClaimsJws(token)
-              .getBody();
+              Jwts.parserBuilder()
+                      .setSigningKey(getSigningKey())
+                      .build()
+                      .parseClaimsJws(token)
+                      .getBody();
 
-      String extractedEmail = claims.getId();
-      if (!extractedEmail.equals(email)) {
-        log.warn("JWT Token validation failed: Email mismatch");
+      Long extractedKakaoId = Long.valueOf(claims.getId());
+      if (!extractedKakaoId.equals(kakaoId)) {
+        log.warn("JWT Token validation failed: kakaoId mismatch");
         return false;
       }
 
@@ -72,23 +72,22 @@ public class JwtUtil {
     }
   }
 
-  public String extractEmail(String token) {
-    return Jwts.parserBuilder()
-        .setSigningKey(getSigningKey())
-        .build()
-        .parseClaimsJws(token)
-        .getBody()
-        .getId();
+  public Long extractKakaoId(String token) {
+    return Long.valueOf(
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getId());
   }
 
   public Long extractFamilyId(String token) {
     return Jwts.parserBuilder()
-        .setSigningKey(getSigningKey())
-        .build()
-        .parseClaimsJws(token)
-        .getBody()
-        .get("familyId", Long.class); // 가족 ID 추출
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("familyId", Long.class); // 가족 ID 추출
   }
-
-
 }
