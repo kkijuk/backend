@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import umc.kkijuk.server.auth.dto.AuthResponse;
+import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
+import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.common.domian.exception.*;
 import umc.kkijuk.server.member.controller.response.EmailAuthResponse;
 import umc.kkijuk.server.member.controller.response.MemberEmailResponse;
@@ -30,6 +33,7 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Override
     public Member getById(Long memberId) {
@@ -58,19 +62,19 @@ public class MemberServiceImpl implements MemberService {
 //        return memberRepository.save(joinMember);
 //    }
 
-    @Override
-    public MemberInfoResponse getMemberInfo(Long memberId) {
-        Member member = this.getById(memberId);
-        if(member.getEmail() == null || member.getName() == null || member.getPhoneNumber() == null || member.getBirthDate() == null){
-            throw new InvalidMemberDataException();
-        }
-        return MemberInfoResponse.builder()
-                .email(member.getEmail())
-                .name(member.getName())
-                .phoneNumber(member.getPhoneNumber())
-                .birthDate(member.getBirthDate())
-                .build();
-    }
+//    @Override
+//    public MemberInfoResponse getMemberInfo(Long memberId) {
+//        Member member = this.getById(memberId);
+//        if(member.getEmail() == null || member.getName() == null || member.getPhoneNumber() == null || member.getBirthDate() == null){
+//            throw new InvalidMemberDataException();
+//        }
+//        return MemberInfoResponse.builder()
+//                .email(member.getEmail())
+//                .name(member.getName())
+//                .phoneNumber(member.getPhoneNumber())
+//                .birthDate(member.getBirthDate())
+//                .build();
+//    }
 
     @Override
     public List<String> getMemberField(Long memberId){
@@ -201,21 +205,20 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-     * 아래부터 소셜로그인 이후 추가된 기능
+     * 소셜로그인 이후 추가된 기능
      */
 
     @Override
     @Transactional
     public Member createUserWithKakaoId(Long kakaoId, Map<String, Object> kakaoUserInfo) {
-        // 카카오 사용자 정보에서 필요한 값 추출
         Map<String, Object> kakaoAccount = (Map<String, Object>) kakaoUserInfo.get("kakao_account");
         String email = (String) kakaoAccount.get("email");
         String name = (String) kakaoAccount.get("name");
         String phoneNumber = (String) kakaoAccount.get("phone_number");
-        String birthday = (String) kakaoAccount.get("birthday"); // MMDD 형식
-        String birthyear = (String) kakaoAccount.get("birthyear"); // YYYY 형식 (선택적)
-        LocalDate birthDate = null;
+        String birthday = (String) kakaoAccount.get("birthday");
+        String birthyear = (String) kakaoAccount.get("birthyear");
 
+        LocalDate birthDate = null;
         if (birthday != null && !birthday.isEmpty()) {
             int year = (birthyear != null && !birthyear.isEmpty())
                     ? Integer.parseInt(birthyear)
@@ -225,7 +228,6 @@ public class MemberServiceImpl implements MemberService {
             birthDate = LocalDate.of(year, month, day);
         }
 
-        // 새로운 사용자 생성 및 저장
         Member newMember = new Member();
         newMember.setKakaoId(kakaoId);
         newMember.setEmail(email);
@@ -234,9 +236,121 @@ public class MemberServiceImpl implements MemberService {
         newMember.setBirthDate(birthDate);
         newMember.setRole(Role.ROLE_USER);
 
-        log.info("신규 사용자 생성 - 카카오 ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", kakaoId, email, name, phoneNumber, birthDate);
-
+        log.info("신규 사용자 생성 - Kakao ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", kakaoId, email, name, phoneNumber, birthDate);
         return memberRepository.save(newMember);
     }
+
+    @Override
+    @Transactional
+    public Boolean isFirstLogin(Long kakaoId) {
+        Member member = findMemberByKakaoId(kakaoId);
+        return member.getRefreshToken() == null;
+    }
+
+    @Override
+    public String registerMemberInfo(Long kakaoId, MemberRegisterDto request) {
+        Member member = findMemberByKakaoId(kakaoId);
+
+        if (member.getRefreshToken() != null) {
+            log.warn("이미 사용자 정보가 등록됨 - Kakao ID: {}", kakaoId);
+            throw new IllegalStateException("사용자의 정보가 이미 등록되었습니다.");
+        }
+
+        member.setEmail(request.getEmail());
+        member.setName(request.getName());
+        member.setPhoneNumber(request.getPhoneNumber());
+        member.setBirthDate(request.getBirthDate());
+
+        log.info("사용자 정보 등록 완료 - Kakao ID: {}", kakaoId);
+        return "사용자 정보가 정상적으로 등록되었습니다.";
+    }
+
+    @Override
+    public MemberInfoResponse getMemberInfo(Long kakaoId) {
+        Member member = findMemberByKakaoId(kakaoId);
+        return MemberInfoResponse.builder()
+                .kakaoId(member.getKakaoId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .phoneNumber(member.getPhoneNumber())
+                .birthDate(member.getBirthDate())
+                .role(member.getRole())
+                .refreshToken(member.getRefreshToken())
+                .build();
+    }
+
+    @Override
+    public void invalidateRefreshToken(Long kakaoId) {
+        Member member = findMemberByKakaoId(kakaoId);
+        member.setRefreshToken(null);
+        log.info("Refresh Token 삭제 완료 - Kakao ID: {}", kakaoId);
+    }
+
+    @Override
+    public void updateRefreshToken(Long kakaoId, String refreshToken) {
+        Member member = findMemberByKakaoId(kakaoId);
+        member.setRefreshToken(refreshToken);
+        log.info("Refresh Token 업데이트 완료 - Kakao ID: {}, Refresh Token: {}", kakaoId, refreshToken);
+    }
+
+//    @Override
+//    public void deleteAccount(Long kakaoId) {
+//        Member member = findMemberByKakaoId(kakaoId);
+//        memberRepository.delete(member);
+//        log.info("계정 삭제 완료 - Kakao ID: {}", kakaoId);
+//    }
+
+    @Override
+    public Long extractMemberId(String bearerToken) {
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Authorization 헤더에 올바른 토큰이 없습니다.");
+        }
+
+        Long kakaoId = jwtUtil.extractKakaoId(bearerToken.substring(7));
+        return findMemberByKakaoId(kakaoId).getId();
+    }
+
+    @Override
+    public Member findByKakaoId(Long kakaoId) {
+        return findMemberByKakaoId(kakaoId);
+    }
+
+    @Override
+    public Member findMemberByKakaoId(Long kakaoId) {
+        return memberRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new RuntimeException("Member not found with Kakao ID: " + kakaoId));
+    }
+
+    @Override
+    @Transactional
+    public AuthResponse refreshAuthToken(RefreshTokenRequest request) {
+        // Refresh Token 검증
+        if (!jwtUtil.validateToken(request.getRefreshToken(), String.valueOf(request.getKakaoId()))) {
+            log.warn("유효하지 않은 Refresh Token - Kakao ID: {}", request.getKakaoId());
+            throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
+        }
+
+        // Member 조회
+        Member member = memberRepository.findByKakaoId(Long.parseLong(request.getKakaoId()))
+                .orElseThrow(() -> new RuntimeException("Member not found with Kakao ID: " + request.getKakaoId()));
+
+        // 새로운 Access Token과 Refresh Token 발급
+        String newAccessToken = jwtUtil.createAccessToken(String.valueOf(request.getKakaoId()));
+        String newRefreshToken = jwtUtil.createRefreshToken(String.valueOf(request.getKakaoId()));
+
+        // Refresh Token 업데이트
+        member.setRefreshToken(newRefreshToken);
+        memberRepository.save(member);
+
+        log.info("Access Token 및 Refresh Token 재발급 - Kakao ID: {}", request.getKakaoId());
+
+        // 응답 반환
+        return AuthResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
+    }
+
+
 
 }

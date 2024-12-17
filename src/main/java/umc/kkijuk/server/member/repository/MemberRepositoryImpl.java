@@ -32,4 +32,10 @@ public class MemberRepositoryImpl implements MemberRepository{
     public Optional<Member> findByKakaoId(Long kakaoId) {
         return memberJpaRepository.findByKakaoId(kakaoId);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        memberJpaRepository.deleteById(id);
+    }
+
 }

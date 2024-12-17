@@ -2,23 +2,18 @@ package umc.kkijuk.server.member.controller.response;
 
 import lombok.Builder;
 import lombok.Data;
+import umc.kkijuk.server.member.domain.Role;
 
 import java.time.LocalDate;
 
 @Data
+@Builder
 public class MemberInfoResponse {
+    private Long kakaoId;
     private String email;
     private String name;
     private String phoneNumber;
     private LocalDate birthDate;
-
-    public MemberInfoResponse() {
-    }
-    @Builder
-    public MemberInfoResponse(String email, String name, String phoneNumber, LocalDate birthDate) {
-        this.email = email;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.birthDate = birthDate;
-    }
+    private Role role;
+    private String refreshToken;
 }

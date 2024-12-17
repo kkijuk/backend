@@ -10,4 +10,5 @@ public interface MemberRepository {
     Member save(Member member);
     Optional<Member> findByPhoneNumber(String phoneNumber);
     Optional<Member> findByKakaoId(Long kakaoId);
+    void deleteById(Long id);
 }

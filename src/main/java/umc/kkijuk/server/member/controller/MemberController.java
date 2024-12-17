@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import umc.kkijuk.server.auth.dto.AuthResponse;
+import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
+import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.member.controller.response.*;
 import umc.kkijuk.server.member.domain.Member;
@@ -18,6 +21,7 @@ import umc.kkijuk.server.member.emailauth.MailServiceImpl;
 import umc.kkijuk.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -32,6 +36,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MailServiceImpl mailService;
+    private final JwtUtil jwtUtil;
 
 //    @Operation(
 //            summary = "회원가입 요청",
@@ -134,17 +139,17 @@ public class MemberController {
 //        return ResponseEntity.ok(Boolean.TRUE);
 //    }
 
-    @Operation(
-            summary = "회원 탈퇴",
-            description = "회원의 상태를 비활성화로 바꿉니다.")
-    @PatchMapping("/inactive")
-    public ResponseEntity<MemberStateResponse> memberInactivate(){
-        Long loginUser = LoginUser.get().getId();
-        MemberStateResponse memberStateResponse = memberService.changeMemberState(loginUser);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(memberStateResponse);
-    }
+//    @Operation(
+//            summary = "회원 탈퇴",
+//            description = "회원의 상태를 비활성화로 바꿉니다.")
+//    @PatchMapping("/inactive")
+//    public ResponseEntity<MemberStateResponse> memberInactivate(){
+//        Long loginUser = LoginUser.get().getId();
+//        MemberStateResponse memberStateResponse = memberService.changeMemberState(loginUser);
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(memberStateResponse);
+//    }
 
     /**
      * 소셜로그인 이후 추가
@@ -153,10 +158,52 @@ public class MemberController {
     @Operation(summary = "홈 화면", description = "로그인 성공 후 홈 화면으로 이동")
     @GetMapping("/home")
     public ResponseEntity<String> home() {
-        log.info("홈 화면 요청 처리 중");
         return ResponseEntity.ok("로그인 성공!");
     }
 
+    @Operation(summary = "액세스 토큰 재발급", description = "Refresh Token을 사용하여 새로운 Access Token을 발급")
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(memberService.refreshAuthToken(request));
+    }
+
+    @Operation(summary = "첫 로그인 확인", description = "사용자 첫 로그인 여부 확인")
+    @PostMapping("/check-first-login")
+    public ResponseEntity<Boolean> checkFirstLogin(@RequestHeader("Authorization") String token) {
+        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
+        return ResponseEntity.ok(memberService.isFirstLogin(kakaoId));
+    }
+
+    @Operation(summary = "사용자 정보 등록", description = "첫 로그인 시 사용자 정보 등록")
+    @PostMapping("/register")
+    public ResponseEntity<String> registerMember(@RequestHeader("Authorization") String token,
+                                                 @RequestBody MemberRegisterDto request) {
+        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
+        return ResponseEntity.ok(memberService.registerMemberInfo(kakaoId, request));
+    }
+
+    @Operation(summary = "사용자 정보 조회", description = "사용자 상세 정보 조회")
+    @GetMapping("/myInfo")
+    public ResponseEntity<MemberInfoResponse> getMemberInfo(@RequestHeader("Authorization") String token) {
+        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
+        return ResponseEntity.ok(memberService.getMemberInfo(kakaoId));
+    }
+
+    @Operation(summary = "로그아웃", description = "사용자 로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
+        memberService.invalidateRefreshToken(kakaoId);
+        return ResponseEntity.ok("로그아웃 완료");
+    }
+
+//    @Operation(summary = "계정 탈퇴", description = "계정 탈퇴 처리")
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> deleteAccount(@RequestHeader("Authorization") String token) {
+//        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
+//        memberService.deleteAccount(kakaoId);
+//        return ResponseEntity.ok("계정이 탈퇴되었습니다.");
+//    }
 }
 
 

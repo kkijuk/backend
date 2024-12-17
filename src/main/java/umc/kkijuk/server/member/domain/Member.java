@@ -59,6 +59,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private String refreshToken;
+
     public Member(String email, String name, String phoneNumber, LocalDate birthDate, MarketingAgree marketingAgree, State userState) {
         this.email = email;
         this.name = name;
@@ -100,13 +102,10 @@ public class Member extends BaseEntity {
         this.kakaoId = kakaoId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public void setEmail(String email) {this.email = email;}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) {this.name = name;}
+    public void setRole(Role role) {this.role = role;}
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
@@ -115,9 +114,6 @@ public class Member extends BaseEntity {
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
+    public void setRefreshToken(String refreshToken){ this.refreshToken = refreshToken;}
 
 }

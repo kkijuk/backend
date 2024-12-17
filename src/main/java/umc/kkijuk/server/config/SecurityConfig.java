@@ -38,30 +38,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
-                        requests ->
-                                requests
-                                        .requestMatchers(
-                                                "/",
-                                                "/swagger-ui/**",
-                                                "/v3/api-docs/**",
-                                                "/health-check",
-                                                "/member/**",
-                                                "/member/home",
-                                                "/oauth2/**",
-                                                "/login/**",
-                                                "/userStatus/**",
-                                                "/auth/**")
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
+                .cors(cors -> {}) // CORS 설정은 KKIJUKConfiguration에 위임
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/", "/swagger-ui/**", "/v3/api-docs/**", "/health-check",
+                                "/member/**", "/member/home", "/oauth2/**", "/login/**",
+                                "/userStatus/**", "/auth/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtCustomFilter(jwtFilter), OAuth2LoginAuthenticationFilter.class);
-//                .oauth2Login(oauth2 ->oauth2
-//                        .successHandler(customSuccessHandler)
-//                                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)));
+//                .oauth2Login(oauth2 -> oauth2
+//                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+//                        .successHandler(customSuccessHandler));
+
         return http.build();
     }
 

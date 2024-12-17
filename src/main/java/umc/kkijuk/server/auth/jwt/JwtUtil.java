@@ -82,12 +82,4 @@ public class JwtUtil {
                     .getId());
   }
 
-  public Long extractFamilyId(String token) {
-    return Jwts.parserBuilder()
-            .setSigningKey(getSigningKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .get("familyId", Long.class); // 가족 ID 추출
-  }
 }
