@@ -248,6 +248,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public String registerMemberInfo(Long kakaoId, MemberRegisterDto request) {
         Member member = findMemberByKakaoId(kakaoId);
 
@@ -264,8 +265,8 @@ public class MemberServiceImpl implements MemberService {
         log.info("사용자 정보 등록 완료 - Kakao ID: {}", kakaoId);
         return "사용자 정보가 정상적으로 등록되었습니다.";
     }
-
     @Override
+    @Transactional
     public MemberInfoResponse getMemberInfo(Long kakaoId) {
         Member member = findMemberByKakaoId(kakaoId);
         return MemberInfoResponse.builder()
@@ -280,6 +281,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void invalidateRefreshToken(Long kakaoId) {
         Member member = findMemberByKakaoId(kakaoId);
         member.setRefreshToken(null);
@@ -287,6 +289,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void updateRefreshToken(Long kakaoId, String refreshToken) {
         Member member = findMemberByKakaoId(kakaoId);
         member.setRefreshToken(refreshToken);
@@ -301,6 +304,7 @@ public class MemberServiceImpl implements MemberService {
 //    }
 
     @Override
+    @Transactional
     public Long extractMemberId(String bearerToken) {
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Authorization 헤더에 올바른 토큰이 없습니다.");
@@ -311,11 +315,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public Member findByKakaoId(Long kakaoId) {
         return findMemberByKakaoId(kakaoId);
     }
 
     @Override
+    @Transactional
     public Member findMemberByKakaoId(Long kakaoId) {
         return memberRepository.findByKakaoId(kakaoId)
                 .orElseThrow(() -> new RuntimeException("Member not found with Kakao ID: " + kakaoId));
@@ -350,7 +356,5 @@ public class MemberServiceImpl implements MemberService {
                 .refreshToken(newRefreshToken)
                 .build();
     }
-
-
 
 }
