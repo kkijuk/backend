@@ -161,10 +161,17 @@ public class MemberController {
         return ResponseEntity.ok("로그인 성공!");
     }
 
-    @Operation(summary = "액세스 토큰 재발급", description = "Refresh Token을 사용하여 새로운 Access Token을 발급")
+    @Operation(summary = "액세스 토큰 재발급",
+            description = "Refresh Token을 받아서 새로운 Access,Refresh Token을 발급(Refresh Token Rotation)")
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(memberService.refreshAuthToken(request));
+
+        String refreshToken = request.getRefreshToken();
+        Long kakaoId = jwtUtil.extractKakaoId(refreshToken);
+
+        AuthResponse response = memberService.refreshAuthToken(refreshToken, kakaoId);
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "첫 로그인 확인", description = "사용자 첫 로그인 여부 확인")

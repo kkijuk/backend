@@ -323,26 +323,26 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public AuthResponse refreshAuthToken(RefreshTokenRequest request) {
+    public AuthResponse refreshAuthToken(String refreshToken, Long kakaoId) {
         // Refresh Token 검증
-        if (!jwtUtil.validateToken(request.getRefreshToken(), String.valueOf(request.getKakaoId()))) {
-            log.warn("유효하지 않은 Refresh Token - Kakao ID: {}", request.getKakaoId());
+        if (!jwtUtil.validateToken(refreshToken, String.valueOf(kakaoId))) {
+            log.warn("유효하지 않은 Refresh Token - Kakao ID: {}", kakaoId);
             throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
         }
 
         // Member 조회
-        Member member = memberRepository.findByKakaoId(Long.parseLong(request.getKakaoId()))
-                .orElseThrow(() -> new RuntimeException("Member not found with Kakao ID: " + request.getKakaoId()));
+        Member member = memberRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new RuntimeException("Member not found with Kakao ID: " + kakaoId));
 
-        // 새로운 Access Token과 Refresh Token 발급
-        String newAccessToken = jwtUtil.createAccessToken(String.valueOf(request.getKakaoId()));
-        String newRefreshToken = jwtUtil.createRefreshToken(String.valueOf(request.getKakaoId()));
+        // 새로운 Access Token과 Refresh Token 발급 (Refresh Token Rotation)
+        String newAccessToken = jwtUtil.createAccessToken(String.valueOf(kakaoId));
+        String newRefreshToken = jwtUtil.createRefreshToken(String.valueOf(kakaoId));
 
         // Refresh Token 업데이트
         member.setRefreshToken(newRefreshToken);
         memberRepository.save(member);
 
-        log.info("Access Token 및 Refresh Token 재발급 - Kakao ID: {}", request.getKakaoId());
+        log.info("Access Token 및 Refresh Token 재발급 - Kakao ID: {}", kakaoId);
 
         // 응답 반환
         return AuthResponse.builder()

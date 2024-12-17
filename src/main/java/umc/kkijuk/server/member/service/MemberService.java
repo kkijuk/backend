@@ -42,8 +42,6 @@ public interface MemberService {
     Long extractMemberId(String bearerToken);
     Member findByKakaoId(Long kakaoId);
     Member findMemberByKakaoId(Long kakaoId);
-    AuthResponse refreshAuthToken(RefreshTokenRequest request);
-
-
+    AuthResponse refreshAuthToken(String refreshToken, Long kakaoId);
 
 }

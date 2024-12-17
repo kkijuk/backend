@@ -54,7 +54,7 @@ public class JwtUtil {
                       .parseClaimsJws(token)
                       .getBody();
 
-      Long extractedKakaoId = Long.valueOf(claims.getId());
+      String extractedKakaoId = claims.getId();
       if (!extractedKakaoId.equals(kakaoId)) {
         log.warn("JWT Token validation failed: kakaoId mismatch");
         return false;
