@@ -9,11 +9,10 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class MemberInfoResponse {
-    private Long kakaoId;
+    private Long socialId;
     private String email;
     private String name;
     private String phoneNumber;
     private LocalDate birthDate;
     private Role role;
-    private String refreshToken;
 }

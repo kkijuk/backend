@@ -13,7 +13,6 @@ import java.util.Map;
 public interface MemberService {
     Member getById(Long memberId);
 //    Member join(MemberJoinDto memberJoinDto);
-//    MemberInfoResponse getMemberInfo(Long memberId);
     List<String> getMemberField(Long memberId);
     Member updateMemberField(Long memberId, MemberFieldDto memberFieldDto);
     Member updateMemberInfo(Long memberId, MemberInfoChangeDto memberInfoChangeDto);
@@ -28,12 +27,12 @@ public interface MemberService {
     /**
      * 소셜로그인 이후 추가된 기능
      */
-    Member createUserWithKakaoId(Long kakaoId, Map<String, Object> kakaoUserInfo);
-    MemberInfoResponse getMemberInfo(Long kakaoId);
-    void invalidateRefreshToken(Long kakaoId);
-    void updateRefreshToken(Long kakaoId, String refreshToken);
+    Member createUserWithKakaoId(Long socialId, Map<String, Object> kakaoUserInfo);
+    MemberInfoResponse getMemberInfo(Long memberId);
+    void invalidateRefreshToken(Long socialId);
+    void updateRefreshToken(Long socialId, String refreshToken);
     Long extractMemberId(String bearerToken);
     Member findBySocialId(Long socialId);
-    AuthResponse refreshAuthToken(String refreshToken, Long kakaoId);
+    AuthResponse refreshAuthToken(String refreshToken, Long socialId);
 
 }

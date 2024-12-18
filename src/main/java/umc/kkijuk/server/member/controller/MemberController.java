@@ -33,6 +33,7 @@ public class MemberController {
     private final MemberService memberService;
     private final MailServiceImpl mailService;
     private final JwtUtil jwtUtil;
+    private final LoginUser loginUser;
 
 //    @Operation(
 //            summary = "회원가입 요청",
@@ -91,17 +92,17 @@ public class MemberController {
 //        return ResponseEntity.ok(Boolean.TRUE);
 //    }
 
-    @Operation(
-            summary = "내정보 조회 인증 화면 이메일 가져오기",
-            description = "내 정보를 조회 인증 화면에서 이메일을 가져옵니다.")
-    @GetMapping("/myPage")
-    public ResponseEntity<MemberEmailResponse> getEmail() {
-        Long loginUser = LoginUser.get().getId();
-        MemberEmailResponse memberEmailResponse = memberService.getMemberEmail(loginUser);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(memberEmailResponse);
-    }
+//    @Operation(
+//            summary = "내정보 조회 인증 화면 이메일 가져오기",
+//            description = "내 정보를 조회 인증 화면에서 이메일을 가져옵니다.")
+//    @GetMapping("/myPage")
+//    public ResponseEntity<MemberEmailResponse> getEmail() {
+//        Long loginUser = LoginUser.get().getId();
+//        MemberEmailResponse memberEmailResponse = memberService.getMemberEmail(loginUser);
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(memberEmailResponse);
+//    }
 
 
 //    @Operation(
@@ -155,9 +156,9 @@ public class MemberController {
             summary = "내 정보 조회",
             description = "마이페이지에서 내 정보들을 가져옵니다.")
     @GetMapping("/myPage/info")
-    public ResponseEntity<MemberInfoResponse> getInfo(@RequestHeader("Authorization") String bearerToken) {
-        Long loginUser = LoginUser.get().extractMemberId(bearerToken);
-        MemberInfoResponse memberInfoResponse = memberService.getMemberInfo(loginUser);
+    public ResponseEntity<MemberInfoResponse> getInfo(@RequestHeader("Authorization") String token) {
+        Long memberId = loginUser.extractMemberId(token);
+        MemberInfoResponse memberInfoResponse = memberService.getMemberInfo(memberId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(memberInfoResponse);
@@ -167,9 +168,10 @@ public class MemberController {
             summary = "내 정보 수정",
             description = "내 정보 수정 요청을 받아 성공/실패를 반환합니다.")
     @PutMapping("/myPage/info")
-    public ResponseEntity<Boolean> changeMemberInfo(@RequestBody @Valid  MemberInfoChangeDto memberInfoChangeDto) {
-        Long loginUser = LoginUser.get().getId();
-        memberService.updateMemberInfo(loginUser, memberInfoChangeDto);
+    public ResponseEntity<Boolean> changeMemberInfo(@RequestHeader("Authorization") String token,
+                                                    @RequestBody @Valid  MemberInfoChangeDto memberInfoChangeDto) {
+        Long memberId = loginUser.extractMemberId(token);
+        memberService.updateMemberInfo(memberId, memberInfoChangeDto);
         return ResponseEntity.ok(Boolean.TRUE);
     }
 
@@ -177,9 +179,9 @@ public class MemberController {
             summary = "관심분야 조회",
             description = "마이페이지에서 관심분야를 조회합니다.")
     @GetMapping("/myPage/field")
-    public ResponseEntity<MemberFieldResponse> getField() {
-        Long loginUser = LoginUser.get().getId();
-        List<String> memberField = memberService.getMemberField(loginUser);
+    public ResponseEntity<MemberFieldResponse> getField(@RequestHeader("Authorization") String token) {
+        Long memberId = loginUser.extractMemberId(token);
+        List<String> memberField = memberService.getMemberField(memberId);
         return ResponseEntity.ok().body(new MemberFieldResponse(memberField));
     }
 
@@ -187,9 +189,10 @@ public class MemberController {
             summary = "관심분야 등록/수정",
             description = "초기/마이페이지에서 관심분야를 등록/수정합니다.")
     @PostMapping({"/field", "/myPage/field"})
-    public ResponseEntity<Boolean> postField(@RequestBody MemberFieldDto memberFieldDto) {
-        Long loginUser = LoginUser.get().getId();
-        memberService.updateMemberField(loginUser, memberFieldDto);
+    public ResponseEntity<Boolean> postField(@RequestHeader("Authorization") String token,
+                                             @RequestBody MemberFieldDto memberFieldDto) {
+        Long memberId = loginUser.extractMemberId(token);
+        memberService.updateMemberField(memberId, memberFieldDto);
         return ResponseEntity.ok(Boolean.TRUE);
     }
 

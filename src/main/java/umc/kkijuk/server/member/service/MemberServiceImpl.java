@@ -237,22 +237,19 @@ public class MemberServiceImpl implements MemberService {
         log.info("신규 사용자 생성 - Kakao ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", kakaoId, email, name, phoneNumber, birthDate);
         return memberRepository.save(newMember);
     }
-
     @Override
     @Transactional
-    public MemberInfoResponse getMemberInfo(Long kakaoId) {
-        Member member = this.findBySocialId(kakaoId);
+    public MemberInfoResponse getMemberInfo(Long memberId) {
+        Member member = this.getById(memberId);
         return MemberInfoResponse.builder()
-                .kakaoId(member.getSocialId())
+                .socialId(member.getSocialId())
                 .email(member.getEmail())
                 .name(member.getName())
                 .phoneNumber(member.getPhoneNumber())
                 .birthDate(member.getBirthDate())
                 .role(member.getRole())
-                .refreshToken(member.getRefreshToken())
                 .build();
     }
-
     @Override
     @Transactional
     public void invalidateRefreshToken(Long kakaoId) {

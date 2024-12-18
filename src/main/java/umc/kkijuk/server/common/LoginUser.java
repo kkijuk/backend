@@ -1,29 +1,33 @@
 package umc.kkijuk.server.common;
 
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 
 @Getter
+@Component
 public class LoginUser {
 
     private final JwtUtil jwtUtil;
     private final MemberService memberService;
     private Long id;
 
-    public LoginUser(JwtUtil jwtUtil, MemberService memberService, Long id) {
+    @Autowired
+    public LoginUser(JwtUtil jwtUtil, MemberService memberService) {
         this.jwtUtil = jwtUtil;
         this.memberService = memberService;
-        this.id = id;
     }
 
-    private static final LoginUser LOGIN_USER = new LoginUser( null, null,1L);
+//    private static final LoginUser LOGIN_USER = new LoginUser( null, null);
 
 
-    public static LoginUser get() {
-        return LOGIN_USER;
-    }
+//    public static LoginUser get() {
+//        return LOGIN_USER;
+//    }
 
     public Long extractMemberId(String bearerToken) {
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {

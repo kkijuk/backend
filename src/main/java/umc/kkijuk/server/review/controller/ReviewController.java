@@ -27,6 +27,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final RecruitService recruitService;
     private final MemberService memberService;
+    private final LoginUser loginUser;
 
     @Operation(
             summary = "지원 공고 후기 추가",
@@ -34,11 +35,12 @@ public class ReviewController {
     @Parameter(name = "recruitId", description = "지원 공고 ID", example = "1")
     @PostMapping("/review")
     public ResponseEntity<ReviewIdResponse> create(
+            @RequestHeader("Authorization") String token,
             @PathVariable Long recruitId,
             @RequestBody @Valid ReviewCreate reviewCreate
     ) {
-        Long loginUser = LoginUser.get().getId();
-        Member requestMember = memberService.getById(loginUser);
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         Recruit recruit = recruitService.getById(recruitId);
         Review review = reviewService.create(requestMember, recruit, reviewCreate);
 
@@ -54,12 +56,13 @@ public class ReviewController {
     @Parameter(name = "reviewId", description = "지원 공고 후기 ID", example = "1")
     @PutMapping("/review/{reviewId}")
     public ResponseEntity<ReviewIdResponse> update(
+            @RequestHeader("Authorization") String token,
             @PathVariable Long recruitId,
             @PathVariable Long reviewId,
             @RequestBody @Valid ReviewUpdate reviewUpdate
     ) {
-        Long loginUser = LoginUser.get().getId();
-        Member requestMember = memberService.getById(loginUser);
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         Recruit recruit = recruitService.getById(recruitId);
         Review review = reviewService.update(requestMember, recruit, reviewId, reviewUpdate);
 
@@ -75,11 +78,12 @@ public class ReviewController {
     @Parameter(name = "reviewId", description = "지원 공고 후기 ID", example = "1")
     @DeleteMapping("/review/{reviewId}")
     public ResponseEntity<Void> delete(
+            @RequestHeader("Authorization") String token,
             @PathVariable Long recruitId,
             @PathVariable Long reviewId
     ) {
-        Long loginUser = LoginUser.get().getId();
-        Member requestMember = memberService.getById(loginUser);
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         Recruit recruit = recruitService.getById(recruitId);
         reviewService.delete(requestMember, recruit, reviewId);
 

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -39,6 +40,7 @@ public class KakaoAuthService {
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String redirectUri;
 
+    @Transactional
     public String getKakaoAccessToken(String code) {
         String tokenUri = "https://kauth.kakao.com/oauth/token";
 
@@ -71,6 +73,7 @@ public class KakaoAuthService {
     }
 
 
+    @Transactional
     public Map<String, Object> getKakaoUserInfo(String accessToken) {
         String userInfoUri = "https://kapi.kakao.com/v2/user/me";
 
@@ -89,6 +92,7 @@ public class KakaoAuthService {
         }
     }
 
+    @Transactional
     public Member processKakaoUser(String accessToken) {
         Map<String, Object> kakaoUserInfo = getKakaoUserInfo(accessToken);
         Long kakaoId = Long.valueOf(kakaoUserInfo.get("id").toString());
@@ -106,6 +110,7 @@ public class KakaoAuthService {
                 });
     }
 
+    @Transactional
     public Map<String, String> generateTokens(Member member) {
         String kakaoId = String.valueOf(member.getSocialId());
 
@@ -113,6 +118,9 @@ public class KakaoAuthService {
         String refreshToken = jwtUtil.createRefreshToken(kakaoId);
 
         log.info("JWT 토큰 생성 완료 - 카카오 ID: {}, accessToken: {}, refreshToken: {}", kakaoId, accessToken, refreshToken);
+
+        member.setRefreshToken(refreshToken);
+        memberRepository.save(member);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);

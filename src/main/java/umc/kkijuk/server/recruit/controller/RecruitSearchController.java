@@ -21,16 +21,18 @@ public class RecruitSearchController {
 
     private final RecruitSearchService recruitSearchService;
     private final MemberService memberService;
+    private final LoginUser loginUser;
 
     @Operation(
             summary = "공고 이름 & 태그 / 공고 후기 기준으로 검색",
             description = "입력받은 텍스트에 대하여, 공고 제목, 공고 태그, 혹은 공고 후기에 포함하는 모든 공고를 검색합니다. 정렬기준은 최신순입니다.")
     @GetMapping
     public ResponseEntity<RecruitReviewListByKeywordResponse> findRecruitsByKeyword(
+            @RequestHeader("Authorization") String token,
             @RequestParam String keyword) {
 
-        Long loginUser = LoginUser.get().getId();
-        Member requestMember = memberService.getById(loginUser);
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         RecruitReviewListByKeywordResponse result = recruitSearchService.findRecruitByKeyword(requestMember, keyword);
 
         return ResponseEntity

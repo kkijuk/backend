@@ -18,14 +18,15 @@ import java.util.List;
 @RequestMapping("/recruit/tag")
 public class RecruitTagController {
     private final MemberService memberService;
+    private final LoginUser loginUser;
 
     @Operation(
             summary = "지원 공고 태그",
             description = "사용자의 지원 공고 태그 정보들을 요청합니다")
     @GetMapping
-    public ResponseEntity<RecruitTagResponse> getRecruitTag() {
-        Long loginUser = LoginUser.get().getId();
-        Member requestMember = memberService.getById(loginUser);
+    public ResponseEntity<RecruitTagResponse> getRecruitTag(@RequestHeader("Authorization") String token) {
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return ResponseEntity
                 .ok()
                 .body(RecruitTagResponse.from(requestMember.getRecruitTags()));
@@ -35,9 +36,10 @@ public class RecruitTagController {
             summary = "지원 공고 태그 추가",
             description = "사용자의 지원 공고 태그를 추가합니다")
     @PostMapping
-    public ResponseEntity<RecruitTagResponse> addRecruitTag(@RequestParam String tag) {
-        Long loginUser = LoginUser.get().getId();
-        Member requestMember = memberService.getById(loginUser);
+    public ResponseEntity<RecruitTagResponse> addRecruitTag(@RequestHeader("Authorization") String token,
+                                                            @RequestParam String tag) {
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         List<String> tags = memberService.addRecruitTag(requestMember, tag);
         return ResponseEntity
                 .ok()
@@ -48,9 +50,10 @@ public class RecruitTagController {
             summary = "지원 공고 태그 제거",
             description = "사용자의 지원 공고 태그를 제거합니다")
     @DeleteMapping
-    public ResponseEntity<RecruitTagResponse> deleteRecruitTag(@RequestParam String tag) {
-        Long loginUser = LoginUser.get().getId();
-        Member requestMember = memberService.getById(loginUser);
+    public ResponseEntity<RecruitTagResponse> deleteRecruitTag(@RequestHeader("Authorization") String token,
+                                                               @RequestParam String tag) {
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         List<String> tags = memberService.deleteRecruitTag(requestMember, tag);
         return ResponseEntity
                 .ok()
