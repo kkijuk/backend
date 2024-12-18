@@ -49,16 +49,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
       if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
         jwt = authorizationHeader.substring(7);
-        kakaoId = jwtUtil.extractKakaoId(jwt);
+        kakaoId = jwtUtil.extractSocialId(jwt);
       }
 
       if (kakaoId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-        Member member = memberRepository.findByKakaoId(kakaoId).orElse(null);
+        Member member = memberRepository.findBySocialId(kakaoId).orElse(null);
 
-        if (member != null && jwtUtil.validateToken(jwt, String.valueOf(member.getKakaoId()))) {
+        if (member != null && jwtUtil.validateToken(jwt, String.valueOf(member.getSocialId()))) {
           UserDetails userDetails =
                   new org.springframework.security.core.userdetails.User(
-                          String.valueOf(member.getKakaoId()),
+                          String.valueOf(member.getSocialId()),
                           "",
                           Collections.singletonList(new SimpleGrantedAuthority(member.getRole().name())));
 

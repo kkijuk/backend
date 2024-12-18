@@ -99,7 +99,7 @@ public class KakaoAuthService {
 
         log.info("카카오 사용자 정보 추출 - 이메일: {}, 이름: {}, 카카오 ID: {}, 전화번호: {}, 생년월일: {}", email, name, kakaoId, phoneNumber, birthDate);
 
-        return memberRepository.findByKakaoId(kakaoId)
+        return memberRepository.findBySocialId(kakaoId)
                 .orElseGet(() -> {
                     log.info("신규 사용자 생성 - 카카오 ID: {}", kakaoId);
                     return memberService.createUserWithKakaoId(kakaoId, kakaoUserInfo);
@@ -107,7 +107,7 @@ public class KakaoAuthService {
     }
 
     public Map<String, String> generateTokens(Member member) {
-        String kakaoId = String.valueOf(member.getKakaoId());
+        String kakaoId = String.valueOf(member.getSocialId());
 
         String accessToken = jwtUtil.createAccessToken(kakaoId);
         String refreshToken = jwtUtil.createRefreshToken(kakaoId);

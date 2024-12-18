@@ -2,8 +2,6 @@ package umc.kkijuk.server.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +13,11 @@ import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.member.controller.response.*;
-import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.dto.*;
 import umc.kkijuk.server.member.emailauth.MailServiceImpl;
 import umc.kkijuk.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Collections;
 import java.util.List;
 
 
@@ -141,7 +137,7 @@ public class MemberController {
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
 
         String refreshToken = request.getRefreshToken();
-        Long kakaoId = jwtUtil.extractKakaoId(refreshToken);
+        Long kakaoId = jwtUtil.extractSocialId(refreshToken);
 
         AuthResponse response = memberService.refreshAuthToken(refreshToken, kakaoId);
 
@@ -159,8 +155,8 @@ public class MemberController {
             summary = "내 정보 조회",
             description = "마이페이지에서 내 정보들을 가져옵니다.")
     @GetMapping("/myPage/info")
-    public ResponseEntity<MemberInfoResponse> getInfo() {
-        Long loginUser = LoginUser.get().getId();
+    public ResponseEntity<MemberInfoResponse> getInfo(@RequestHeader("Authorization") String bearerToken) {
+        Long loginUser = LoginUser.get().extractMemberId(bearerToken);
         MemberInfoResponse memberInfoResponse = memberService.getMemberInfo(loginUser);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -200,7 +196,7 @@ public class MemberController {
     @Operation(summary = "로그아웃", description = "사용자 로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
+        Long kakaoId = jwtUtil.extractSocialId(token.substring(7));
         memberService.invalidateRefreshToken(kakaoId);
         return ResponseEntity.ok("로그아웃 완료");
     }

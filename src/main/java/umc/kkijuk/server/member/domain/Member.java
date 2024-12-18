@@ -22,7 +22,7 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
-    private Long kakaoId;
+    private Long socialId;
 
     @NotNull
     private String email;
@@ -98,8 +98,8 @@ public class Member extends BaseEntity {
         this.recruitTags.remove(tag);
     }
 
-    public void setKakaoId(Long kakaoId) {
-        this.kakaoId = kakaoId;
+    public void setSocialId(Long kakaoId) {
+        this.socialId = kakaoId;
     }
 
     public void setEmail(String email) {this.email = email;}

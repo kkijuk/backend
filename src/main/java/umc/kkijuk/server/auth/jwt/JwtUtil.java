@@ -72,7 +72,7 @@ public class JwtUtil {
     }
   }
 
-  public Long extractKakaoId(String token) {
+  public Long extractSocialId(String token) {
     return Long.valueOf(
             Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())

@@ -7,10 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.kkijuk.server.auth.dto.AuthResponse;
-import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.common.domian.exception.*;
-import umc.kkijuk.server.member.controller.response.EmailAuthResponse;
 import umc.kkijuk.server.member.controller.response.MemberEmailResponse;
 import umc.kkijuk.server.member.controller.response.MemberInfoResponse;
 import umc.kkijuk.server.member.controller.response.MemberStateResponse;
@@ -229,7 +227,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member newMember = new Member();
-        newMember.setKakaoId(kakaoId);
+        newMember.setSocialId(kakaoId);
         newMember.setEmail(email);
         newMember.setName(name);
         newMember.setPhoneNumber(phoneNumber);
@@ -243,9 +241,9 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public MemberInfoResponse getMemberInfo(Long kakaoId) {
-        Member member = findMemberByKakaoId(kakaoId);
+        Member member = this.findBySocialId(kakaoId);
         return MemberInfoResponse.builder()
-                .kakaoId(member.getKakaoId())
+                .kakaoId(member.getSocialId())
                 .email(member.getEmail())
                 .name(member.getName())
                 .phoneNumber(member.getPhoneNumber())
@@ -258,7 +256,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void invalidateRefreshToken(Long kakaoId) {
-        Member member = findMemberByKakaoId(kakaoId);
+        Member member = this.findBySocialId(kakaoId);
         member.setRefreshToken(null);
         log.info("Refresh Token 삭제 완료 - Kakao ID: {}", kakaoId);
     }
@@ -266,7 +264,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void updateRefreshToken(Long kakaoId, String refreshToken) {
-        Member member = findMemberByKakaoId(kakaoId);
+        Member member = this.findBySocialId(kakaoId);
         member.setRefreshToken(refreshToken);
         log.info("Refresh Token 업데이트 완료 - Kakao ID: {}, Refresh Token: {}", kakaoId, refreshToken);
     }
@@ -285,21 +283,15 @@ public class MemberServiceImpl implements MemberService {
             throw new IllegalArgumentException("Authorization 헤더에 올바른 토큰이 없습니다.");
         }
 
-        Long kakaoId = jwtUtil.extractKakaoId(bearerToken.substring(7));
-        return findMemberByKakaoId(kakaoId).getId();
+        Long kakaoId = jwtUtil.extractSocialId(bearerToken.substring(7));
+        return this.findBySocialId(kakaoId).getId();
     }
 
     @Override
     @Transactional
-    public Member findByKakaoId(Long kakaoId) {
-        return findMemberByKakaoId(kakaoId);
-    }
-
-    @Override
-    @Transactional
-    public Member findMemberByKakaoId(Long kakaoId) {
-        return memberRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new RuntimeException("Member not found with Kakao ID: " + kakaoId));
+    public Member findBySocialId(Long SocialId) {
+        return memberRepository.findBySocialId(SocialId)
+                .orElseThrow(() -> new RuntimeException("Member not found with Social ID: " + SocialId));
     }
 
     @Override
@@ -307,13 +299,13 @@ public class MemberServiceImpl implements MemberService {
     public AuthResponse refreshAuthToken(String refreshToken, Long kakaoId) {
         // Refresh Token 검증
         if (!jwtUtil.validateToken(refreshToken, String.valueOf(kakaoId))) {
-            log.warn("유효하지 않은 Refresh Token - Kakao ID: {}", kakaoId);
+            log.warn("유효하지 않은 Refresh Token - Social ID: {}", kakaoId);
             throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
         }
 
         // Member 조회
-        Member member = memberRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new RuntimeException("Member not found with Kakao ID: " + kakaoId));
+        Member member = memberRepository.findBySocialId(kakaoId)
+                .orElseThrow(() -> new RuntimeException("Member not found with Social ID: " + kakaoId));
 
         // 새로운 Access Token과 Refresh Token 발급 (Refresh Token Rotation)
         String newAccessToken = jwtUtil.createAccessToken(String.valueOf(kakaoId));

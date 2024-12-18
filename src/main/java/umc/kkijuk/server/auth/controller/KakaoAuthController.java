@@ -31,7 +31,7 @@ public class KakaoAuthController {
             Map<String, Object> tokens = new HashMap<>();
             tokens.put("Token", kakaoAuthService.generateTokens(member));
 
-            log.info("카카오 로그인 성공: 사용자 이름={}, 카카오 ID={}", member.getName(), member.getKakaoId());
+            log.info("카카오 로그인 성공: 사용자 이름={}, 카카오 ID={}", member.getName(), member.getSocialId());
             return ResponseEntity.ok(tokens);
 
         } catch (Exception e) {

@@ -1,18 +1,14 @@
 package umc.kkijuk.server.member.service;
 
 import umc.kkijuk.server.auth.dto.AuthResponse;
-import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
-import umc.kkijuk.server.member.controller.response.EmailAuthResponse;
 import umc.kkijuk.server.member.controller.response.MemberEmailResponse;
 import umc.kkijuk.server.member.controller.response.MemberInfoResponse;
 import umc.kkijuk.server.member.controller.response.MemberStateResponse;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.dto.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public interface MemberService {
     Member getById(Long memberId);
@@ -37,8 +33,7 @@ public interface MemberService {
     void invalidateRefreshToken(Long kakaoId);
     void updateRefreshToken(Long kakaoId, String refreshToken);
     Long extractMemberId(String bearerToken);
-    Member findByKakaoId(Long kakaoId);
-    Member findMemberByKakaoId(Long kakaoId);
+    Member findBySocialId(Long socialId);
     AuthResponse refreshAuthToken(String refreshToken, Long kakaoId);
 
 }
