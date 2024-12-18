@@ -55,56 +55,35 @@ public class MemberController {
 //    }
 
 
-    @Operation(
-            summary = "이메일 중복 확인",
-            description = "회원가입시 이메일 중복을 확인합니다.")
-    @PostMapping("/confirmEmail")
-    public ResponseEntity<Boolean> confirmEmail(@RequestBody MemberEmailDto memberEmailDto){
-        Boolean result = mailService.confirmDupEmail(memberEmailDto);
-        return ResponseEntity.ok(result);
-    }
+//    @Operation(
+//            summary = "이메일 중복 확인",
+//            description = "회원가입시 이메일 중복을 확인합니다.")
+//    @PostMapping("/confirmEmail")
+//    public ResponseEntity<Boolean> confirmEmail(@RequestBody MemberEmailDto memberEmailDto){
+//        Boolean result = mailService.confirmDupEmail(memberEmailDto);
+//        return ResponseEntity.ok(result);
+//    }
 
-    @Operation(
-            summary = "내 정보 조회",
-            description = "마이페이지에서 내 정보들을 가져옵니다.")
-    @GetMapping("/myPage/info")
-    public ResponseEntity<MemberInfoResponse> getInfo() {
-        Long loginUser = LoginUser.get().getId();
-        MemberInfoResponse memberInfoResponse = memberService.getMemberInfo(loginUser);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(memberInfoResponse);
-    }
 
-    @Operation(
-            summary = "내 정보 수정",
-            description = "내 정보 수정 요청을 받아 성공/실패를 반환합니다.")
-    @PutMapping("/myPage/info")
-    public ResponseEntity<Boolean> changeMemberInfo(@RequestBody @Valid  MemberInfoChangeDto memberInfoChangeDto) {
-        Long loginUser = LoginUser.get().getId();
-        memberService.updateMemberInfo(loginUser, memberInfoChangeDto);
-        return ResponseEntity.ok(Boolean.TRUE);
-    }
-
-    @Operation(
-            summary = "관심분야 조회",
-            description = "마이페이지에서 관심분야를 조회합니다.")
-    @GetMapping("/myPage/field")
-    public ResponseEntity<MemberFieldResponse> getField() {
-        Long loginUser = LoginUser.get().getId();
-        List<String> memberField = memberService.getMemberField(loginUser);
-        return ResponseEntity.ok().body(new MemberFieldResponse(memberField));
-    }
-
-    @Operation(
-            summary = "관심분야 등록/수정",
-            description = "초기/마이페이지에서 관심분야를 등록/수정합니다.")
-    @PostMapping({"/field", "/myPage/field"})
-    public ResponseEntity<Boolean> postField(@RequestBody MemberFieldDto memberFieldDto) {
-        Long loginUser = LoginUser.get().getId();
-        memberService.updateMemberField(loginUser, memberFieldDto);
-        return ResponseEntity.ok(Boolean.TRUE);
-    }
+//    @Operation(
+//            summary = "관심분야 조회",
+//            description = "마이페이지에서 관심분야를 조회합니다.")
+//    @GetMapping("/myPage/field")
+//    public ResponseEntity<MemberFieldResponse> getField() {
+//        Long loginUser = LoginUser.get().getId();
+//        List<String> memberField = memberService.getMemberField(loginUser);
+//        return ResponseEntity.ok().body(new MemberFieldResponse(memberField));
+//    }
+//
+//    @Operation(
+//            summary = "관심분야 등록/수정",
+//            description = "초기/마이페이지에서 관심분야를 등록/수정합니다.")
+//    @PostMapping({"/field", "/myPage/field"})
+//    public ResponseEntity<Boolean> postField(@RequestBody MemberFieldDto memberFieldDto) {
+//        Long loginUser = LoginUser.get().getId();
+//        memberService.updateMemberField(loginUser, memberFieldDto);
+//        return ResponseEntity.ok(Boolean.TRUE);
+//    }
 
 //    @Operation(
 //            summary = "비밀번호 변경",
@@ -152,18 +131,13 @@ public class MemberController {
 //    }
 
     /**
-     * 소셜로그인 이후 추가
+     * 소셜로그인 이후 필요한 api
      */
 
-    @Operation(summary = "홈 화면", description = "로그인 성공 후 홈 화면으로 이동")
-    @GetMapping("/home")
-    public ResponseEntity<String> home() {
-        return ResponseEntity.ok("로그인 성공!");
-    }
 
     @Operation(summary = "액세스 토큰 재발급",
             description = "Refresh Token을 받아서 새로운 Access,Refresh Token을 발급(Refresh Token Rotation)")
-    @PostMapping("/refresh-token")
+    @PostMapping("/refreshToken")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
 
         String refreshToken = request.getRefreshToken();
@@ -174,26 +148,53 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "첫 로그인 확인", description = "사용자 첫 로그인 여부 확인")
-    @PostMapping("/check-first-login")
-    public ResponseEntity<Boolean> checkFirstLogin(@RequestHeader("Authorization") String token) {
-        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
-        return ResponseEntity.ok(memberService.isFirstLogin(kakaoId));
+//    @Operation(summary = "사용자 정보 조회", description = "사용자 상세 정보 조회")
+//    @GetMapping("/info")
+//    public ResponseEntity<MemberInfoResponse> getMemberInfo(@RequestHeader("Authorization") String token) {
+//        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
+//        return ResponseEntity.ok(memberService.getMemberInfo(kakaoId));
+//    }
+
+    @Operation(
+            summary = "내 정보 조회",
+            description = "마이페이지에서 내 정보들을 가져옵니다.")
+    @GetMapping("/myPage/info")
+    public ResponseEntity<MemberInfoResponse> getInfo() {
+        Long loginUser = LoginUser.get().getId();
+        MemberInfoResponse memberInfoResponse = memberService.getMemberInfo(loginUser);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(memberInfoResponse);
     }
 
-    @Operation(summary = "사용자 정보 등록", description = "첫 로그인 시 사용자 정보 등록")
-    @PostMapping("/register")
-    public ResponseEntity<String> registerMember(@RequestHeader("Authorization") String token,
-                                                 @RequestBody MemberRegisterDto request) {
-        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
-        return ResponseEntity.ok(memberService.registerMemberInfo(kakaoId, request));
+    @Operation(
+            summary = "내 정보 수정",
+            description = "내 정보 수정 요청을 받아 성공/실패를 반환합니다.")
+    @PutMapping("/myPage/info")
+    public ResponseEntity<Boolean> changeMemberInfo(@RequestBody @Valid  MemberInfoChangeDto memberInfoChangeDto) {
+        Long loginUser = LoginUser.get().getId();
+        memberService.updateMemberInfo(loginUser, memberInfoChangeDto);
+        return ResponseEntity.ok(Boolean.TRUE);
     }
 
-    @Operation(summary = "사용자 정보 조회", description = "사용자 상세 정보 조회")
-    @GetMapping("/myInfo")
-    public ResponseEntity<MemberInfoResponse> getMemberInfo(@RequestHeader("Authorization") String token) {
-        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
-        return ResponseEntity.ok(memberService.getMemberInfo(kakaoId));
+    @Operation(
+            summary = "관심분야 조회",
+            description = "마이페이지에서 관심분야를 조회합니다.")
+    @GetMapping("/myPage/field")
+    public ResponseEntity<MemberFieldResponse> getField() {
+        Long loginUser = LoginUser.get().getId();
+        List<String> memberField = memberService.getMemberField(loginUser);
+        return ResponseEntity.ok().body(new MemberFieldResponse(memberField));
+    }
+
+    @Operation(
+            summary = "관심분야 등록/수정",
+            description = "초기/마이페이지에서 관심분야를 등록/수정합니다.")
+    @PostMapping({"/field", "/myPage/field"})
+    public ResponseEntity<Boolean> postField(@RequestBody MemberFieldDto memberFieldDto) {
+        Long loginUser = LoginUser.get().getId();
+        memberService.updateMemberField(loginUser, memberFieldDto);
+        return ResponseEntity.ok(Boolean.TRUE);
     }
 
     @Operation(summary = "로그아웃", description = "사용자 로그아웃")

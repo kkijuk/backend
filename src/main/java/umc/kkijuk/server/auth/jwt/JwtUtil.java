@@ -25,27 +25,27 @@ public class JwtUtil {
     return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
   }
 
-  public String createAccessToken(String kakaoId) {
+  public String createAccessToken(String socialId) {
     Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS)); // 1시간 유효
     return Jwts.builder()
-            .setId(String.valueOf(kakaoId))
+            .setId(String.valueOf(socialId))
             .setIssuedAt(new Date())
             .setExpiration(expiration)
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact();
   }
 
-  public String createRefreshToken(String kakaoId) {
+  public String createRefreshToken(String socialId) {
     Date expiration = Date.from(Instant.now().plus(7, ChronoUnit.DAYS)); // 7일 유효
     return Jwts.builder()
-            .setId(String.valueOf(kakaoId))
+            .setId(String.valueOf(socialId))
             .setIssuedAt(new Date())
             .setExpiration(expiration)
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact();
   }
 
-  public boolean validateToken(String token, String kakaoId) {
+  public boolean validateToken(String token, String socialId) {
     try {
       Claims claims =
               Jwts.parserBuilder()
@@ -54,8 +54,8 @@ public class JwtUtil {
                       .parseClaimsJws(token)
                       .getBody();
 
-      String extractedKakaoId = claims.getId();
-      if (!extractedKakaoId.equals(kakaoId)) {
+      String extractedSocialId = claims.getId();
+      if (!extractedSocialId.equals(socialId)) {
         log.warn("JWT Token validation failed: kakaoId mismatch");
         return false;
       }

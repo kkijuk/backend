@@ -242,31 +242,6 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Boolean isFirstLogin(Long kakaoId) {
-        Member member = findMemberByKakaoId(kakaoId);
-        return member.getRefreshToken() == null;
-    }
-
-    @Override
-    @Transactional
-    public String registerMemberInfo(Long kakaoId, MemberRegisterDto request) {
-        Member member = findMemberByKakaoId(kakaoId);
-
-        if (member.getRefreshToken() != null) {
-            log.warn("이미 사용자 정보가 등록됨 - Kakao ID: {}", kakaoId);
-            throw new IllegalStateException("사용자의 정보가 이미 등록되었습니다.");
-        }
-
-        member.setEmail(request.getEmail());
-        member.setName(request.getName());
-        member.setPhoneNumber(request.getPhoneNumber());
-        member.setBirthDate(request.getBirthDate());
-
-        log.info("사용자 정보 등록 완료 - Kakao ID: {}", kakaoId);
-        return "사용자 정보가 정상적으로 등록되었습니다.";
-    }
-    @Override
-    @Transactional
     public MemberInfoResponse getMemberInfo(Long kakaoId) {
         Member member = findMemberByKakaoId(kakaoId);
         return MemberInfoResponse.builder()

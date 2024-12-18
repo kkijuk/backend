@@ -33,12 +33,9 @@ public interface MemberService {
      * 소셜로그인 이후 추가된 기능
      */
     Member createUserWithKakaoId(Long kakaoId, Map<String, Object> kakaoUserInfo);
-    Boolean isFirstLogin(Long kakaoId);
-    String registerMemberInfo(Long kakaoId, MemberRegisterDto request);
     MemberInfoResponse getMemberInfo(Long kakaoId);
     void invalidateRefreshToken(Long kakaoId);
     void updateRefreshToken(Long kakaoId, String refreshToken);
-//    void deleteAccount(Long kakaoId);
     Long extractMemberId(String bearerToken);
     Member findByKakaoId(Long kakaoId);
     Member findMemberByKakaoId(Long kakaoId);
