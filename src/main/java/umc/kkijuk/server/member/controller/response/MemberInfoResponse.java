@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class MemberInfoResponse {
-    private Long socialId;
+    private String socialId;
     private String email;
     private String name;
     private String phoneNumber;

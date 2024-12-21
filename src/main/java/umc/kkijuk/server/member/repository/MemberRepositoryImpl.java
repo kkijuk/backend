@@ -28,10 +28,13 @@ public class MemberRepositoryImpl implements MemberRepository{
     public Optional<Member> findByPhoneNumber(String phoneNumber) {
         return memberJpaRepository.findByPhoneNumber(phoneNumber);
     }
+
     @Override
-    public Optional<Member> findBySocialId(Long socialId) {
+    public Optional<Member> findBySocialId(String socialId) {
         return memberJpaRepository.findBySocialId(socialId);
     }
+
+
 
     @Override
     public void deleteById(Long id) {

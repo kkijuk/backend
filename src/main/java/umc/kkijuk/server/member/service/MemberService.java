@@ -1,6 +1,7 @@
 package umc.kkijuk.server.member.service;
 
 import umc.kkijuk.server.auth.dto.AuthResponse;
+import umc.kkijuk.server.auth.dto.NaverUserResponse;
 import umc.kkijuk.server.member.controller.response.MemberEmailResponse;
 import umc.kkijuk.server.member.controller.response.MemberInfoResponse;
 import umc.kkijuk.server.member.controller.response.MemberStateResponse;
@@ -27,12 +28,20 @@ public interface MemberService {
     /**
      * 소셜로그인 이후 추가된 기능
      */
-    Member createUserWithKakaoId(Long socialId, Map<String, Object> kakaoUserInfo);
-    MemberInfoResponse getMemberInfo(Long memberId);
-    void invalidateRefreshToken(Long socialId);
-    void updateRefreshToken(Long socialId, String refreshToken);
-    Long extractMemberId(String bearerToken);
-    Member findBySocialId(Long socialId);
-    AuthResponse refreshAuthToken(String refreshToken, Long socialId);
+//    Member createUserWithKakaoId(Long socialId, Map<String, Object> kakaoUserInfo);
+//    MemberInfoResponse getMemberInfo(Long memberId);
+//    void invalidateRefreshToken(Long socialId);
+//    void updateRefreshToken(Long socialId, String refreshToken);
+//    Long extractMemberId(String bearerToken);
+//    Member findBySocialId(Long socialId);
+//    AuthResponse refreshAuthToken(String refreshToken, Long socialId);
 
+    Member createUserWithKakaoId(String kakaoId, Map<String, Object> kakaoUserInfo);
+    MemberInfoResponse getMemberInfo(Long memberId);
+    void invalidateRefreshToken(String socialId);
+    void updateRefreshToken(String socialId, String refreshToken);
+    Long extractMemberId(String bearerToken);
+    public Member findBySocialId(String SocialId);
+    AuthResponse refreshAuthToken(String refreshToken, String socialId);
+    Member createUserWithNaverId(String naverId, NaverUserResponse.NaverUserDetail naverUserInfo);
 }

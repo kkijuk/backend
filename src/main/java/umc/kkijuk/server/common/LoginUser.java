@@ -35,7 +35,7 @@ public class LoginUser {
         }
 
         String token = bearerToken.substring(7);
-        Long socialId = jwtUtil.extractSocialId(token);
+        String socialId = jwtUtil.extractSocialId(token);
 
         if (socialId == null) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");

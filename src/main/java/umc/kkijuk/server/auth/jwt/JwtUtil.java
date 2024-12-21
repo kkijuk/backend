@@ -72,14 +72,13 @@ public class JwtUtil {
     }
   }
 
-  public Long extractSocialId(String token) {
-    return Long.valueOf(
-            Jwts.parserBuilder()
+  public String extractSocialId(String token) {
+    return Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody()
-                    .getId());
+                    .getId();
   }
 
 }

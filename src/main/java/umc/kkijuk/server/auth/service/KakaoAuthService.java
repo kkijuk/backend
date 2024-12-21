@@ -95,7 +95,7 @@ public class KakaoAuthService {
     @Transactional
     public Member processKakaoUser(String accessToken) {
         Map<String, Object> kakaoUserInfo = getKakaoUserInfo(accessToken);
-        Long kakaoId = Long.valueOf(kakaoUserInfo.get("id").toString());
+        String kakaoId = kakaoUserInfo.get("id").toString();
         String email = extractEmail(kakaoUserInfo);
         String name = extractName(kakaoUserInfo);
         String phoneNumber = extractPhoneNumber(kakaoUserInfo);
@@ -103,7 +103,7 @@ public class KakaoAuthService {
 
         log.info("카카오 사용자 정보 추출 - 이메일: {}, 이름: {}, 카카오 ID: {}, 전화번호: {}, 생년월일: {}", email, name, kakaoId, phoneNumber, birthDate);
 
-        return memberRepository.findBySocialId(kakaoId)
+        return memberRepository.findBySocialId(String.valueOf(kakaoId))
                 .orElseGet(() -> {
                     log.info("신규 사용자 생성 - 카카오 ID: {}", kakaoId);
                     return memberService.createUserWithKakaoId(kakaoId, kakaoUserInfo);
