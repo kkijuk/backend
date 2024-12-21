@@ -36,24 +36,24 @@ public class JwtFilter extends OncePerRequestFilter {
 
     String requestUri = request.getRequestURI();
 
-    // 카카오 로그인 경로 제외
-    if (requestUri.startsWith("/auth/kakao/login")) {
+    // 카카오 로그인 경로 제외, 네이버 로그인 경로 제외
+    if (requestUri.startsWith("/auth/kakao/login")||requestUri.startsWith("/auth/naver/login")) {
       chain.doFilter(request, response);
       return;
     }
 
     try {
       final String authorizationHeader = request.getHeader("Authorization");
-      Long kakaoId = null;
+      String socialId = null;
       String jwt = null;
 
       if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
         jwt = authorizationHeader.substring(7);
-        kakaoId = jwtUtil.extractSocialId(jwt);
+        socialId = jwtUtil.extractSocialId(jwt);
       }
 
-      if (kakaoId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-        Member member = memberRepository.findBySocialId(kakaoId).orElse(null);
+      if (socialId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        Member member = memberRepository.findBySocialId(socialId).orElse(null);
 
         if (member != null && jwtUtil.validateToken(jwt, String.valueOf(member.getSocialId()))) {
           UserDetails userDetails =
@@ -69,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
           SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-          log.warn("Invalid JWT Token for member: {}", kakaoId);
+          log.warn("Invalid JWT Token for member: {}", socialId);
         }
       }
     } catch (Exception e) {

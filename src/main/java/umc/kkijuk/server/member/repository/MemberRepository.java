@@ -9,6 +9,7 @@ public interface MemberRepository {
     Optional<Member> findByEmail(String email);
     Member save(Member member);
     Optional<Member> findByPhoneNumber(String phoneNumber);
-    Optional<Member> findBySocialId(Long socialId);
+//    Optional<Member> findBySocialId(Long socialId);
+    Optional<Member> findBySocialId(String socialId);
     void deleteById(Long id);
 }

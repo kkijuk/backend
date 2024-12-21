@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.kkijuk.server.auth.dto.AuthResponse;
+import umc.kkijuk.server.auth.dto.NaverUserResponse;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.common.domian.exception.*;
 import umc.kkijuk.server.member.controller.response.MemberEmailResponse;
@@ -14,6 +15,7 @@ import umc.kkijuk.server.member.controller.response.MemberInfoResponse;
 import umc.kkijuk.server.member.controller.response.MemberStateResponse;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.domain.Role;
+import umc.kkijuk.server.member.domain.SocialType;
 import umc.kkijuk.server.member.domain.State;
 import umc.kkijuk.server.member.dto.*;
 import umc.kkijuk.server.member.repository.MemberRepository;
@@ -208,7 +210,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member createUserWithKakaoId(Long kakaoId, Map<String, Object> kakaoUserInfo) {
+    public Member createUserWithKakaoId(String kakaoId, Map<String, Object> kakaoUserInfo) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) kakaoUserInfo.get("kakao_account");
         String email = (String) kakaoAccount.get("email");
         String name = (String) kakaoAccount.get("name");
@@ -233,6 +235,8 @@ public class MemberServiceImpl implements MemberService {
         newMember.setPhoneNumber(phoneNumber);
         newMember.setBirthDate(birthDate);
         newMember.setRole(Role.ROLE_USER);
+        newMember.setSocialType(SocialType.KAKAO);
+
 
         log.info("신규 사용자 생성 - Kakao ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", kakaoId, email, name, phoneNumber, birthDate);
         return memberRepository.save(newMember);
@@ -250,20 +254,57 @@ public class MemberServiceImpl implements MemberService {
                 .role(member.getRole())
                 .build();
     }
+
+    @Transactional
+    public Member createUserWithNaverId(String naverId, NaverUserResponse.NaverUserDetail naverUserInfo) {
+        String email = naverUserInfo.getEmail();
+        String name = naverUserInfo.getName();
+        String phoneNumber = naverUserInfo.getMobile();
+        String birthday = (String) naverUserInfo.getBirthday();
+        String birthyear = (String) naverUserInfo.getBirthyear();
+
+        LocalDate birthDate = null;
+        if (birthday != null && !birthday.isEmpty()) {
+            int year = (birthyear != null && !birthyear.isEmpty())
+                    ? Integer.parseInt(birthyear)
+                    : LocalDate.now().getYear();
+            String[] dateParts = birthday.split("-");
+            int month = Integer.parseInt(dateParts[0]);
+            int day = Integer.parseInt(dateParts[1]);
+
+            birthDate = LocalDate.of(year, month, day);
+        }
+
+        Member newMember = new Member();
+        newMember.setSocialId(naverId);
+        newMember.setEmail(email);
+        newMember.setName(name);
+        newMember.setPhoneNumber(phoneNumber);
+        newMember.setBirthDate(birthDate);
+        newMember.setRole(Role.ROLE_USER);
+        newMember.setSocialType(SocialType.NAVER);
+
+
+        log.info("신규 사용자 생성 - Naver ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", naverId, email, name, phoneNumber, birthDate);
+        return memberRepository.save(newMember);
+    }
+
+
+
     @Override
     @Transactional
-    public void invalidateRefreshToken(Long kakaoId) {
-        Member member = this.findBySocialId(kakaoId);
+    public void invalidateRefreshToken(String socialId) {
+        Member member = this.findBySocialId(socialId);
         member.setRefreshToken(null);
-        log.info("Refresh Token 삭제 완료 - Kakao ID: {}", kakaoId);
+        log.info("Refresh Token 삭제 완료 - Kakao ID: {}", socialId);
     }
 
     @Override
     @Transactional
-    public void updateRefreshToken(Long kakaoId, String refreshToken) {
-        Member member = this.findBySocialId(kakaoId);
+    public void updateRefreshToken(String socialId, String refreshToken) {
+        Member member = this.findBySocialId(socialId);
         member.setRefreshToken(refreshToken);
-        log.info("Refresh Token 업데이트 완료 - Kakao ID: {}, Refresh Token: {}", kakaoId, refreshToken);
+        log.info("Refresh Token 업데이트 완료 - Social ID: {}, Refresh Token: {}", socialId, refreshToken);
     }
 
 //    @Override
@@ -280,39 +321,39 @@ public class MemberServiceImpl implements MemberService {
             throw new IllegalArgumentException("Authorization 헤더에 올바른 토큰이 없습니다.");
         }
 
-        Long kakaoId = jwtUtil.extractSocialId(bearerToken.substring(7));
-        return this.findBySocialId(kakaoId).getId();
+        String kakaoId = jwtUtil.extractSocialId(bearerToken.substring(7));
+        return this.findBySocialId(String.valueOf(kakaoId)).getId();
     }
 
     @Override
     @Transactional
-    public Member findBySocialId(Long SocialId) {
+    public Member findBySocialId(String SocialId) {
         return memberRepository.findBySocialId(SocialId)
                 .orElseThrow(() -> new RuntimeException("Member not found with Social ID: " + SocialId));
     }
 
     @Override
     @Transactional
-    public AuthResponse refreshAuthToken(String refreshToken, Long kakaoId) {
+    public AuthResponse refreshAuthToken(String refreshToken, String socialId) {
         // Refresh Token 검증
-        if (!jwtUtil.validateToken(refreshToken, String.valueOf(kakaoId))) {
-            log.warn("유효하지 않은 Refresh Token - Social ID: {}", kakaoId);
+        if (!jwtUtil.validateToken(refreshToken, socialId)) {
+            log.warn("유효하지 않은 Refresh Token - Social ID: {}", socialId);
             throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
         }
 
         // Member 조회
-        Member member = memberRepository.findBySocialId(kakaoId)
-                .orElseThrow(() -> new RuntimeException("Member not found with Social ID: " + kakaoId));
+        Member member = memberRepository.findBySocialId(socialId)
+                .orElseThrow(() -> new RuntimeException("Member not found with Social ID: " + socialId));
 
         // 새로운 Access Token과 Refresh Token 발급 (Refresh Token Rotation)
-        String newAccessToken = jwtUtil.createAccessToken(String.valueOf(kakaoId));
-        String newRefreshToken = jwtUtil.createRefreshToken(String.valueOf(kakaoId));
+        String newAccessToken = jwtUtil.createAccessToken(socialId);
+        String newRefreshToken = jwtUtil.createRefreshToken(socialId);
 
         // Refresh Token 업데이트
         member.setRefreshToken(newRefreshToken);
         memberRepository.save(member);
 
-        log.info("Access Token 및 Refresh Token 재발급 - Kakao ID: {}", kakaoId);
+        log.info("Access Token 및 Refresh Token 재발급 - Kakao ID: {}", socialId);
 
         // 응답 반환
         return AuthResponse.builder()

@@ -138,9 +138,9 @@ public class MemberController {
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
 
         String refreshToken = request.getRefreshToken();
-        Long kakaoId = jwtUtil.extractSocialId(refreshToken);
+        String socialId = jwtUtil.extractSocialId(refreshToken);
 
-        AuthResponse response = memberService.refreshAuthToken(refreshToken, kakaoId);
+        AuthResponse response = memberService.refreshAuthToken(refreshToken, socialId);
 
         return ResponseEntity.ok(response);
     }
@@ -192,7 +192,7 @@ public class MemberController {
     @Operation(summary = "로그아웃", description = "사용자 로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        Long kakaoId = jwtUtil.extractSocialId(token.substring(7));
+        String kakaoId = jwtUtil.extractSocialId(token.substring(7));
         memberService.invalidateRefreshToken(kakaoId);
         return ResponseEntity.ok("로그아웃 완료");
     }

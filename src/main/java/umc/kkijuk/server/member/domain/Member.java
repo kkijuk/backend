@@ -22,7 +22,10 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
-    private Long socialId;
+    private String socialId;
+
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
 
     @NotNull
     private String email;
@@ -98,7 +101,7 @@ public class Member extends BaseEntity {
         this.recruitTags.remove(tag);
     }
 
-    public void setSocialId(Long kakaoId) {
+    public void setSocialId(String kakaoId) {
         this.socialId = kakaoId;
     }
 
@@ -115,5 +118,6 @@ public class Member extends BaseEntity {
         this.birthDate = birthDate;
     }
     public void setRefreshToken(String refreshToken){ this.refreshToken = refreshToken;}
+    public void setSocialType(SocialType type){this.socialType = type;}
 
 }
