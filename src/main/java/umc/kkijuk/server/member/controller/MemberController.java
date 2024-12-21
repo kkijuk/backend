@@ -145,13 +145,6 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-//    @Operation(summary = "사용자 정보 조회", description = "사용자 상세 정보 조회")
-//    @GetMapping("/info")
-//    public ResponseEntity<MemberInfoResponse> getMemberInfo(@RequestHeader("Authorization") String token) {
-//        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
-//        return ResponseEntity.ok(memberService.getMemberInfo(kakaoId));
-//    }
-
     @Operation(
             summary = "내 정보 조회",
             description = "마이페이지에서 내 정보들을 가져옵니다.")
