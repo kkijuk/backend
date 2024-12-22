@@ -11,6 +11,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.member.emailauth.RedisService;
 import umc.kkijuk.server.member.repository.MemberRepository;
 import umc.kkijuk.server.member.service.MemberService;
 
@@ -27,6 +28,7 @@ public class KakaoAuthService {
     private final MemberService memberService;
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
+    private final RedisService redisTokenService;
 
     @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
     private String grantType;
@@ -119,8 +121,9 @@ public class KakaoAuthService {
 
         log.info("JWT 토큰 생성 완료 - 카카오 ID: {}, accessToken: {}, refreshToken: {}", kakaoId, accessToken, refreshToken);
 
-        member.setRefreshToken(refreshToken);
-        memberRepository.save(member);
+//        member.setRefreshToken(refreshToken);
+//        memberRepository.save(member);
+        redisTokenService.saveRefreshToken(kakaoId, refreshToken, 7 * 24 * 60 * 60 * 1000 );
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);

@@ -56,7 +56,7 @@ public class JwtUtil {
 
       String extractedSocialId = claims.getId();
       if (!extractedSocialId.equals(socialId)) {
-        log.warn("JWT Token validation failed: kakaoId mismatch");
+        log.warn("JWT Token validation failed: socialId mismatch");
         return false;
       }
 

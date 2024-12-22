@@ -62,7 +62,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private String refreshToken;
+//    private String refreshToken;
 
     public Member(String email, String name, String phoneNumber, LocalDate birthDate, MarketingAgree marketingAgree, State userState) {
         this.email = email;
@@ -101,8 +101,8 @@ public class Member extends BaseEntity {
         this.recruitTags.remove(tag);
     }
 
-    public void setSocialId(String kakaoId) {
-        this.socialId = kakaoId;
+    public void setSocialId(String socialId) {
+        this.socialId = socialId;
     }
 
     public void setEmail(String email) {this.email = email;}
@@ -117,7 +117,7 @@ public class Member extends BaseEntity {
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
-    public void setRefreshToken(String refreshToken){ this.refreshToken = refreshToken;}
+//    public void setRefreshToken(String refreshToken){ this.refreshToken = refreshToken;}
     public void setSocialType(SocialType type){this.socialType = type;}
 
 }

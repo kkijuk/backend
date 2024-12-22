@@ -39,7 +39,7 @@ public interface MemberService {
     Member createUserWithKakaoId(String kakaoId, Map<String, Object> kakaoUserInfo);
     MemberInfoResponse getMemberInfo(Long memberId);
     void invalidateRefreshToken(String socialId);
-    void updateRefreshToken(String socialId, String refreshToken);
+//    void updateRefreshToken(String socialId, String refreshToken);
     Long extractMemberId(String bearerToken);
     public Member findBySocialId(String SocialId);
     AuthResponse refreshAuthToken(String refreshToken, String socialId);

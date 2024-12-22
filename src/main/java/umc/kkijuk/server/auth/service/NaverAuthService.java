@@ -15,6 +15,7 @@ import umc.kkijuk.server.auth.dto.NaverTokenResponse;
 import umc.kkijuk.server.auth.dto.NaverUserResponse;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.member.emailauth.RedisService;
 import umc.kkijuk.server.member.repository.MemberRepository;
 import umc.kkijuk.server.member.service.MemberService;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 public class NaverAuthService {
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
+    private final RedisService redisTokenService;
     private final MemberService memberService;
     private final RestTemplate restTemplate;
 
@@ -79,7 +81,7 @@ public class NaverAuthService {
         String phoneNumber = naverUserInfo.getMobile();
         LocalDate birthDate = extractBirthDate(naverUserInfo);
 
-        log.info("네이버 사용자 정보 추출 - 이메일: {}, 이름: {}, 카카오 ID: {}, 전화번호: {}, 생년월일: {}", email, name, naverId, phoneNumber, birthDate);
+        log.info("네이버 사용자 정보 추출 - 이메일: {}, 이름: {}, 네이버 ID: {}, 전화번호: {}, 생년월일: {}", email, name, naverId, phoneNumber, birthDate);
 
         return memberRepository.findBySocialId(naverId)
                 .orElseGet(() -> {
@@ -94,6 +96,8 @@ public class NaverAuthService {
         String refreshToken = jwtUtil.createRefreshToken(naverId);
 
         log.info("JWT Token 생성 완료 - 네이버 ID : {}, accessToken : {}, refreshToken : {}", naverId, accessToken, refreshToken);
+
+        redisTokenService.saveRefreshToken(naverId, refreshToken, 7 * 24 * 60 * 60 * 1000 );
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
