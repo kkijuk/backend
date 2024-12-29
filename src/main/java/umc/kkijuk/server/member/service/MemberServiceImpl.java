@@ -252,6 +252,8 @@ public class MemberServiceImpl implements MemberService {
                 .phoneNumber(member.getPhoneNumber())
                 .birthDate(member.getBirthDate())
                 .role(member.getRole())
+                .marketingAgree(member.getMarketingAgree())
+                .socialType(member.getSocialType())
                 .build();
     }
 
