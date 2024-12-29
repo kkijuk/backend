@@ -132,7 +132,6 @@ public class MemberController {
      * 소셜로그인 이후 필요한 api
      */
 
-
     @Operation(summary = "액세스 토큰 재발급",
             description = "Refresh Token을 받아서 새로운 Access,Refresh Token을 발급(Refresh Token Rotation)")
     @PostMapping("/refreshToken")
@@ -146,7 +145,6 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    // 테스트 필요
     @Operation(
         summary = "내정보 조회 이메일 일치 확인",
         description = "내 정보를 조회를 위해 이메일 일치 여부를 확인합니다.")
@@ -159,7 +157,6 @@ public class MemberController {
         return ResponseEntity.ok(member.getEmail().equals(memberEmailDto.getEmail()));
     }
 
-    // 테스트 필요
     @Operation(
             summary = "내 정보 조회",
             description = "마이페이지에서 내 정보들을 가져옵니다.")
@@ -212,13 +209,13 @@ public class MemberController {
         return ResponseEntity.ok("Logout successful");
     }
 
-//    @Operation(summary = "계정 탈퇴", description = "계정 탈퇴 처리")
-//    @DeleteMapping("/delete")
-//    public ResponseEntity<String> deleteAccount(@RequestHeader("Authorization") String token) {
-//        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
-//        memberService.deleteAccount(kakaoId);
-//        return ResponseEntity.ok("계정이 탈퇴되었습니다.");
-//    }
+    @Operation(summary = "회원 탈퇴 예약", description = "탈퇴 요청을 처리하여 7일 후 탈퇴 예약을 설정합니다.")
+    @PostMapping("/inactive")
+    public ResponseEntity<String> deactivateMember(@RequestHeader("Authorization") String token) {
+        Long memberId = loginUser.extractMemberId(token);
+        memberService.scheduleDeactivation(memberId);
+        return ResponseEntity.ok("탈퇴가 예약되었습니다. 7일 후 회원 탈퇴가 처리됩니다.");
+    }
 }
 
 

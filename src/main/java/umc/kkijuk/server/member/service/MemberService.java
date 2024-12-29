@@ -44,4 +44,6 @@ public interface MemberService {
     public Member findBySocialId(String SocialId);
     AuthResponse refreshAuthToken(String refreshToken, String socialId);
     Member createUserWithNaverId(String naverId, NaverUserResponse.NaverUserDetail naverUserInfo);
+    void scheduleDeactivation(Long memberId);
+    void deleteScheduledMembers();
 }

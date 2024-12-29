@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.auth.service.KakaoAuthService;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.member.domain.State;
+import umc.kkijuk.server.member.repository.MemberRepository;
+import umc.kkijuk.server.member.service.MemberService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +20,7 @@ import java.util.Map;
 public class KakaoAuthController {
 
     private final KakaoAuthService kakaoAuthService;
+    private final MemberRepository memberRepository;
 
     @GetMapping("/auth/kakao/login")
     public ResponseEntity<Map<String, Object>> kakaoCallback(@RequestParam("code") String code) {
@@ -27,9 +31,16 @@ public class KakaoAuthController {
             // 2. 카카오 사용자 정보 처리 및 사용자 생성/조회
             Member member = kakaoAuthService.processKakaoUser(kakaoAccessToken);
 
+            if (member.getUserState().equals(State.INACTIVATE)) {
+                member.activate();
+                memberRepository.save(member);
+            }
+
             // 3. JWT 토큰 생성
             Map<String, Object> tokens = new HashMap<>();
             tokens.put("Token", kakaoAuthService.generateTokens(member));
+
+
 
             log.info("카카오 로그인 성공: 사용자 이름={}, 카카오 ID={}", member.getName(), member.getSocialId());
             return ResponseEntity.ok(tokens);

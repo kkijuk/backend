@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import umc.kkijuk.server.auth.service.NaverAuthService;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.member.domain.State;
+import umc.kkijuk.server.member.repository.MemberRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NaverAuthController {
     private final NaverAuthService naverAuthService;
+    private final MemberRepository memberRepository;
 
     @GetMapping("/auth/naver/login")
     public ResponseEntity<Object> naverCallback(@RequestParam("code") String code,
@@ -25,6 +28,12 @@ public class NaverAuthController {
         try{
             String naverAccessToken = naverAuthService.getNaverAccessToken(code, state);
             Member member = naverAuthService.processNaverUser(naverAccessToken);
+
+            if (member.getUserState().equals(State.INACTIVATE)) {
+                member.activate();
+                memberRepository.save(member);
+            }
+
             Map<String, Object> tokens = new HashMap<>();
             tokens.put("Token", naverAuthService.generateTokens(member));
             log.info("네이버 로그인 성공: 사용자 이름={}, 네이버 ID={}", member.getName(), member.getSocialId());
