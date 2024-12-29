@@ -79,7 +79,7 @@ public class NaverAuthService {
         String phoneNumber = naverUserInfo.getMobile();
         LocalDate birthDate = extractBirthDate(naverUserInfo);
 
-        log.info("네이버 사용자 정보 추출 - 이메일: {}, 이름: {}, 카카오 ID: {}, 전화번호: {}, 생년월일: {}", email, name, naverId, phoneNumber, birthDate);
+        log.info("네이버 사용자 정보 추출 - 이메일: {}, 이름: {}, 네이버 ID: {}, 전화번호: {}, 생년월일: {}", email, name, naverId, phoneNumber, birthDate);
 
         return memberRepository.findBySocialId(naverId)
                 .orElseGet(() -> {

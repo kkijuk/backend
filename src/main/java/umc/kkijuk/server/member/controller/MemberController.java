@@ -13,6 +13,7 @@ import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.member.controller.response.*;
+import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.dto.*;
 import umc.kkijuk.server.member.emailauth.MailServiceImpl;
 import umc.kkijuk.server.member.service.MemberService;
@@ -145,6 +146,20 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    // 테스트 필요
+    @Operation(
+        summary = "내정보 조회 이메일 일치 확인",
+        description = "내 정보를 조회를 위해 이메일 일치 여부를 확인합니다.")
+    @PostMapping("/checkEmail")
+    public ResponseEntity<Boolean> checkEmail(@RequestHeader("Authorization") String token,
+                                              @RequestBody MemberEmailDto memberEmailDto) {
+
+        Member member = memberService.getById(loginUser.extractMemberId(token));
+
+        return ResponseEntity.ok(member.getEmail().equals(memberEmailDto.getEmail()));
+    }
+
+    // 테스트 필요
     @Operation(
             summary = "내 정보 조회",
             description = "마이페이지에서 내 정보들을 가져옵니다.")
@@ -194,7 +209,7 @@ public class MemberController {
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
         String kakaoId = jwtUtil.extractSocialId(token.substring(7));
         memberService.invalidateRefreshToken(kakaoId);
-        return ResponseEntity.ok("로그아웃 완료");
+        return ResponseEntity.ok("Logout successful");
     }
 
 //    @Operation(summary = "계정 탈퇴", description = "계정 탈퇴 처리")
