@@ -211,9 +211,9 @@ public class MemberController {
 
     @Operation(summary = "회원 탈퇴 예약", description = "탈퇴 요청을 처리하여 7일 후 탈퇴 예약을 설정합니다.")
     @PostMapping("/inactive")
-    public ResponseEntity<String> deactivateMember(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<String> inactivateMember(@RequestHeader("Authorization") String token) {
         Long memberId = loginUser.extractMemberId(token);
-        memberService.scheduleDeactivation(memberId);
+        memberService.memberInactivation(memberId);
         return ResponseEntity.ok("탈퇴가 예약되었습니다. 7일 후 회원 탈퇴가 처리됩니다.");
     }
 }

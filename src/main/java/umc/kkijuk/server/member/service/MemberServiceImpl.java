@@ -361,7 +361,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void scheduleDeactivation(Long memberId) {
+    public void memberInactivation(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
 

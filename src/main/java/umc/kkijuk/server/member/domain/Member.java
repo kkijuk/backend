@@ -86,6 +86,7 @@ public class Member extends BaseEntity {
     public void inactivate() {
         this.userState = State.INACTIVATE;
         this.deleteDate = LocalDate.now().plusWeeks(1);
+        this.refreshToken = null;
     }
 
     public void activate() {
