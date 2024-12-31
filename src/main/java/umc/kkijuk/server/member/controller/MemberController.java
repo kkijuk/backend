@@ -207,8 +207,8 @@ public class MemberController {
     @Operation(summary = "로그아웃", description = "사용자 로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        String kakaoId = jwtUtil.extractSocialId(token.substring(7));
-        memberService.invalidateRefreshToken(kakaoId);
+        String socialId = jwtUtil.extractSocialId(token.substring(7));
+        memberService.invalidateRefreshToken(socialId);
         return ResponseEntity.ok("Logout successful");
     }
 
@@ -241,7 +241,7 @@ public class MemberController {
     @PostMapping("/inactive")
     public ResponseEntity<String> inactivateMember(@RequestHeader("Authorization") String token) {
         Long memberId = loginUser.extractMemberId(token);
-        memberService.memberInactivation(memberId);
+        memberService.memberInactivation(memberId,token);
         return ResponseEntity.ok("탈퇴가 예약되었습니다. 7일 후 회원 탈퇴가 처리됩니다.");
     }
 

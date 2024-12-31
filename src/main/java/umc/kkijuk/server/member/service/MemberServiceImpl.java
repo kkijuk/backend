@@ -404,11 +404,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void memberInactivation(Long memberId) {
+    public void memberInactivation(Long memberId, String token) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
-
+        String socialId = jwtUtil.extractSocialId(token.substring(7));
         member.inactivate();
+        invalidateRefreshToken(socialId);
         memberRepository.save(member);
     }
 

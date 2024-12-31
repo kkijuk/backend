@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Tag(name = "Auth", description = "소셜로그인 관련 API")
+@Tag(name = "social login", description = "소셜로그인 관련 API")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor

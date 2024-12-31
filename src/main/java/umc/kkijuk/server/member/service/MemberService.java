@@ -46,6 +46,6 @@ public interface MemberService {
     Member createUserWithNaverId(String naverId, NaverUserResponse.NaverUserDetail naverUserInfo);
 
     Member completeProfile(Long memberId, ProfileInputDto profileInputDto);
-    void memberInactivation(Long memberId);
+    void memberInactivation(Long memberId, String token);
     void deleteScheduledMembers();
 }
