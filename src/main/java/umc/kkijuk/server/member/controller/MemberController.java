@@ -11,15 +11,18 @@ import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.auth.dto.AuthResponse;
 import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
+import umc.kkijuk.server.auth.service.AuthService;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.member.controller.response.*;
+import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.dto.*;
 import umc.kkijuk.server.member.emailauth.MailServiceImpl;
 import umc.kkijuk.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 @Tag(name = "member", description = "회원 관리 API")
@@ -31,6 +34,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final AuthService authService;
     private final MailServiceImpl mailService;
     private final JwtUtil jwtUtil;
     private final LoginUser loginUser;
@@ -195,6 +199,23 @@ public class MemberController {
         String kakaoId = jwtUtil.extractSocialId(token.substring(7));
         memberService.invalidateRefreshToken(kakaoId);
         return ResponseEntity.ok("로그아웃 완료");
+    }
+
+    @Operation(
+            summary = "추가 정보 입력",
+            description = "소셜 로그인 후 사용자에게 추가 정보(이용약관 동의, 개인정보 수집 및 이용 동의," +
+                    "마케팅 정보 수신 동의, 사용자 직업 )를 입력받아 저장합니다."
+    )
+    @PostMapping("/profile")
+    public ResponseEntity<Map<String, Object>> addProfile(@RequestHeader("Authorization") String token,
+                                                   @RequestBody @Valid ProfileInputDto profileInputDto){
+        Long memberId = loginUser.extractMemberId(token);
+        Member member = memberService.completeProfile(memberId, profileInputDto);
+
+        Map<String, Object> tokens = new HashMap<>();
+        tokens.put("Token", authService.generateTokens(member));
+
+        return ResponseEntity.ok(tokens);
     }
 
 //    @Operation(summary = "계정 탈퇴", description = "계정 탈퇴 처리")

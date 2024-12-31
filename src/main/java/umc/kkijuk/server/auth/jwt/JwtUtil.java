@@ -25,12 +25,13 @@ public class JwtUtil {
     return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
   }
 
-  public String createAccessToken(String socialId) {
+  public String createAccessToken(String socialId, boolean isProfileComplete) {
     Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS)); // 1시간 유효
     return Jwts.builder()
             .setId(String.valueOf(socialId))
             .setIssuedAt(new Date())
             .setExpiration(expiration)
+            .claim("isProfileComplete",isProfileComplete)
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact();
   }

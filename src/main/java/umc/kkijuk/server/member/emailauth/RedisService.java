@@ -43,8 +43,16 @@ public class RedisService {
         String key = REFRESH_TOKEN_PREFIX+socialId;
         return stringRedisTemplate.opsForValue().get(key);
     }
-    public void deleteRefreshToken(String socialId){
-        String key = REFRESH_TOKEN_PREFIX+socialId;
-        stringRedisTemplate.delete(key);
+    public boolean deleteRefreshToken(String socialId){
+        try {
+            String key = REFRESH_TOKEN_PREFIX + socialId;
+            Boolean wasDeleted = stringRedisTemplate.delete(key);
+            if (Boolean.TRUE.equals(wasDeleted)) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

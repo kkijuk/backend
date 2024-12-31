@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import umc.kkijuk.server.auth.dto.NaverTokenResponse;
+import umc.kkijuk.server.auth.dto.NaverUserResponse;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.emailauth.RedisService;
@@ -22,7 +25,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class KakaoAuthService {
+public class AuthService {
 
     private final RestTemplate restTemplate;
     private final MemberService memberService;
@@ -31,16 +34,24 @@ public class KakaoAuthService {
     private final RedisService redisTokenService;
 
     @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
-    private String grantType;
-
+    private String kakaoGrantType;
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
-    private String clientId;
-
+    private String kakaoClientId;
     @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
-    private String clientSecret;
-
+    private String kakaoClientSecret;
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private String redirectUri;
+    private String kakaoRedirectUri;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String naverClientId;
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String naverClientSecret;
+    @Value("${spring.security.oauth2.client.provider.naver.token-uri}")
+    private String naverTokenUri;
+    @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
+    private String naverUserInfoUri;
+    @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}")
+    private String naverGrantType;
 
     @Transactional
     public String getKakaoAccessToken(String code) {
@@ -50,10 +61,10 @@ public class KakaoAuthService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", grantType);
-        params.add("client_id", clientId);
-        params.add("client_secret", clientSecret);
-        params.add("redirect_uri", redirectUri);
+        params.add("grant_type", kakaoGrantType);
+        params.add("client_id", kakaoClientId);
+        params.add("client_secret", kakaoClientSecret);
+        params.add("redirect_uri", kakaoRedirectUri);
         params.add("code", code);
 
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
@@ -73,7 +84,6 @@ public class KakaoAuthService {
             throw new RuntimeException("카카오 액세스 토큰 요청 실패", e);
         }
     }
-
 
     @Transactional
     public Map<String, Object> getKakaoUserInfo(String accessToken) {
@@ -112,17 +122,95 @@ public class KakaoAuthService {
                 });
     }
 
+
+    @Transactional
+    public String getNaverAccessToken(String code, String state){
+        String url = UriComponentsBuilder.fromHttpUrl(naverTokenUri)
+                .queryParam("grant_type",naverGrantType)
+                .queryParam("client_id", naverClientId)
+                .queryParam("client_secret", naverClientSecret)
+                .queryParam("code", code)
+                .queryParam("state", state)
+                .build().toUriString();
+
+        try{
+            ResponseEntity<NaverTokenResponse> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    NaverTokenResponse.class
+            );
+            log.info("네이버 엑세스 토큰 응답: {}",response.getBody().getAccessToken());
+            return response.getBody().getAccessToken();
+        }catch (Exception e){
+            log.error("네이버 엑세스 토큰 요청 실패 : {}",e.getMessage(),e);
+            throw new RuntimeException("네이버 엑세스 토큰 요청 실패",e);
+        }
+
+    }
+    public NaverUserResponse.NaverUserDetail getNaverUserInfo(String naverAccessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(naverAccessToken);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
+        try {
+            ResponseEntity<NaverUserResponse> response =
+                    restTemplate.exchange(naverUserInfoUri, HttpMethod.GET, request, NaverUserResponse.class);
+                log.info("네이버 사용자 정보 응답: {}", response.getBody());
+            return response.getBody().getNaverUserDetail();
+
+        } catch (Exception e) {
+            log.error("네이버 사용자 정보 요청 실패: {}", e.getMessage());
+            throw new RuntimeException("네이버 사용자 정보 요청 실패", e);
+
+        }
+    }
+
+    public Member processNaverUser(String naverAccessToken) {
+        NaverUserResponse.NaverUserDetail naverUserInfo = getNaverUserInfo(naverAccessToken);
+        String naverId = naverUserInfo.getId ();
+        String email = naverUserInfo.getEmail();
+        String name = naverUserInfo.getName();
+        String phoneNumber = naverUserInfo.getMobile();
+        LocalDate birthDate = extractNaverBirthDate(naverUserInfo);
+
+        log.info("네이버 사용자 정보 추출 - 이메일: {}, 이름: {}, 네이버 ID: {}, 전화번호: {}, 생년월일: {}", email, name, naverId, phoneNumber, birthDate);
+
+        return memberRepository.findBySocialId(naverId)
+                .orElseGet(() -> {
+                    log.info("신규 사용자 생성 - 네이버 ID: {}", naverId);
+                    return memberService.createUserWithNaverId(naverId,naverUserInfo);
+                });
+    }
+
+
+
+
+
+
     @Transactional
     public Map<String, String> generateTokens(Member member) {
         String kakaoId = String.valueOf(member.getSocialId());
 
-        String accessToken = jwtUtil.createAccessToken(kakaoId);
+        boolean isProfileComplete = member.getIsProfileComplete();
+
+        String accessToken = jwtUtil.createAccessToken(kakaoId,isProfileComplete);
         String refreshToken = jwtUtil.createRefreshToken(kakaoId);
 
-        log.info("JWT 토큰 생성 완료 - 카카오 ID: {}, accessToken: {}, refreshToken: {}", kakaoId, accessToken, refreshToken);
+        log.info("JWT 토큰 생성 완료 - social ID: {}, accessToken: {}, refreshToken: {}", kakaoId, accessToken, refreshToken);
 
 //        member.setRefreshToken(refreshToken);
 //        memberRepository.save(member);
+        try {
+            boolean deleted = redisTokenService.deleteRefreshToken(kakaoId);
+            if (deleted) {
+                log.info("기존 리프레시 토큰 삭제 완료 - social ID: {}", kakaoId);
+            } else {
+                log.info("기존 리프레시 토큰이 존재하지 않음 - social ID: {}", kakaoId);
+            }
+        } catch (Exception e) {
+            log.warn("기존 리프레시 토큰 삭제 중 예외 발생 - social ID: {}", kakaoId, e);
+        }
         redisTokenService.saveRefreshToken(kakaoId, refreshToken, 7 * 24 * 60 * 60 * 1000 );
 
         Map<String, String> tokens = new HashMap<>();
@@ -166,6 +254,27 @@ public class KakaoAuthService {
 
         int month = Integer.parseInt(birthday.substring(0, 2));
         int day = Integer.parseInt(birthday.substring(2, 4));
+
+        return LocalDate.of(year, month, day);
+    }
+    private LocalDate extractNaverBirthDate(NaverUserResponse.NaverUserDetail naverUserInfo) {
+        String birthday = (String) naverUserInfo.getBirthday();
+        String birthyear = (String) naverUserInfo.getBirthyear();
+        log.info("Naver 생년월일 정보: {}, {}", birthday,birthyear );
+
+
+        if (birthday == null || birthday.isEmpty()) {
+            return null;
+        }
+
+        int year = (birthyear != null && !birthyear.isEmpty())
+                ? Integer.parseInt(birthyear)
+                : LocalDate.now().getYear();
+
+        String[] dateParts = birthday.split("-");
+        int month = Integer.parseInt(dateParts[0]);
+        int day = Integer.parseInt(dateParts[1]);
+
 
         return LocalDate.of(year, month, day);
     }

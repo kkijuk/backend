@@ -238,6 +238,7 @@ public class MemberServiceImpl implements MemberService {
         newMember.setBirthDate(birthDate);
         newMember.setRole(Role.ROLE_USER);
         newMember.setSocialType(SocialType.KAKAO);
+        newMember.setProfileComplete(false);
 
 
         log.info("신규 사용자 생성 - Kakao ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", kakaoId, email, name, phoneNumber, birthDate);
@@ -285,12 +286,24 @@ public class MemberServiceImpl implements MemberService {
         newMember.setBirthDate(birthDate);
         newMember.setRole(Role.ROLE_USER);
         newMember.setSocialType(SocialType.NAVER);
+        newMember.setProfileComplete(false);
 
 
         log.info("신규 사용자 생성 - Naver ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", naverId, email, name, phoneNumber, birthDate);
         return memberRepository.save(newMember);
     }
 
+    @Override
+    @Transactional
+    public Member completeProfile(Long memberId, ProfileInputDto profileInputDto) {
+        Member member = this.getById(memberId);
+        member.setTermsAgree(profileInputDto.getIsTermsAgreed());
+        member.setPrivacyAgree(profileInputDto.getIsPrivacyAgreed());
+        member.setMarketingAgree(profileInputDto.getIsMarketingAgreed());
+        member.setMemberJob(profileInputDto.getMemberJob());
+        member.setProfileComplete(true);
+        return memberRepository.save(member);
+    }
 
 
     @Override
@@ -298,8 +311,16 @@ public class MemberServiceImpl implements MemberService {
     public void invalidateRefreshToken(String socialId) {
 //        Member member = this.findBySocialId(socialId);
 //        member.setRefreshToken(null);
-        redisTokenService.deleteRefreshToken(socialId);
-        log.info("Refresh Token 삭제 완료 - Social ID: {}", socialId);
+        try {
+            boolean deleted = redisTokenService.deleteRefreshToken(socialId);
+            if (deleted) {
+                log.info("기존 리프레시 토큰 삭제 완료 - social ID: {}", socialId);
+            } else {
+                log.info("기존 리프레시 토큰이 존재하지 않음 - social ID: {}", socialId);
+            }
+        } catch (Exception e) {
+            log.warn("기존 리프레시 토큰 삭제 중 예외 발생 - social ID: {}", socialId, e);
+        }
     }
 
 //    @Override
@@ -358,8 +379,11 @@ public class MemberServiceImpl implements MemberService {
             throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
         }
 
+        Member member = this.findBySocialId(socialId);
+        boolean isProfileComplete = member.getIsProfileComplete();
+
         // 새로운 Access Token과 Refresh Token 발급 (Refresh Token Rotation)
-        String newAccessToken = jwtUtil.createAccessToken(socialId);
+        String newAccessToken = jwtUtil.createAccessToken(socialId,isProfileComplete);
         String newRefreshToken = jwtUtil.createRefreshToken(socialId);
 
         // Refresh Token 업데이트
