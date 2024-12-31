@@ -3,6 +3,7 @@ package umc.kkijuk.server.member.service;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -239,6 +240,7 @@ public class MemberServiceImpl implements MemberService {
         newMember.setRole(Role.ROLE_USER);
         newMember.setSocialType(SocialType.KAKAO);
         newMember.setProfileComplete(false);
+        newMember.setUserState(State.ACTIVATE);
 
 
         log.info("신규 사용자 생성 - Kakao ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", kakaoId, email, name, phoneNumber, birthDate);
@@ -255,6 +257,8 @@ public class MemberServiceImpl implements MemberService {
                 .phoneNumber(member.getPhoneNumber())
                 .birthDate(member.getBirthDate())
                 .role(member.getRole())
+                .marketingAgree(member.getMarketingAgree())
+                .socialType(member.getSocialType())
                 .build();
     }
 
@@ -286,6 +290,7 @@ public class MemberServiceImpl implements MemberService {
         newMember.setBirthDate(birthDate);
         newMember.setRole(Role.ROLE_USER);
         newMember.setSocialType(SocialType.NAVER);
+        newMember.setUserState(State.ACTIVATE);
         newMember.setProfileComplete(false);
 
 
@@ -329,13 +334,6 @@ public class MemberServiceImpl implements MemberService {
 //        Member member = this.findBySocialId(socialId);
 //        member.setRefreshToken(refreshToken);
 //        log.info("Refresh Token 업데이트 완료 - Social ID: {}, Refresh Token: {}", socialId, refreshToken);
-//    }
-
-//    @Override
-//    public void deleteAccount(Long kakaoId) {
-//        Member member = findMemberByKakaoId(kakaoId);
-//        memberRepository.delete(member);
-//        log.info("계정 삭제 완료 - Kakao ID: {}", kakaoId);
 //    }
 
     @Override
@@ -402,6 +400,31 @@ public class MemberServiceImpl implements MemberService {
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void memberInactivation(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
+
+        member.inactivate();
+        memberRepository.save(member);
+    }
+
+    //매일 자정 확인 후 유저 정보 지우는 함수, 실제로 자정에 삭제 되는지는 배포 후 확인 필요
+    @Override
+    @Scheduled(cron = "0 0 0 * * ?")
+    @Transactional
+    public void deleteScheduledMembers() {
+        Optional<List<Member>> optionalMembersToDelete = memberRepository.findByDeleteDateBefore(LocalDate.now());
+
+        if (optionalMembersToDelete.isPresent()) {
+            List<Member> membersToDelete = optionalMembersToDelete.get();
+            for (Member member : membersToDelete) {
+                memberRepository.deleteById(member.getId());
+            }
+        }
     }
 
 }

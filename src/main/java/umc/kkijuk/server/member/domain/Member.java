@@ -124,6 +124,7 @@ public class Member extends BaseEntity {
     }
 //    public void setRefreshToken(String refreshToken){ this.refreshToken = refreshToken;}
     public void setSocialType(SocialType type){this.socialType = type;}
+    public void setUserState(State state){this.userState = state;}
 
     public void setMarketingAgree(MarketingAgree marketingAgree) {
         this.marketingAgree = marketingAgree;

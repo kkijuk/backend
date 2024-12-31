@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import umc.kkijuk.server.member.domain.Member;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,17 +30,17 @@ public class MemberRepositoryImpl implements MemberRepository{
     public Optional<Member> findByPhoneNumber(String phoneNumber) {
         return memberJpaRepository.findByPhoneNumber(phoneNumber);
     }
-
     @Override
     public Optional<Member> findBySocialId(String socialId) {
         return memberJpaRepository.findBySocialId(socialId);
     }
-
-
-
     @Override
     public void deleteById(Long id) {
         memberJpaRepository.deleteById(id);
+    }
+    @Override
+    public Optional<List<Member>> findByDeleteDateBefore(LocalDate date) {
+        return memberJpaRepository.findByDeleteDateBefore(date);
     }
 
 }

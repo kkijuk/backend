@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.auth.service.AuthService;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.member.domain.State;
+import umc.kkijuk.server.member.repository.MemberRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,23 +23,15 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final MemberRepository memberRepository;
 
     @GetMapping("/kakao/login")
     @Operation(summary = "카카오 로그인", description = "카카오 OAuth 인증을 통해 사용자 정보를 처리하고 JWT 토큰을 생성하여 반환합니다.")
     @Parameter(name = "code", description = "카카오에서 발급된 인증 코드", required = true)
     public ResponseEntity<Map<String, Object>> kakaoCallback(@RequestParam("code") String code) {
         try {
-            // 1. 카카오 액세스 토큰 발급
-            String kakaoAccessToken = authService.getKakaoAccessToken(code);
-
-            // 2. 카카오 사용자 정보 처리 및 사용자 생성/조회
-            Member member = authService.processKakaoUser(kakaoAccessToken);
-
-            // 3. JWT 토큰 생성
-            Map<String, Object> tokens = new HashMap<>();
-            tokens.put("Token", authService.generateTokens(member));
-
-            log.info("카카오 로그인 성공: 사용자 이름={}, 카카오 ID={}", member.getName(), member.getSocialId());
+            Map<String, Object> tokens = authService.handleKakaoLogin(code);
+            log.info("카카오 로그인 성공");
             return ResponseEntity.ok(tokens);
 
         } catch (Exception e) {
@@ -54,11 +48,8 @@ public class AuthController {
     public ResponseEntity<Map<String,Object>> naverCallback(@RequestParam("code") String code,
                                                             @RequestParam("state") String state){
         try{
-            String naverAccessToken = authService.getNaverAccessToken(code, state);
-            Member member = authService.processNaverUser(naverAccessToken);
-            Map<String, Object> tokens = new HashMap<>();
-            tokens.put("Token", authService.generateTokens(member));
-            log.info("네이버 로그인 성공: 사용자 이름={}, 네이버 ID={}", member.getName(), member.getSocialId());
+            Map<String, Object> tokens = authService.handleNaverLogin(code, state);
+            log.info("네이버 로그인 성공");
             return ResponseEntity.ok(tokens);
 
         }catch (Exception e){

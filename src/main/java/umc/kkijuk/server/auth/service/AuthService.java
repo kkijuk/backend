@@ -14,6 +14,7 @@ import umc.kkijuk.server.auth.dto.NaverTokenResponse;
 import umc.kkijuk.server.auth.dto.NaverUserResponse;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.member.domain.State;
 import umc.kkijuk.server.member.emailauth.RedisService;
 import umc.kkijuk.server.member.repository.MemberRepository;
 import umc.kkijuk.server.member.service.MemberService;
@@ -52,6 +53,40 @@ public class AuthService {
     private String naverUserInfoUri;
     @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}")
     private String naverGrantType;
+
+    @Transactional
+    public Map<String, Object> handleKakaoLogin(String code) {
+        // 1. 카카오 액세스 토큰 발급
+        String kakaoAccessToken = getKakaoAccessToken(code);
+
+        // 2. 카카오 사용자 정보 처리 및 사용자 생성/조회
+        Member member = processKakaoUser(kakaoAccessToken);
+
+        // 3. 사용자 상태 확인 및 활성화 처리
+        if (member.getUserState().equals(State.INACTIVATE)) {
+            member.activate();
+            memberRepository.save(member);
+        }
+        // 4. JWT 토큰 생성
+        Map<String, Object> tokens = new HashMap<>();
+        tokens.put("Token", generateTokens(member));
+
+        return tokens;
+    }
+    @Transactional
+    public Map<String, Object> handleNaverLogin(String code, String state) {
+        String naverAccessToken = getNaverAccessToken(code, state);
+        Member member = processNaverUser(naverAccessToken);
+
+        if (member.getUserState().equals(State.INACTIVATE)) {
+            member.activate();
+            memberRepository.save(member);
+        }
+
+        Map<String, Object> tokens = new HashMap<>();
+        tokens.put("Token", generateTokens(member));
+        return tokens;
+    }
 
     @Transactional
     public String getKakaoAccessToken(String code) {
@@ -278,4 +313,6 @@ public class AuthService {
 
         return LocalDate.of(year, month, day);
     }
+
+
 }

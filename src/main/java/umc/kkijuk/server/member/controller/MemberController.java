@@ -135,7 +135,6 @@ public class MemberController {
      * 소셜로그인 이후 필요한 api
      */
 
-
     @Operation(summary = "액세스 토큰 재발급",
             description = "Refresh Token을 받아서 새로운 Access,Refresh Token을 발급(Refresh Token Rotation)")
     @PostMapping("/refreshToken")
@@ -147,6 +146,18 @@ public class MemberController {
         AuthResponse response = memberService.refreshAuthToken(refreshToken, socialId);
 
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+        summary = "내정보 조회 이메일 일치 확인",
+        description = "내 정보를 조회를 위해 이메일 일치 여부를 확인합니다.")
+    @PostMapping("/checkEmail")
+    public ResponseEntity<Boolean> checkEmail(@RequestHeader("Authorization") String token,
+                                              @RequestBody MemberEmailDto memberEmailDto) {
+
+        Member member = memberService.getById(loginUser.extractMemberId(token));
+
+        return ResponseEntity.ok(member.getEmail().equals(memberEmailDto.getEmail()));
     }
 
     @Operation(
@@ -198,8 +209,9 @@ public class MemberController {
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
         String kakaoId = jwtUtil.extractSocialId(token.substring(7));
         memberService.invalidateRefreshToken(kakaoId);
-        return ResponseEntity.ok("로그아웃 완료");
+        return ResponseEntity.ok("Logout successful");
     }
+
 
     @Operation(
             summary = "추가 정보 입력",
@@ -225,6 +237,14 @@ public class MemberController {
 //        memberService.deleteAccount(kakaoId);
 //        return ResponseEntity.ok("계정이 탈퇴되었습니다.");
 //    }
+    @Operation(summary = "회원 탈퇴 예약", description = "탈퇴 요청을 처리하여 7일 후 탈퇴 예약을 설정합니다.")
+    @PostMapping("/inactive")
+    public ResponseEntity<String> inactivateMember(@RequestHeader("Authorization") String token) {
+        Long memberId = loginUser.extractMemberId(token);
+        memberService.memberInactivation(memberId);
+        return ResponseEntity.ok("탈퇴가 예약되었습니다. 7일 후 회원 탈퇴가 처리됩니다.");
+    }
+
 }
 
 
