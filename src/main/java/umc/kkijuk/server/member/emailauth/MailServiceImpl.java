@@ -8,7 +8,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import umc.kkijuk.server.common.domian.exception.CertificationNumberMismatchException;
 import umc.kkijuk.server.common.domian.exception.EmailNotResistedException;
-import umc.kkijuk.server.common.domian.exception.MemberAlreadyExistsException;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.dto.MemberEmailDto;
 import umc.kkijuk.server.member.repository.MemberRepository;
@@ -20,7 +19,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService{
 
-    private final MailCertification mailCertification;
+    private final RedisService mailCertification;
     private final JavaMailSender javaMailSender;
     private final MemberRepository memberRepository;
 

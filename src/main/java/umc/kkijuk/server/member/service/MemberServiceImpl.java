@@ -19,6 +19,7 @@ import umc.kkijuk.server.member.domain.Role;
 import umc.kkijuk.server.member.domain.SocialType;
 import umc.kkijuk.server.member.domain.State;
 import umc.kkijuk.server.member.dto.*;
+import umc.kkijuk.server.member.emailauth.RedisService;
 import umc.kkijuk.server.member.repository.MemberRepository;
 
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RedisService redisTokenService;
 
     @Override
     public Member getById(Long memberId) {
@@ -237,6 +239,7 @@ public class MemberServiceImpl implements MemberService {
         newMember.setBirthDate(birthDate);
         newMember.setRole(Role.ROLE_USER);
         newMember.setSocialType(SocialType.KAKAO);
+        newMember.setProfileComplete(false);
         newMember.setUserState(State.ACTIVATE);
 
 
@@ -287,29 +290,51 @@ public class MemberServiceImpl implements MemberService {
         newMember.setBirthDate(birthDate);
         newMember.setRole(Role.ROLE_USER);
         newMember.setSocialType(SocialType.NAVER);
+        newMember.setUserState(State.ACTIVATE);
+        newMember.setProfileComplete(false);
 
 
         log.info("신규 사용자 생성 - Naver ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", naverId, email, name, phoneNumber, birthDate);
         return memberRepository.save(newMember);
     }
 
+    @Override
+    @Transactional
+    public Member completeProfile(Long memberId, ProfileInputDto profileInputDto) {
+        Member member = this.getById(memberId);
+        member.setTermsAgree(profileInputDto.getIsTermsAgreed());
+        member.setPrivacyAgree(profileInputDto.getIsPrivacyAgreed());
+        member.setMarketingAgree(profileInputDto.getIsMarketingAgreed());
+        member.setMemberJob(profileInputDto.getMemberJob());
+        member.setProfileComplete(true);
+        return memberRepository.save(member);
+    }
 
 
     @Override
     @Transactional
     public void invalidateRefreshToken(String socialId) {
-        Member member = this.findBySocialId(socialId);
-        member.setRefreshToken(null);
-        log.info("Refresh Token 삭제 완료 - Kakao ID: {}", socialId);
+//        Member member = this.findBySocialId(socialId);
+//        member.setRefreshToken(null);
+        try {
+            boolean deleted = redisTokenService.deleteRefreshToken(socialId);
+            if (deleted) {
+                log.info("기존 리프레시 토큰 삭제 완료 - social ID: {}", socialId);
+            } else {
+                log.info("기존 리프레시 토큰이 존재하지 않음 - social ID: {}", socialId);
+            }
+        } catch (Exception e) {
+            log.warn("기존 리프레시 토큰 삭제 중 예외 발생 - social ID: {}", socialId, e);
+        }
     }
 
-    @Override
-    @Transactional
-    public void updateRefreshToken(String socialId, String refreshToken) {
-        Member member = this.findBySocialId(socialId);
-        member.setRefreshToken(refreshToken);
-        log.info("Refresh Token 업데이트 완료 - Social ID: {}, Refresh Token: {}", socialId, refreshToken);
-    }
+//    @Override
+//    @Transactional
+//    public void updateRefreshToken(String socialId, String refreshToken) {
+//        Member member = this.findBySocialId(socialId);
+//        member.setRefreshToken(refreshToken);
+//        log.info("Refresh Token 업데이트 완료 - Social ID: {}, Refresh Token: {}", socialId, refreshToken);
+//    }
 
     @Override
     @Transactional
@@ -318,8 +343,8 @@ public class MemberServiceImpl implements MemberService {
             throw new IllegalArgumentException("Authorization 헤더에 올바른 토큰이 없습니다.");
         }
 
-        String kakaoId = jwtUtil.extractSocialId(bearerToken.substring(7));
-        return this.findBySocialId(String.valueOf(kakaoId)).getId();
+        String socialId = jwtUtil.extractSocialId(bearerToken.substring(7));
+        return this.findBySocialId(String.valueOf(socialId)).getId();
     }
 
     @Override
@@ -332,6 +357,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public AuthResponse refreshAuthToken(String refreshToken, String socialId) {
+        String storedToken = redisTokenService.getRefreshToken(socialId);
+        if (storedToken == null) {
+            log.warn("Redis에 저장된 Refresh Token 없음 - Social ID: {}", socialId);
+            throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
+        }
         // Refresh Token 검증
         if (!jwtUtil.validateToken(refreshToken, socialId)) {
             log.warn("유효하지 않은 Refresh Token - Social ID: {}", socialId);
@@ -339,18 +369,31 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // Member 조회
-        Member member = memberRepository.findBySocialId(socialId)
-                .orElseThrow(() -> new RuntimeException("Member not found with Social ID: " + socialId));
+//        Member member = memberRepository.findBySocialId(socialId)
+//                .orElseThrow(() -> new RuntimeException("Member not found with Social ID: " + socialId));
+
+        if(!refreshToken.equals(storedToken)){
+            log.warn("유효하지 않은 Refresh Token - Social ID: {}", socialId);
+            throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
+        }
+
+        Member member = this.findBySocialId(socialId);
+        boolean isProfileComplete = member.getIsProfileComplete();
 
         // 새로운 Access Token과 Refresh Token 발급 (Refresh Token Rotation)
-        String newAccessToken = jwtUtil.createAccessToken(socialId);
+        String newAccessToken = jwtUtil.createAccessToken(socialId,isProfileComplete);
         String newRefreshToken = jwtUtil.createRefreshToken(socialId);
 
         // Refresh Token 업데이트
-        member.setRefreshToken(newRefreshToken);
-        memberRepository.save(member);
-
-        log.info("Access Token 및 Refresh Token 재발급 - Kakao ID: {}", socialId);
+//        member.setRefreshToken(newRefreshToken);
+//        memberRepository.save(member);
+        try{
+            redisTokenService.saveRefreshToken(socialId,newRefreshToken,7 * 24 * 60 * 60 * 1000);
+        }catch (Exception e){
+            log.error("Refresh Token 저장 실패 - Social ID: {}", socialId, e);
+            throw new RuntimeException("토큰 저장 중 오류가 발생했습니다.", e);
+        }
+        log.info("Access Token 및 Refresh Token 재발급 - Social ID: {}", socialId);
 
         // 응답 반환
         return AuthResponse.builder()
@@ -361,11 +404,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void memberInactivation(Long memberId) {
+    public void memberInactivation(Long memberId, String token) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
-
+        String socialId = jwtUtil.extractSocialId(token.substring(7));
         member.inactivate();
+        invalidateRefreshToken(socialId);
         memberRepository.save(member);
     }
 
