@@ -33,8 +33,7 @@ public class FakeActivityRepository implements ActivityRepository {
         return data.stream()
                 .filter(item -> Objects.equals(item.getMemberId(), memberId) &&
                         item.getName() != null &&
-                        item.getName().contains(keyword))
-                .toList();
+                        item.getName().contains(keyword)).toList();
     }
 
     public Activity save(Activity activity) {

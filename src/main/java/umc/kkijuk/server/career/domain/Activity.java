@@ -2,11 +2,8 @@ package umc.kkijuk.server.career.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc.kkijuk.server.detail.domain.BaseCareerDetail;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -21,11 +18,6 @@ public class Activity extends BaseCareer {
     private int teamSize;
     private int contribution;
     private Boolean isTeam;
-
-//    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
-//    private List<BaseCareerDetail> detailList = new ArrayList<>();
-//    @Convert(converter = LongListConverter.class)
-//    private List<Long> details = new ArrayList<>();
 
     @Override
     public Long getId() {

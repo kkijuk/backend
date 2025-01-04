@@ -59,7 +59,7 @@ public class ActivityReqDto {
 
     //팀 선택시 입력 사항인
     @Schema(description = "인원, 숫자만, 2자리까지 직접 입력 가능", example = "30", type = "int")
-    private int teamSize;
+    private Integer teamSize;
     @Schema(description = "기여도, 숫자만, 100이내 직접 입력 가능", example = "20", type = "int")
-    private int contribution;
+    private Integer contribution;
 }

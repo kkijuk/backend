@@ -207,6 +207,7 @@ public class CareerServiceImpl implements CareerService{
                 request.getContribution(),
                 request.getIsTeam()
         );
+        setCommonFields(updateActivity);
         return new ActivityResponse(updateActivity);
     }
 
@@ -228,6 +229,7 @@ public class CareerServiceImpl implements CareerService{
                 request.getLocation(),
                 request.getRole()
         );
+        setCommonFields(updateCircle);
         return new CircleResponse(updateCircle);
     }
 
@@ -252,6 +254,7 @@ public class CareerServiceImpl implements CareerService{
                 request.getIsTeam()
 
         );
+        setCommonFields(updateComp);
         return new CompetitionResponse(updateComp);
     }
 
@@ -273,6 +276,7 @@ public class CareerServiceImpl implements CareerService{
                 request.getOrganizer(),
                 request.getTime()
         );
+        setCommonFields(updateEduCareer);
         return new EduCareerResponse(updateEduCareer);
     }
 
@@ -295,6 +299,7 @@ public class CareerServiceImpl implements CareerService{
                 request.getPosition(),
                 request.getField()
         );
+        setCommonFields(updateEmployment);
         return new EmploymentResponse(updateEmployment);
 
     }
@@ -315,6 +320,7 @@ public class CareerServiceImpl implements CareerService{
                 request.getStartdate(),
                 request.getEnddate()
         );
+        setCommonFields(updateEtc);
         return new EtcResponse(updateEtc);
     }
 
@@ -339,6 +345,7 @@ public class CareerServiceImpl implements CareerService{
                 request.getLocation()
 
         );
+        setCommonFields(updateProject);
         return new ProjectResponse(updateProject);
     }
 

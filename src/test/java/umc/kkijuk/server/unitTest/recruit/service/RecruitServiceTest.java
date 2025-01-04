@@ -148,7 +148,7 @@ class RecruitServiceTest {
                 .link("https://www.update-title.com")
                 .build();
 
-        //when
+        //when생
         Recruit updatedRecruit = recruitService.update(requestMember, 1L, recruitUpdate);
 
         //then
