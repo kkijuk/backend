@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -115,6 +116,7 @@ public class RecruitController {
                 .body(RecruitInfoResponse.from(recruit, reviews));
     }
 
+    //수정 필요 -> 태그 필요
     @Operation(
         summary = "지원 공고 목록 (특정 날짜 이후)",
         description = "주어진 날짜에 마감 종료되는 지원 공고들의 목록을 요청합니다.")
@@ -124,12 +126,13 @@ public class RecruitController {
             @Parameter(name = "date", description = "지원 공고 마감 날짜", example = "2024-07-20")
             @RequestParam LocalDate date) {
         Member requestMember = memberService.getById(loginInfo.getMemberId());
-        List<Recruit> recruits = recruitService.findAllByEndTime(requestMember, date);
+        Map<Recruit, String> recruits = recruitService.findAllByEndTime(requestMember, date);
         return ResponseEntity
                 .ok()
                 .body(RecruitListByEndDateResponse.from(recruits));
     }
 
+    //수정 필요 -> 태그 필요
     @Operation(
             summary = "지원 공고 목록 (특정 시간 이후)",
             description = "주어진 시간 이후 마감 종료되는 지원 공고들의 목록을 요청합니다.")
@@ -140,7 +143,7 @@ public class RecruitController {
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
             @RequestParam LocalDateTime time) {
         Member requestMember = memberService.getById(loginInfo.getMemberId());
-        List<Recruit> recruits = recruitService.findAllByEndTimeAfter(requestMember, time);
+        Map<Recruit, String> recruits = recruitService.findAllByEndTimeAfter(requestMember, time);
         return ResponseEntity
                 .ok()
                 .body(RecruitListByEndTimeAfterResponse.from(recruits));
