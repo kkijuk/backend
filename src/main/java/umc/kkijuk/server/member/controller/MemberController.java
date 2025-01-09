@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.auth.dto.AuthResponse;
 import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
+import umc.kkijuk.server.auth.service.AuthService;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.member.controller.response.*;
 import umc.kkijuk.server.member.domain.Member;
@@ -19,8 +20,9 @@ import umc.kkijuk.server.member.emailauth.MailServiceImpl;
 import umc.kkijuk.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 @Tag(name = "member", description = "회원 관리 API")
@@ -32,6 +34,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final AuthService authService;
     private final MailServiceImpl mailService;
     private final JwtUtil jwtUtil;
     private final LoginUser loginUser;
@@ -204,18 +207,44 @@ public class MemberController {
     @Operation(summary = "로그아웃", description = "사용자 로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        String kakaoId = jwtUtil.extractSocialId(token.substring(7));
-        memberService.invalidateRefreshToken(kakaoId);
+        String socialId = jwtUtil.extractSocialId(token.substring(7));
+        memberService.invalidateRefreshToken(socialId);
         return ResponseEntity.ok("Logout successful");
     }
 
+
+    @Operation(
+            summary = "추가 정보 입력",
+            description = "소셜 로그인 후 사용자에게 추가 정보(이용약관 동의, 개인정보 수집 및 이용 동의," +
+                    "마케팅 정보 수신 동의, 사용자 직업 )를 입력받아 저장합니다."
+    )
+    @PostMapping("/profile")
+    public ResponseEntity<Map<String, Object>> addProfile(@RequestHeader("Authorization") String token,
+                                                   @RequestBody @Valid ProfileInputDto profileInputDto){
+        Long memberId = loginUser.extractMemberId(token);
+        Member member = memberService.completeProfile(memberId, profileInputDto);
+
+        Map<String, Object> tokens = new HashMap<>();
+        tokens.put("Token", authService.generateTokens(member));
+
+        return ResponseEntity.ok(tokens);
+    }
+
+//    @Operation(summary = "계정 탈퇴", description = "계정 탈퇴 처리")
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> deleteAccount(@RequestHeader("Authorization") String token) {
+//        Long kakaoId = jwtUtil.extractKakaoId(token.substring(7));
+//        memberService.deleteAccount(kakaoId);
+//        return ResponseEntity.ok("계정이 탈퇴되었습니다.");
+//    }
     @Operation(summary = "회원 탈퇴 예약", description = "탈퇴 요청을 처리하여 7일 후 탈퇴 예약을 설정합니다.")
     @PostMapping("/inactive")
     public ResponseEntity<String> inactivateMember(@RequestHeader("Authorization") String token) {
         Long memberId = loginUser.extractMemberId(token);
-        memberService.memberInactivation(memberId);
+        memberService.memberInactivation(memberId,token);
         return ResponseEntity.ok("탈퇴가 예약되었습니다. 7일 후 회원 탈퇴가 처리됩니다.");
     }
+
 }
 
 
