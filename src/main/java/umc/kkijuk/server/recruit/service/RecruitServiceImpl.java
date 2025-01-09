@@ -1,5 +1,7 @@
 package umc.kkijuk.server.recruit.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -80,14 +82,35 @@ public class RecruitServiceImpl implements RecruitService {
 
     @Override
     @Transactional
-    public List<Recruit> findAllByEndTime(Member requestMember, LocalDate date) {
-        return recruitRepository.findAllActiveRecruitByMemberIdAndEndDate(requestMember.getId(), date);
+    public Map<Recruit, String> findAllByEndTime(Member requestMember, LocalDate date) {
+        List<Recruit> recruits = recruitRepository.findAllActiveRecruitByMemberIdAndEndDate(requestMember.getId(), date);
+
+        Map<Recruit, String> reviewMap = new HashMap<>();
+
+        for (Recruit recruit : recruits) {
+            String reviewTitle = reviewRepository.findAllByRecruitId(recruit.getId())
+                    .stream().max(Comparator.comparing(Review::getDate))
+                    .map(Review::getTitle).orElse("");
+            reviewMap.put(recruit,reviewTitle);
+        }
+        return reviewMap;
     }
 
     @Override
     @Transactional
-    public List<Recruit> findAllByEndTimeAfter(Member requestMember, LocalDateTime endTime) {
-        return recruitRepository.findAllActiveRecruitByMemberIdAndEndTimeAfter(requestMember.getId(), endTime);
+    public Map<Recruit, String> findAllByEndTimeAfter(Member requestMember, LocalDateTime endTime) {
+        List<Recruit> recruits = recruitRepository.findAllActiveRecruitByMemberIdAndEndTimeAfter(requestMember.getId(), endTime);
+
+        Map<Recruit, String> reviewMap = new HashMap<>();
+
+        for (Recruit recruit : recruits) {
+            String reviewTitle = reviewRepository.findAllByRecruitId(recruit.getId())
+                .stream().max(Comparator.comparing(Review::getDate))
+                .map(Review::getTitle).orElse("");
+            reviewMap.put(recruit, reviewTitle);
+        }
+
+        return reviewMap;
     }
     @Override
     public List<ValidRecruitDto> findAllValidRecruitByMember(Member requestMember, LocalDateTime endTime) {

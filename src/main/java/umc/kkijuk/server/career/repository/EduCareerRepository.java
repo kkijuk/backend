@@ -1,11 +1,17 @@
 package umc.kkijuk.server.career.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import umc.kkijuk.server.career.domain.EduCareer;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface EduCareerRepository extends JpaRepository<EduCareer,Long> {
+public interface EduCareerRepository {
     List<EduCareer> findByMemberId(Long memberId);
     List<EduCareer> findByMemberIdAndNameContaining(Long memberId, String keyword);
+
+    EduCareer save(EduCareer edu);
+
+    Optional<EduCareer> findById(Long educareerId);
+
+    void delete(EduCareer eduCareer);
 }

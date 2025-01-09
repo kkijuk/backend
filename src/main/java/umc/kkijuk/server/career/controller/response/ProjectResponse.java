@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ProjectResponse implements BaseCareerResponse {
     private Long id;
-    private String category;
+    private CategoryResponse category;
     private String name;
     private String alias;
     private Boolean unknown;
@@ -32,7 +32,7 @@ public class ProjectResponse implements BaseCareerResponse {
     private List<BaseCareerDetailResponse> detailList;
     public ProjectResponse(Project project) {
         this.id = project.getId();
-        this.category = CareerType.PROJECT.getDescription();
+        this.category = new CategoryResponse(CareerType.PROJECT.getId(),CareerType.PROJECT.getDescription(),CareerType.PROJECT.name());
         this.name = project.getName();
         this.alias = project.getAlias();
         this.unknown = project.getUnknown();

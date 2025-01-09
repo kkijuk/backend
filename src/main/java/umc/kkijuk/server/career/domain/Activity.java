@@ -13,7 +13,8 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Activity extends BaseCareer {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String organizer;
     private String role;
@@ -21,8 +22,6 @@ public class Activity extends BaseCareer {
     private int contribution;
     private Boolean isTeam;
 
-    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
-    private List<BaseCareerDetail> detailList = new ArrayList<>();
     @Override
     public Long getId() {
         return id;
@@ -32,20 +31,21 @@ public class Activity extends BaseCareer {
     public void setSummary(String summary) {
         super.setSummary(summary);
     }
+
     @Builder
     public Activity(Long memberId, String name, String alias, Boolean unknown,
-                    String summary, LocalDate startdate,
-                    LocalDate enddate, String organizer,
+                    LocalDate startDate, LocalDate endDate, String organizer,
                     String role, int teamSize, int contribution,
                     Boolean isTeam) {
-        super(memberId, name, alias, unknown,startdate, enddate);
+        super(memberId, name, alias, unknown, startDate, endDate);
         this.organizer = organizer;
         this.role = role;
         this.teamSize = teamSize;
         this.contribution = contribution;
         this.isTeam = isTeam;
     }
-    public void updateActivity(String name, String alias, Boolean unknown,LocalDate startdate,
+
+    public void updateActivity(String name, String alias, Boolean unknown, LocalDate startdate,
                                LocalDate enddate, String organizer, String role, int teamSize,
                                int contribution, Boolean isTeam) {
 

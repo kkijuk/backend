@@ -1,5 +1,6 @@
 package umc.kkijuk.server.recruit.controller.port;
 
+import java.util.Map;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.recruit.domain.*;
 
@@ -18,9 +19,9 @@ public interface RecruitService {
 
     Recruit disable(Member member, long recruitId);
 
-    List<Recruit> findAllByEndTime(Member member, LocalDate date);
+    Map<Recruit, String> findAllByEndTime(Member member, LocalDate date);
 
-    List<Recruit> findAllByEndTimeAfter(Member member, LocalDateTime endTime);
+    Map<Recruit, String> findAllByEndTimeAfter(Member member, LocalDateTime endTime);
 
     List<ValidRecruitDto> findAllValidRecruitByMember(Member member, LocalDateTime endTime);
 

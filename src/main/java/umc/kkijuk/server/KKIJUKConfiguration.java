@@ -10,7 +10,7 @@ public class KKIJUKConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "https://www.kkijuk.com", "https://api.kkijuk.com")
+                .allowedOrigins("http://localhost:3000", "https://www.kkijuk.com", "https://api.kkijuk.com", "https://test.kkijuk.com")
                 .allowedMethods("GET", "POST", "PATCH", "DELETE", "PUT")
                 .allowedHeaders("*")
                 .allowCredentials(true);

@@ -1,18 +1,24 @@
 package umc.kkijuk.server.career.controller.response;
 
 import lombok.*;
-import umc.kkijuk.server.tag.domain.Tag;
+import java.util.List;
 
-@Data
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
+
 public class FindTagResponse {
-    private Long tagId;
-    private String tagName;
-    public FindTagResponse(Tag tag) {
-        this.tagId = tag.getId();
-        this.tagName = tag.getName();
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    public static class TagResponse {
+        private Long tagId;
+        private String tagName;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    public static class SearchTagResponse{
+        private int detailCount;
+        private List<TagResponse> tagList;
     }
 }

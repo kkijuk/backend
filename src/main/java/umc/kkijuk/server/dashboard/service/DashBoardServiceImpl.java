@@ -27,11 +27,12 @@ public class DashBoardServiceImpl implements DashBoardService {
     private final RecruitService recruitService;
     private final IntroduceRepository introduceRepository;
     private final ActivityRepository activityRepository;
-    private final CircleRepository circleRepository;
-    private final CompetitionRepository competitionRepository;
-    private final EduCareerRepository eduCareerRepository;
-    private final EmploymentRepository employmentRepository;
-    private final ProjectRepository projectRepository;
+    private final CircleJpaRepository circleRepository;
+    private final CompetitionJpaRepository competitionJpaRepository;
+    private final EduCareerJpaRepository eduCareerJpaRepository;
+    private final EmploymentJpaRepository employmentJpaRepository;
+    private final ProjectJpaRepository projectJpaRepository;
+    private final CareerEtcJpaRepository etcRepository;
 
     @Override
     public DashBoardUserInfoResponse getUserInfo(Member requestMember) {
@@ -59,10 +60,12 @@ public class DashBoardServiceImpl implements DashBoardService {
         return Stream.of(
                         activityRepository.findByMemberId(memberId),
                         circleRepository.findByMemberId(memberId),
-                        competitionRepository.findByMemberId(memberId),
-                        eduCareerRepository.findByMemberId(memberId),
-                        employmentRepository.findByMemberId(memberId),
-                        projectRepository.findByMemberId(memberId)
+                        competitionJpaRepository.findByMemberId(memberId),
+                        eduCareerJpaRepository.findByMemberId(memberId),
+                        employmentJpaRepository.findByMemberId(memberId),
+                        projectJpaRepository.findByMemberId(memberId),
+                        etcRepository.findByMemberId(memberId)
+
                 )
                 .mapToLong(List::size)
                 .sum();

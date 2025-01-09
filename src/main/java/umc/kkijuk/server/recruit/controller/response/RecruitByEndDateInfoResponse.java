@@ -12,12 +12,14 @@ import java.util.List;
 public class RecruitByEndDateInfoResponse {
     private final Long recruitId;
     private final String title;
+    private final String reviewTag; // 리뷰태그
     private final RecruitStatus status;
     private final List<String> tag;
 
-    public static RecruitByEndDateInfoResponse from(Recruit recruit) {
+    public static RecruitByEndDateInfoResponse from(Recruit recruit,String reviewTag) {
         return RecruitByEndDateInfoResponse.builder()
                 .recruitId(recruit.getId())
+                .reviewTag(reviewTag)
                 .title(recruit.getTitle())
                 .status(recruit.getStatus())
                 .tag(recruit.getTags())

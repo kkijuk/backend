@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ActivityResponse implements BaseCareerResponse{
     private Long id;
-    private String category;
+    private CategoryResponse category;
     private String name;
     private String alias;
     private Boolean unknown;
@@ -38,7 +38,7 @@ public class ActivityResponse implements BaseCareerResponse{
 
     public ActivityResponse(Activity activity) {
         this.id = activity.getId();
-        this.category = CareerType.ACTIVITY.getDescription();
+        this.category = new CategoryResponse(CareerType.ACTIVITY.getId(),CareerType.ACTIVITY.getDescription(),CareerType.ACTIVITY.name());
         this.name = activity.getName();
         this.alias = activity.getAlias();
         this.unknown = activity.getUnknown();

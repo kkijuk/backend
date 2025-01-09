@@ -21,7 +21,7 @@ import umc.kkijuk.server.member.service.MemberService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/career/detail")
-public class BaseCareerDetailController {
+public class CareerDetailController {
     private final MemberService memberService;
     private final BaseCareerDetailService careerDetailService;
     private final LoginUser loginUser;

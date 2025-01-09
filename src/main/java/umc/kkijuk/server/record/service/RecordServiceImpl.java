@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.kkijuk.server.career.controller.response.*;
-import umc.kkijuk.server.career.domain.*;
 import umc.kkijuk.server.career.repository.*;
 import umc.kkijuk.server.common.domian.exception.IntroFoundException;
 import umc.kkijuk.server.common.domian.exception.IntroOwnerMismatchException;
 import umc.kkijuk.server.common.domian.exception.RecordNotFoundException;
 import umc.kkijuk.server.common.domian.exception.ResourceNotFoundException;
+import umc.kkijuk.server.detail.domain.CareerType;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.repository.MemberRepository;
 import umc.kkijuk.server.record.controller.response.*;
@@ -36,10 +36,12 @@ public class RecordServiceImpl implements RecordService {
 
     private final ActivityRepository activityRepository;
     private final CircleRepository circleRepository;
-    private final CompetitionRepository competitionRepository;
-    private final EduCareerRepository eduCareerRepository;
-    private final EmploymentRepository employmentRepository;
-    private final ProjectRepository projectRepository;
+    private final CompetitionRepository competitionJpaRepository;
+    private final EduCareerRepository eduCareerJpaRepository;
+    private final EmploymentRepository employmentJpaRepository;
+    private final ProjectRepository projectJpaRepository;
+    private final CareerEtcRepository etcRepository;
+
     private final FileRepository fileRepository;
 
     @Override
@@ -80,29 +82,33 @@ public class RecordServiceImpl implements RecordService {
         }
 
         // 경력
-        List<EmploymentResponse> employments = employmentRepository.findByMemberId(memberId).stream()
+        List<EmploymentResponse> employments = employmentJpaRepository.findByMemberId(memberId).stream()
                 .map(EmploymentResponse::new)
                 .sorted(Comparator.comparing(EmploymentResponse::getEndDate).reversed())
                 .toList();
 
-        // 활동 및 경험 ( 동아리, 대외활동)
+        // 활동 및 경험 ( 동아리, 대외활동, 기타 )
         List<BaseCareerResponse> activitiesAndExperiences = activityRepository.findByMemberId(memberId).stream()
                 .map(ActivityResponse::new)
                 .collect(Collectors.toList());
+
         activitiesAndExperiences.addAll(circleRepository.findByMemberId(memberId).stream()
                 .map(CircleResponse::new).collect(Collectors.toList()));
+        activitiesAndExperiences.addAll(etcRepository.findByMemberId(memberId).stream()
+                .map(EtcResponse::new).collect(Collectors.toList()));
+
         activitiesAndExperiences.stream().sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed());
 
         // 프로젝트 ( 프로젝트, 공모전/대회)
-        List<BaseCareerResponse> projectsAndComp = projectRepository.findByMemberId(memberId).stream()
+        List<BaseCareerResponse> projectsAndComp = projectJpaRepository.findByMemberId(memberId).stream()
                 .map(ProjectResponse::new)
                 .collect(Collectors.toList());
-        projectsAndComp.addAll(competitionRepository.findByMemberId(memberId).stream()
+        projectsAndComp.addAll(competitionJpaRepository.findByMemberId(memberId).stream()
                 .map(CompetitionResponse::new).collect(Collectors.toList()));
         projectsAndComp.stream().sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed());
 
         // 교육 ( 교육)
-        List<EduCareerResponse> eduCareers = eduCareerRepository.findByMemberId(memberId).stream()
+        List<EduCareerResponse> eduCareers = eduCareerJpaRepository.findByMemberId(memberId).stream()
                 .map(EduCareerResponse::new)
                 .sorted(Comparator.comparing(EduCareerResponse::getEndDate).reversed())
                 .toList();
@@ -153,29 +159,32 @@ public class RecordServiceImpl implements RecordService {
                 .orElseThrow(() -> new ResourceNotFoundException("member ", memberId));
 
         //경력
-        List<EmploymentResponse> employments = employmentRepository.findByMemberId(memberId).stream()
+        List<EmploymentResponse> employments = employmentJpaRepository.findByMemberId(memberId).stream()
                 .map(EmploymentResponse::new)
                 .sorted(Comparator.comparing(EmploymentResponse::getEndDate).reversed())
                 .toList();
 
-        //활동 및 경험 ( 동아리, 대외활동)
+        //활동 및 경험 ( 동아리, 대외활동, 기타 )
         List<BaseCareerResponse> activitiesAndExperiences = activityRepository.findByMemberId(memberId).stream()
                 .map(ActivityResponse::new)
                 .collect(Collectors.toList());
         activitiesAndExperiences.addAll(circleRepository.findByMemberId(memberId).stream()
                 .map(CircleResponse::new).collect(Collectors.toList()));
+        activitiesAndExperiences.addAll(etcRepository.findByMemberId(memberId).stream()
+                .map(EtcResponse::new).collect(Collectors.toList()));
+
         activitiesAndExperiences.stream().sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed());
 
         //프로젝트 ( 프로젝트, 공모전/대회)
-        List<BaseCareerResponse> projectsAndComp = projectRepository.findByMemberId(memberId).stream()
+        List<BaseCareerResponse> projectsAndComp = projectJpaRepository.findByMemberId(memberId).stream()
                 .map(ProjectResponse::new)
                 .collect(Collectors.toList());
-        projectsAndComp.addAll(competitionRepository.findByMemberId(memberId).stream()
+        projectsAndComp.addAll(competitionJpaRepository.findByMemberId(memberId).stream()
                 .map(CompetitionResponse::new).collect(Collectors.toList()));
         projectsAndComp.stream().sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed());
 
         //교육 ( 교육)
-        List<EduCareerResponse> eduCareers = eduCareerRepository.findByMemberId(memberId).stream()
+        List<EduCareerResponse> eduCareers = eduCareerJpaRepository.findByMemberId(memberId).stream()
                 .map(EduCareerResponse::new)
                 .sorted(Comparator.comparing(EduCareerResponse::getEndDate).reversed())
                 .toList();
@@ -223,34 +232,40 @@ public class RecordServiceImpl implements RecordService {
                 .orElseThrow(() -> new ResourceNotFoundException("member ", memberId));
         Record record = recordRepository.findByMemberId(memberId);
 
-        List<ResumeResponse> employments = employmentRepository.findByMemberId(memberId).stream()
-                .map(employment -> new ResumeResponse(employment.getId(),"경력",employment.getName(),
+        List<ResumeResponse> employments = employmentJpaRepository.findByMemberId(memberId).stream()
+                .map(employment -> new ResumeResponse(employment.getId(),CareerType.EMP.getDescription(),employment.getName(),
                         employment.getAlias(),employment.getSummary(),employment.getStartdate(),
                         employment.getEnddate())).collect(Collectors.toList());
+        //활동 및 경험 ( 대외 활동, 동아리, 기타 )
 
         List<ResumeResponse> activitiesAndExperiences = activityRepository.findByMemberId(memberId).stream()
-                .map(activity -> new ResumeResponse(activity.getId(), "대외활동",activity.getName(),
+                .map(activity -> new ResumeResponse(activity.getId(), CareerType.ACTIVITY.getDescription(), activity.getName(),
                         activity.getAlias(),activity.getSummary(),activity.getStartdate(),
                         activity.getEnddate())).collect(Collectors.toList());
 
         activitiesAndExperiences.addAll(circleRepository.findByMemberId(memberId).stream()
-                .map(circle->new ResumeResponse(circle.getId(),"동아리",circle.getName(),
+                .map(circle->new ResumeResponse(circle.getId(),CareerType.CIRCLE.getDescription(), circle.getName(),
                         circle.getAlias(),circle.getSummary(),circle.getStartdate(),
                         circle.getEnddate())).collect(Collectors.toList()));
 
+        activitiesAndExperiences.addAll(etcRepository.findByMemberId(memberId).stream()
+                .map(etc -> new ResumeResponse(etc.getId(), CareerType.ETC.getDescription(), etc.getName(),
+                        etc.getAlias(), etc.getSummary(), etc.getStartdate(),
+                        etc.getEnddate())).collect(Collectors.toList()));
+
         //프로젝트 ( 프로젝트, 공모전/대회)
-        List<ResumeResponse> projectsAndComp = projectRepository.findByMemberId(memberId).stream()
-                .map(project->new ResumeResponse(project.getId(),"프로젝트",project.getName(),
+        List<ResumeResponse> projectsAndComp = projectJpaRepository.findByMemberId(memberId).stream()
+                .map(project->new ResumeResponse(project.getId(),CareerType.PROJECT.getDescription(), project.getName(),
                         project.getAlias(),project.getSummary(),project.getStartdate(),
                         project.getEnddate())).collect(Collectors.toList());
 
-        projectsAndComp.addAll(competitionRepository.findByMemberId(memberId).stream()
-                .map(comp -> new ResumeResponse(comp.getId(),"공모전/대회", comp.getName(),
+        projectsAndComp.addAll(competitionJpaRepository.findByMemberId(memberId).stream()
+                .map(comp -> new ResumeResponse(comp.getId(),CareerType.COM.getDescription(), comp.getName(),
                         comp.getAlias(),comp.getSummary(),comp.getStartdate(),
                         comp.getEnddate())).collect(Collectors.toList()));
 
-        List<ResumeResponse> eduCareers = eduCareerRepository.findByMemberId(memberId).stream()
-                .map(edu-> new ResumeResponse(edu.getId(),"교육",edu.getName(),
+        List<ResumeResponse> eduCareers = eduCareerJpaRepository.findByMemberId(memberId).stream()
+                .map(edu-> new ResumeResponse(edu.getId(),CareerType.EDU.getDescription(),edu.getName(),
                         edu.getAlias(),edu.getSummary(),edu.getStartdate(),
                         edu.getEnddate())).collect(Collectors.toList());
 

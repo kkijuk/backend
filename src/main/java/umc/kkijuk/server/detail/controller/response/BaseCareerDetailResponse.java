@@ -1,7 +1,9 @@
 package umc.kkijuk.server.detail.controller.response;
 
 import lombok.*;
+import umc.kkijuk.server.career.controller.response.CategoryResponse;
 import umc.kkijuk.server.detail.domain.BaseCareerDetail;
+import umc.kkijuk.server.detail.domain.CareerType;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor
 public class BaseCareerDetailResponse {
+//    private CategoryResponse category;
     private Long detailId;
     private String title;
     private String content;
@@ -28,6 +31,7 @@ public class BaseCareerDetailResponse {
         this.content = detail.getContent();
         this.startDate = detail.getStartDate();
         this.endDate = detail.getEndDate();
+//        this.category = new CategoryResponse(type.getId(),type.getDescription(),type.name());
         this.detailTag = Optional.ofNullable(detail.getCareerTagList())
                 .orElse(Collections.emptyList())
                 .stream()

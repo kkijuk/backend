@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -125,7 +126,7 @@ public class RecruitController {
             @RequestParam LocalDate date) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        List<Recruit> recruits = recruitService.findAllByEndTime(requestMember, date);
+        Map<Recruit, String> recruits = recruitService.findAllByEndTime(requestMember, date);
         return ResponseEntity
                 .ok()
                 .body(RecruitListByEndDateResponse.from(recruits));
@@ -142,7 +143,7 @@ public class RecruitController {
             @RequestParam LocalDateTime time) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        List<Recruit> recruits = recruitService.findAllByEndTimeAfter(requestMember, time);
+        Map<Recruit, String> recruits = recruitService.findAllByEndTimeAfter(requestMember, time);
         return ResponseEntity
                 .ok()
                 .body(RecruitListByEndTimeAfterResponse.from(recruits));
