@@ -198,4 +198,12 @@ public class IntroduceServiceImpl implements IntroduceService {
 
         return response;
     }
+
+    @Override
+    @Transactional
+    public int findStateByRecruitId(Long recruitId) {
+        return introduceRepository.findByRecruitId(recruitId)
+                .map(Introduce::getState)
+                .orElse(0);
+    }
 }
