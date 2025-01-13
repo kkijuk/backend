@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewJpaRepository extends JpaRepository<ReviewEntity, Long> {
     List<ReviewEntity> findAllByRecruitId(Long id);
@@ -18,4 +19,7 @@ public interface ReviewJpaRepository extends JpaRepository<ReviewEntity, Long> {
             "ORDER BY rv.date DESC, r.end_time DESC", nativeQuery = true)
     List<RecruitReviewDtoInterface> findActiveRecruitReviewsByMemberIdAndKeyword(@Param("memberId") Long memberId,
                                                                                  @Param("keyword") String keyword);
+
+    @Query("SELECT rv FROM ReviewEntity rv WHERE rv.recruitId = :recruitId AND rv.title = :title")
+    Optional<ReviewEntity> findByRecruitIdAndTitle(@Param("recruitId") Long recruitId, @Param("title") String title);
 }

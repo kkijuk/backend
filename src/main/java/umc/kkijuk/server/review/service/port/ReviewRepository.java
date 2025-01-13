@@ -1,5 +1,6 @@
 package umc.kkijuk.server.review.service.port;
 
+import umc.kkijuk.server.recruit.domain.Recruit;
 import umc.kkijuk.server.review.domain.RecruitReviewDto;
 import umc.kkijuk.server.review.domain.Review;
 
@@ -18,4 +19,6 @@ public interface ReviewRepository {
     List<Review> findAllByRecruitId(Long id);
 
     List<RecruitReviewDto> findReviewByKeyword(Long memberId, String keyword);
+
+    Optional<Review> findByRecruitAndTitle(Recruit recruit, String title);
 }

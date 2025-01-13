@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import umc.kkijuk.server.introduce.domain.Introduce;
 import umc.kkijuk.server.recruit.domain.Recruit;
 import umc.kkijuk.server.recruit.domain.RecruitStatus;
 import umc.kkijuk.server.review.domain.Review;
@@ -11,6 +12,7 @@ import umc.kkijuk.server.review.domain.Review;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -34,8 +36,9 @@ public class RecruitInfoResponse {
     private final int reviewCount;
     private final String link;
     private final List<ReviewResponse> reviews;
+    private final int introduceState;
 
-    public static RecruitInfoResponse from(Recruit recruit, List<Review> reviews) {
+    public static RecruitInfoResponse from(Recruit recruit, List<Review> reviews, int introduceState) {
         return RecruitInfoResponse.builder()
                 .title(recruit.getTitle())
                 .startTime(recruit.getStartTime())
@@ -46,6 +49,7 @@ public class RecruitInfoResponse {
                 .link(recruit.getLink())
                 .reviewCount(reviews.size())
                 .reviews(reviews.stream().map(ReviewResponse::from).toList())
+                .introduceState(introduceState)
                 .build();
     }
 }
