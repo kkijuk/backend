@@ -62,6 +62,36 @@ jobs:
           echo "cloud.aws.s3.bucket=${{ secrets.AWS_BUCKET_NAME }}" >> ./src/main/resources/application.properties
           echo "cloud.aws.s3.bucket-path=${{ secrets.AWS_BUCKET_PATH }}" >> ./src/main/resources/application.properties
 
+          # JWT Secret
+          echo "spring.jwt.secret=${{ secrets.JWT_SECRET }}" >> ./src/main/resources/application.properties
+
+          # Kakao OAuth2 Configuration
+          echo "spring.security.oauth2.client.registration.kakao.client-name=${{ secrets.KAKAO_CLIENT_NAME }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.kakao.client-id=${{ secrets.KAKAO_CLIENT_ID }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.kakao.client-secret=${{ secrets.KAKAO_CLIENT_SECRET }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.kakao.redirect-uri=${{ secrets.KAKAO_REDIRECT_URI }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.kakao.authorization-grant-type=${{ secrets.KAKAO_AUTH_GRANT_TYPE }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.kakao.client-authentication-method=${{ secrets.KAKAO_AUTH_METHOD }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.kakao.scope=${{ secrets.KAKAO_SCOPE }}" >> ./src/main/resources/application.properties
+
+          echo "spring.security.oauth2.client.provider.kakao.authorization-uri=${{ secrets.KAKAO_AUTHORIZATION_URI }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.provider.kakao.token-uri=${{ secrets.KAKAO_TOKEN_URI }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.provider.kakao.user-info-uri=${{ secrets.KAKAO_USER_INFO_URI }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.provider.kakao.user-name-attribute=${{ secrets.KAKAO_USER_NAME_ATTRIBUTE }}" >> ./src/main/resources/application.properties
+
+          # Naver OAuth2 Configuration
+          echo "spring.security.oauth2.client.registration.naver.client-name=${{ secrets.NAVER_CLIENT_NAME }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.naver.client-id=${{ secrets.NAVER_CLIENT_ID }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.naver.client-secret=${{ secrets.NAVER_CLIENT_SECRET }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.naver.redirect-uri=${{ secrets.NAVER_REDIRECT_URI }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.naver.authorization-grant-type=${{ secrets.NAVER_AUTH_GRANT_TYPE }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.registration.naver.scope=${{ secrets.NAVER_SCOPE }}" >> ./src/main/resources/application.properties
+
+          echo "spring.security.oauth2.client.provider.naver.authorization-uri=${{ secrets.NAVER_AUTHORIZATION_URI }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.provider.naver.token-uri=${{ secrets.NAVER_TOKEN_URI }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.provider.naver.user-info-uri=${{ secrets.NAVER_USER_INFO_URI }}" >> ./src/main/resources/application.properties
+          echo "spring.security.oauth2.client.provider.naver.user-name-attribute=${{ secrets.NAVER_USER_NAME_ATTRIBUTE }}" >> ./src/main/resources/application.properties
+
       - name: Build with Gradle Wrapper
         run: ./gradlew build
 
