@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 import umc.kkijuk.server.recruit.controller.port.RecruitService;
@@ -19,6 +17,7 @@ import umc.kkijuk.server.review.controller.response.ReviewIdResponse;
 import umc.kkijuk.server.review.domain.Review;
 import umc.kkijuk.server.review.domain.ReviewCreate;
 import umc.kkijuk.server.review.domain.ReviewUpdate;
+import umc.kkijuk.server.common.LoginUser;
 
 @Tag(name = "review", description = "모집 공고 후기 API")
 @RestController
@@ -28,6 +27,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final RecruitService recruitService;
     private final MemberService memberService;
+    private final LoginUser loginUser;
 
     @Operation(
             summary = "지원 공고 후기 추가",
@@ -35,11 +35,12 @@ public class ReviewController {
     @Parameter(name = "recruitId", description = "지원 공고 ID", example = "1")
     @PostMapping("/review")
     public ResponseEntity<ReviewIdResponse> create(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long recruitId,
             @RequestBody @Valid ReviewCreate reviewCreate
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         Recruit recruit = recruitService.getById(recruitId);
         Review review = reviewService.create(requestMember, recruit, reviewCreate);
 
@@ -55,12 +56,13 @@ public class ReviewController {
     @Parameter(name = "reviewId", description = "지원 공고 후기 ID", example = "1")
     @PutMapping("/review/{reviewId}")
     public ResponseEntity<ReviewIdResponse> update(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long recruitId,
             @PathVariable Long reviewId,
             @RequestBody @Valid ReviewUpdate reviewUpdate
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         Recruit recruit = recruitService.getById(recruitId);
         Review review = reviewService.update(requestMember, recruit, reviewId, reviewUpdate);
 
@@ -76,11 +78,12 @@ public class ReviewController {
     @Parameter(name = "reviewId", description = "지원 공고 후기 ID", example = "1")
     @DeleteMapping("/review/{reviewId}")
     public ResponseEntity<Void> delete(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long recruitId,
             @PathVariable Long reviewId
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         Recruit recruit = recruitService.getById(recruitId);
         reviewService.delete(requestMember, recruit, reviewId);
 

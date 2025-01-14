@@ -7,8 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.career.controller.response.*;
 import umc.kkijuk.server.career.service.CareerSearchService;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
+import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 
@@ -21,15 +20,17 @@ import java.util.List;
 public class CareerSearchController {
     private final CareerSearchService careerSearchService;
     private final MemberService memberService;
+    private final LoginUser loginUser;
     @GetMapping("")
     @Operation(
             summary = "활동 목록",
             description = "활동을 조회합니다. query 값으로 category(카테고리 기준), year(연도 기준), 또는 all(전체 조회) 중 하나를 선택하여 요청해주세요." )
     public CareerResponse<?> findAllCareersGroupedYear(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @RequestParam(name="status") String value
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         if(value.equals("category")){
             return CareerResponse.success(
                     CareerResponseMessage.CAREER_FINDALL_SUCCESS,
@@ -50,11 +51,12 @@ public class CareerSearchController {
     @Operation(summary = "활동 상세", description = "활동 ID에 해당하는 활동의 세부 내용과, 활동 기록을 조회합니다.")
     @Parameter(name = "careerId", description = "활동 Id, path variable 입니다.", example = "1")
     public CareerResponse<BaseCareerResponse> findCareer(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable String type,
             @PathVariable Long careerId
     ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findCareer(requestMember, careerId, type)
@@ -65,14 +67,15 @@ public class CareerSearchController {
             summary = "활동 검색 - 활동 기록",
             description = "활동기록을 주어진 조건에 맞추어 조회합니다. query 값으로 검색어(keyword)와 정렬 기준(new,old)을 요청해주세요. " )
     public CareerResponse<List<FindDetailResponse>> findDetail(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @RequestParam(name="keyword")String keyword,
             @RequestParam(name="sort") String sort
     ) {
-        Member reqeustMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
-                careerSearchService.findAllDetail(reqeustMember,keyword,sort)
+                careerSearchService.findAllDetail(requestMember,keyword,sort)
         );
     }
 
@@ -82,10 +85,11 @@ public class CareerSearchController {
             description = "검색어를 포함하는 활동 태그들을 가나다 순으로 조회합니다.  " +
                     "query 값으로 검색어(keyword)를 요청해주세요. " )
     public CareerResponse<FindTagResponse.SearchTagResponse> findTag(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @RequestParam(name="keyword")String keyword
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_SEARCH_SUCCESS,
                 careerSearchService.findAllTag(requestMember, keyword)
@@ -98,11 +102,12 @@ public class CareerSearchController {
             description = "선택한 태그를 포함하는 활동 기록들을 조회합니다. " +
                     " query 값으로 태그의 ID 와 정렬 기준(new,old)을 요청해주세요. " )
     public CareerResponse<List<FindDetailResponse>> findTagAndDetail(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @RequestParam(name="tagId") Long tagId,
             @RequestParam(name="sort") String sort
     ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findAllDetailByTag(requestMember, tagId, sort)
@@ -113,11 +118,12 @@ public class CareerSearchController {
             summary = "활동 검색 - 활동",
             description =  "활동을 주어진 조건에 맞추어 조회합니다. query 값으로 검색어(keyword)와 정렬 기준(new,old)을 요청해주세요. " )
     public CareerResponse<List<FindCareerResponse>> findCareerWithKeyword(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "sort") String sort
     ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findCareerWithKeyword(requestMember, keyword, sort)
@@ -129,9 +135,10 @@ public class CareerSearchController {
             summary = "활동 타임라인",
             description = "타임라인에 필요한 활동 정보들을 조회합니다.")
     public CareerResponse<List<TimelineResponse>> findCareerForTimeline(
-            @Login LoginInfo loginInfo
+            @RequestHeader("Authorization") String token
     ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findCareerForTimeline(requestMember)

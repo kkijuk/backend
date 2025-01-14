@@ -22,11 +22,6 @@ public class Activity extends BaseCareer {
     private int contribution;
     private Boolean isTeam;
 
-//    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
-//    private List<BaseCareerDetail> detailList = new ArrayList<>();
-//    @Convert(converter = LongListConverter.class)
-//    private List<Long> details = new ArrayList<>();
-
     @Override
     public Long getId() {
         return id;

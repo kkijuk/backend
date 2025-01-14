@@ -22,29 +22,38 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
+    private String socialId;
+
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+
     @NotNull
     private String email;
 
-    @NotNull
+//    @NotNull
     private String name;
 
-    @NotNull
+//    @NotNull
     private String phoneNumber;
 
-    @NotNull
+//    @NotNull
     private LocalDate birthDate;
-
-    @NotNull
-    private String password;
 
     @Convert(converter = StringListToStringConverter.class)
     private List<String> field;
 
-    @NotNull
+    //소셜 로그인 후 추가적으로 입력받아야 하는 항목들 - 4개
+//    @NotNull
     @Enumerated(EnumType.STRING)
-    private MarketingAgree marketingAgree;
+    private MarketingAgree marketingAgree; //마케팅 정보 수신 동의 여부
+    private Boolean termsAgree; //이용약관 동의 여부
+    private Boolean privacyAgree; //개인정보 수집 동의 여부
+    @Enumerated(EnumType.STRING)
+    private MemberJob memberJob;
+    //그리고 사용자가 4개의 정보를 입력하였는지를 확인할 수 있는 상태
+    private Boolean isProfileComplete;
 
-    @NotNull
+//    @NotNull
     @Enumerated(EnumType.STRING)
     private State userState;
 
@@ -54,12 +63,17 @@ public class Member extends BaseEntity {
     private List<String> recruitTags;
 
 
-    public Member(String email, String name, String phoneNumber, LocalDate birthDate, String password, MarketingAgree marketingAgree, State userState) {
+//    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+//    private String refreshToken;
+
+    public Member(String email, String name, String phoneNumber, LocalDate birthDate, MarketingAgree marketingAgree, State userState) {
         this.email = email;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
-        this.password = password;
         this.marketingAgree = marketingAgree;
         this.userState = userState;
     }
@@ -72,10 +86,6 @@ public class Member extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
         this.marketingAgree = marketingAgree;
-    }
-
-    public void changeMemberPassword(String password){
-        this.password = password;
     }
 
     public void inactivate() {
@@ -94,5 +104,45 @@ public class Member extends BaseEntity {
 
     public void deleteRecruitTag(String tag) {
         this.recruitTags.remove(tag);
+    }
+
+    public void setSocialId(String socialId) {
+        this.socialId = socialId;
+    }
+
+    public void setEmail(String email) {this.email = email;}
+
+    public void setName(String name) {this.name = name;}
+    public void setRole(Role role) {this.role = role;}
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+//    public void setRefreshToken(String refreshToken){ this.refreshToken = refreshToken;}
+    public void setSocialType(SocialType type){this.socialType = type;}
+    public void setUserState(State state){this.userState = state;}
+
+    public void setMarketingAgree(MarketingAgree marketingAgree) {
+        this.marketingAgree = marketingAgree;
+    }
+
+    public void setTermsAgree(Boolean termsAgree) {
+        this.termsAgree = termsAgree;
+    }
+
+    public void setPrivacyAgree(Boolean privacyAgree) {
+        this.privacyAgree = privacyAgree;
+    }
+
+    public void setMemberJob(MemberJob memberJob) {
+        this.memberJob = memberJob;
+    }
+
+    public void setProfileComplete(Boolean profileComplete) {
+        isProfileComplete = profileComplete;
     }
 }

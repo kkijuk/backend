@@ -21,8 +21,6 @@ public class Project extends BaseCareer{
     @Enumerated(EnumType.STRING)
     private ProjectType location;
 
-//    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-//    private List<BaseCareerDetail> detailList = new ArrayList<>();
     @Override
     public Long getId() {
         return id;

@@ -13,7 +13,6 @@ import umc.kkijuk.server.common.domian.exception.*;
 import umc.kkijuk.server.common.domian.response.ErrorResponse;
 import umc.kkijuk.server.common.domian.exception.ConfirmPasswordMismatchException;
 import umc.kkijuk.server.common.domian.response.ErrorResultResponse;
-import umc.kkijuk.server.login.exception.UnauthorizedException;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -121,11 +120,11 @@ public class ExceptionControllerAdvice {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(UnauthorizedException.class)
-    public ErrorResponse UnauthorizedException(UnauthorizedException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    @ExceptionHandler(UnauthorizedException.class)
+//    public ErrorResponse UnauthorizedException(UnauthorizedException exception) {
+//        return new ErrorResponse(exception.getMessage());
+//    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(EmailAlreadyExistsException.class)

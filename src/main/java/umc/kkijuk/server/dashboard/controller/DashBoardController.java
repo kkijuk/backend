@@ -6,14 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.dashboard.controller.port.DashBoardService;
 import umc.kkijuk.server.dashboard.controller.response.DashBoardUserInfoResponse;
 import umc.kkijuk.server.dashboard.controller.response.IntroduceRemindResponse;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 import umc.kkijuk.server.dashboard.controller.response.RecruitRemindResponse;
@@ -27,20 +26,22 @@ import java.util.List;
 public class DashBoardController {
     private final DashBoardService dashBoardService;
     private final MemberService memberService;
+    private final LoginUser loginUser;
 
-    private final Member requestMember = Member.builder()
-            .id(LoginUser.get().getId())
-            .name("tester")
-            .build();
+//    private final Member requestMember = Member.builder()
+//            .id(LoginUser.get().getId())
+//            .name("tester")
+//            .build();
 
     @Operation(
             summary = "메인화면 정보 보드",
             description = "메인화면에 사용자이름, 가입한 기간, 활동, 지원현황 갯수 데이터를 응답합니다.")
     @GetMapping("/user-info")
     public ResponseEntity<DashBoardUserInfoResponse> getUserInfo(
-            @Login LoginInfo loginInfo
+            @RequestHeader("Authorization") String token
             ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         DashBoardUserInfoResponse response = dashBoardService.getUserInfo(requestMember);
         return ResponseEntity
                 .ok()
@@ -53,9 +54,10 @@ public class DashBoardController {
     )
     @GetMapping("/remind/recruit")
     public ResponseEntity<RecruitRemindResponse> getRemindRecruits(
-            @Login LoginInfo loginInfo
+            @RequestHeader("Authorization") String token
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         RecruitRemindResponse response = dashBoardService.getTopTwoRecruitsByEndTime(requestMember);
         return ResponseEntity
                 .ok()
@@ -64,10 +66,10 @@ public class DashBoardController {
 
     @GetMapping("/introduce")
     @Operation(summary = "홈 자기소개서 작성 알림")
-    public ResponseEntity<Object> get(
-            @Login LoginInfo loginInfo
+    public ResponseEntity<Object> get(@RequestHeader("Authorization") String token
     ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         List<IntroduceRemindResponse> homeIntroduceResDtos = dashBoardService.getHomeIntro(requestMember);
         return ResponseEntity
                 .status(HttpStatus.OK)

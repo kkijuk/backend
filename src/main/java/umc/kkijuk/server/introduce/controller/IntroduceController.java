@@ -11,16 +11,12 @@ import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.introduce.common.BaseResponse;
 import umc.kkijuk.server.introduce.controller.response.IntroduceListResponse;
 import umc.kkijuk.server.introduce.controller.response.IntroduceResponse;
-import umc.kkijuk.server.introduce.controller.response.MasterIntroduceResponse;
 import umc.kkijuk.server.introduce.dto.*;
 import umc.kkijuk.server.introduce.service.IntroduceService;
 import umc.kkijuk.server.introduce.service.MasterIntroduceService;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,39 +28,37 @@ public class IntroduceController {
     private final IntroduceService introduceService;
     private final MasterIntroduceService masterIntroduceService;
     private final MemberService memberService;
-
-    private final Member requestMember = Member.builder()
-            .id(LoginUser.get().getId())
-            .build();
+    private final LoginUser loginUser;
 
     @PostMapping("/{recruitId}")
     @Operation(summary = "자기소개서 생성")
-    public ResponseEntity<Object> save(
-            @Login LoginInfo loginInfo,
+    public ResponseEntity<Object> save(@RequestHeader("Authorization") String token,
             @PathVariable("recruitId") Long recruitId, @RequestBody IntroduceReqDto introduceReqDto){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         IntroduceResponse introduceResponse = introduceService.saveIntro(requestMember, recruitId, introduceReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "자기소개서 생성 완료", introduceResponse));
     }
 
-   @GetMapping("detail/{introId}")
-   @Operation(summary = "자기소개서 개별 조회")
-    public ResponseEntity<Object> get(
-           @Login LoginInfo loginInfo,
-           @PathVariable("introId") Long introId){
-       Member requestMember = memberService.getById(loginInfo.getMemberId());
-       IntroduceResponse introduceResponse = introduceService.getIntro(requestMember, introId);
-       return ResponseEntity
-               .status(HttpStatus.OK)
-               .body(new BaseResponse<>(HttpStatus.OK.value(), "자기소개서 조회 완료", introduceResponse));
+    @GetMapping("detail/{introId}")
+    @Operation(summary = "자기소개서 개별 조회")
+    public ResponseEntity<Object> get(@RequestHeader("Authorization") String token,
+            @PathVariable("introId") Long introId){
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
+        IntroduceResponse introduceResponse = introduceService.getIntro(requestMember, introId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new BaseResponse<>(HttpStatus.OK.value(), "자기소개서 조회 완료", introduceResponse));
     }
 
     @GetMapping("list")
     @Operation(summary = "자기소개서 목록 조회")
-    public ResponseEntity<Object> getList(@Login LoginInfo loginInfo){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+    public ResponseEntity<Object> getList(@RequestHeader("Authorization") String token){
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         List<IntroduceListResponse> introduceListResponses = introduceService.getIntroList(requestMember);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -73,10 +67,10 @@ public class IntroduceController {
 
     @PatchMapping("/{introId}")
     @Operation(summary = "자기소개서 수정")
-    public ResponseEntity<Object> update(
-            @Login LoginInfo loginInfo,
+    public ResponseEntity<Object> update(@RequestHeader("Authorization") String token,
             @PathVariable("introId") Long introId, @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         IntroduceResponse introduceResponse = introduceService.updateIntro(requestMember, introId, introduceReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -85,10 +79,10 @@ public class IntroduceController {
 
     @DeleteMapping("/{introId}")
     @Operation(summary = "자기소개서 삭제")
-    public ResponseEntity<Object> delete(
-            @Login LoginInfo loginInfo,
+    public ResponseEntity<Object> delete(@RequestHeader("Authorization") String token,
             @PathVariable("introId") Long introId){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         Long intro_Id = introduceService.deleteIntro(requestMember, introId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -97,12 +91,12 @@ public class IntroduceController {
 
     @GetMapping("/search")
     @Operation(summary = "키워드로 자기소개서 문단 검색")
-    public ResponseEntity<Map<String, Object>> searchIntroduceByKeyword(@Login LoginInfo loginInfo, @RequestParam String keyword) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+    public ResponseEntity<Map<String, Object>> searchIntroduceByKeyword(
+            @RequestHeader("Authorization") String token,
+            @RequestParam String keyword) {
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         Map<String, Object> response = introduceService.searchIntroduceAndMasterByKeyword(keyword, requestMember);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
-
-
 }

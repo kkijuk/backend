@@ -46,7 +46,7 @@ public class TagServiceTest {
                 .email("test@naver.com")
                 .phoneNumber("010-1234-5678")
                 .birthDate(LocalDate.of(2024, 7, 31))
-                .password("test")
+//                .password("test")
                 .userState(State.ACTIVATE)
                 .build();
 
@@ -55,7 +55,7 @@ public class TagServiceTest {
                 .email("test2@naver.com")
                 .phoneNumber("010-2345-5678")
                 .birthDate(LocalDate.of(2024, 7, 31))
-                .password("test")
+//                .password("test")
                 .userState(State.ACTIVATE)
                 .build();
 

@@ -18,8 +18,6 @@ public class Circle extends BaseCareer{
     private Boolean location;
     private String role;
 
-//    @OneToMany(mappedBy = "circle", cascade = CascadeType.ALL)
-//    private List<BaseCareerDetail> detailList = new ArrayList<>();
     @Override
     public Long getId() {
         return id;

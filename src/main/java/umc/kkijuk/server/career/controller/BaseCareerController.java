@@ -1,6 +1,5 @@
 package umc.kkijuk.server.career.controller;
 
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,10 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.career.controller.response.*;
 import umc.kkijuk.server.career.dto.*;
 import umc.kkijuk.server.career.service.CareerService;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
+import umc.kkijuk.server.common.LoginUser;
 
 
 
@@ -24,43 +22,46 @@ import umc.kkijuk.server.member.service.MemberService;
 public class BaseCareerController {
     private final CareerService baseCareerService;
     private final MemberService memberService;
+    private final LoginUser loginUser;
 
     @PostMapping("/activity")
     @Operation(summary = "커리어(대외활동) 생성", description = "주어진 정보를 바탕으로 활동을 추가합니다.")
-    public CareerResponse<ActivityResponse> createActivity(
-            @Login LoginInfo loginInfo,
+    public CareerResponse<ActivityResponse> createActivity(@RequestHeader("Authorization") String token,
             @RequestBody @Valid ActivityReqDto activityReqDto
-            ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+    ) {
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
 
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createActivity(requestMember, activityReqDto)
         );
-
     }
 
     @PatchMapping("/activity/{activityId}")
     @Operation(summary = "커리어(대외활동) 수정", description = "활동 ID에 해당하는 활동을 수정합니다.")
-    @Parameter(name="activityId", description = "커리어(대외활동) Id, path variable 입니다.",example = "1")
+    @Parameter(name = "activityId", description = "커리어(대외활동) Id, path variable 입니다.", example = "1")
     public CareerResponse<ActivityResponse> updateActivity(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long activityId,
             @Valid @RequestBody ActivityReqDto activityReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
-                baseCareerService.updateActivity(requestMember,activityId,activityReqDto)
+                baseCareerService.updateActivity(requestMember, activityId, activityReqDto)
         );
     }
+
     @PostMapping("/circle")
     @Operation(summary = "커리어(동아리) 생성", description = "주어진 정보를 바탕으로 활동을 추가합니다.")
     public CareerResponse<CircleResponse> createCircle(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @Valid @RequestBody CircleReqDto circleReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createCircle(requestMember, circleReqDto)
@@ -68,95 +69,105 @@ public class BaseCareerController {
     }
 
     @PatchMapping("/circle/{circleId}")
-    @Operation(summary = "커리어(동아리) 수정", description = "활동 ID에 해당하는 활동을 수정합니다..")
-    @Parameter(name="circleId", description = "커리어(동아리) Id, path variable 입니다.",example = "1")
+    @Operation(summary = "커리어(동아리) 수정", description = "활동 ID에 해당하는 활동을 수정합니다.")
+    @Parameter(name = "circleId", description = "커리어(동아리) Id, path variable 입니다.", example = "1")
     public CareerResponse<CircleResponse> updateCircle(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long circleId,
             @Valid @RequestBody CircleReqDto circleReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
-                baseCareerService.updateCircle(requestMember,circleId,circleReqDto)
+                baseCareerService.updateCircle(requestMember, circleId, circleReqDto)
         );
     }
+
     @PostMapping("/competition")
     @Operation(summary = "커리어(대회) 생성", description = "주어진 정보를 바탕으로 활동을 추가합니다.")
     public CareerResponse<CompetitionResponse> createComp(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @Valid @RequestBody CompetitionReqDto competitionReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
-                baseCareerService.createCompetition(requestMember,competitionReqDto)
+                baseCareerService.createCompetition(requestMember, competitionReqDto)
         );
     }
 
     @PatchMapping("/competition/{competitionId}")
     @Operation(summary = "커리어(대회) 수정", description = "활동 ID에 해당하는 활동을 수정합니다.")
-    @Parameter(name="competitionId", description = "커리어(대회) Id, path variable 입니다.",example = "1")
+    @Parameter(name = "competitionId", description = "커리어(대회) Id, path variable 입니다.", example = "1")
     public CareerResponse<CompetitionResponse> updateComp(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long competitionId,
             @Valid @RequestBody CompetitionReqDto competitionReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
-                baseCareerService.updateComp(requestMember,competitionId,competitionReqDto)
+                baseCareerService.updateComp(requestMember, competitionId, competitionReqDto)
         );
     }
+
     @PostMapping("/educareer")
     @Operation(summary = "커리어(교육) 생성", description = "주어진 정보를 바탕으로 활동을 추가합니다.")
     public CareerResponse<EduCareerResponse> createEdu(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @Valid @RequestBody EduCareerReqDto eduCareerReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
-                baseCareerService.crateEduCareer(requestMember,eduCareerReqDto)
+                baseCareerService.crateEduCareer(requestMember, eduCareerReqDto)
         );
     }
 
     @PatchMapping("/educareer/{educareerId}")
     @Operation(summary = "커리어(교육) 수정", description = "활동 ID에 해당하는 활동을 수정합니다.")
-    @Parameter(name="educareerId", description = "커리어(교육) Id, path variable 입니다.",example = "1")
+    @Parameter(name = "educareerId", description = "커리어(교육) Id, path variable 입니다.", example = "1")
     public CareerResponse<EduCareerResponse> updateEdu(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long educareerId,
             @Valid @RequestBody EduCareerReqDto eduCareerReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
-                baseCareerService.updateEdu(requestMember,educareerId,eduCareerReqDto)
+                baseCareerService.updateEdu(requestMember, educareerId, eduCareerReqDto)
         );
     }
 
     @PostMapping("/employment")
     @Operation(summary = "커리어(경력) 생성", description = "주어진 정보를 바탕으로 활동을 추가합니다.")
     public CareerResponse<EmploymentResponse> createEmp(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @Valid @RequestBody EmploymentReqDto employmentReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
-                baseCareerService.createEmployment(requestMember,employmentReqDto)
+                baseCareerService.createEmployment(requestMember, employmentReqDto)
         );
     }
+
     @PatchMapping("/employment/{employmentId}")
     @Operation(summary = "커리어(경력) 수정", description = "활동 ID에 해당하는 활동을 수정합니다.")
-    @Parameter(name="employmentId", description = "커리어(아르바이트/인턴) Id, path variable 입니다.",example = "1")
+    @Parameter(name = "employmentId", description = "커리어(아르바이트/인턴) Id, path variable 입니다.", example = "1")
     public CareerResponse<EmploymentResponse> updateEmp(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long employmentId,
             @Valid @RequestBody EmploymentReqDto employmentReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateEmp(requestMember, employmentId, employmentReqDto)
@@ -166,10 +177,11 @@ public class BaseCareerController {
     @PostMapping("/project")
     @Operation(summary = "커리어(프로젝트) 생성", description = "주어진 정보를 바탕으로 활동을 추가합니다.")
     public CareerResponse<ProjectResponse> createProject(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @Valid @RequestBody ProjectReqDto projectReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createProject(requestMember, projectReqDto)
@@ -178,25 +190,29 @@ public class BaseCareerController {
 
     @PatchMapping("/project/{projectId}")
     @Operation(summary = "커리어(프로젝트) 수정", description = "활동 ID에 해당하는 활동을 수정합니다.")
-    @Parameter(name="projectId", description = "커리어(프로젝트) Id, path variable 입니다.",example = "1")
+    @Parameter(name = "projectId", description = "커리어(프로젝트) Id, path variable 입니다.", example = "1")
     public CareerResponse<ProjectResponse> updateProject(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long projectId,
             @Valid @RequestBody ProjectReqDto projectReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateProject(requestMember, projectId, projectReqDto)
         );
     }
+
+
     @PostMapping("/etc")
     @Operation(summary = "커리어(기타) 생성", description = "주어진 정보를 바탕으로 활동을 추가합니다.")
     public CareerResponse<EtcResponse> createEtc(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @Valid @RequestBody EtcReqDto etcReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createEtc(requestMember, etcReqDto)
@@ -207,11 +223,12 @@ public class BaseCareerController {
     @Operation(summary = "커리어(기타) 수정", description = "활동 ID에 해당하는 활동을 수정합니다.")
     @Parameter(name="etcId", description = "커리어(기타) Id, path variable 입니다.",example = "1")
     public CareerResponse<EtcResponse> updateEtc(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long etcId,
             @Valid @RequestBody EtcReqDto etcReqDto
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateEtc(requestMember, etcId, etcReqDto)
@@ -221,33 +238,32 @@ public class BaseCareerController {
     @DeleteMapping("/{type}/{careerId}")
     @Operation(summary = "커리어 삭제", description = "활동의 type과 ID에 해당하는 활동을 삭제합니다.")
     public CareerResponse<Object> deleteBaseCareer(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable String type,
             @PathVariable Long careerId
-
-    ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
-        baseCareerService.deleteBaseCareer(requestMember,careerId, type);
+    ) {
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
+        baseCareerService.deleteBaseCareer(requestMember, careerId, type);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_DELETE_SUCCESS,
                 null
         );
-
     }
 
     @PatchMapping("/{careerId}")
     @Operation(summary = "활동 내역 수정", description = "활동 ID에 해당하는 활동에 활동 내역을 추가합니다.")
     @Parameter(name = "careerId", description = "활동 Id, path variable 입니다.", example = "1")
     public CareerResponse<BaseCareerResponse> createSummary(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long careerId,
             @Valid @RequestBody CareerSummaryReqDto request
-    ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+    ) {
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
-                baseCareerService.createSummary(requestMember,careerId,request)
+                baseCareerService.createSummary(requestMember, careerId, request)
         );
     }
-
 }

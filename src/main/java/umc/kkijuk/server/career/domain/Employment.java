@@ -20,8 +20,6 @@ public class Employment extends BaseCareer{
     private String position;
     private String field;
 
-//    @OneToMany(mappedBy = "employment", cascade = CascadeType.ALL)
-//    private List<BaseCareerDetail> detailList = new ArrayList<>();
     @Override
     public Long getId() {
         return id;

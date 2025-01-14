@@ -14,8 +14,6 @@ import umc.kkijuk.server.introduce.controller.response.MasterIntroduceResponse;
 import umc.kkijuk.server.introduce.dto.IntroduceReqDto;
 import umc.kkijuk.server.introduce.dto.MasterIntroduceReqDto;
 import umc.kkijuk.server.introduce.service.MasterIntroduceService;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 
@@ -27,17 +25,19 @@ import umc.kkijuk.server.member.service.MemberService;
 public class MasterIntroduceController {
     private final MasterIntroduceService masterIntroduceService;
     private final MemberService memberService;
+    private final LoginUser loginUser;
 
-    private final Member requestMember = Member.builder()
-            .id(LoginUser.get().getId())
-            .build();
+//    private final Member requestMember = Member.builder()
+//            .id(LoginUser.get().getId())
+//            .build();
 
     @PostMapping
     @Operation(summary = "마스터 자기소개서 생성")
-    public ResponseEntity<Object> saveMasterIntro(@Login LoginInfo loginInfo,
+    public ResponseEntity<Object> saveMasterIntro(@RequestHeader("Authorization") String token,
                                                   @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
+        Long memberId = loginUser.extractMemberId(token);
         MasterIntroduceResponse masterIntroduceResponse =
-                masterIntroduceService.saveMasterIntro(loginInfo.getMemberId(), introduceReqDto);
+                masterIntroduceService.saveMasterIntro(memberId, introduceReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "마스터 자기소개서 생성 완료", masterIntroduceResponse));
@@ -45,8 +45,9 @@ public class MasterIntroduceController {
 
     @GetMapping
     @Operation(summary = "마스터 자기소개서 조회")
-    public ResponseEntity<Object> getMasterIntro(@Login LoginInfo loginInfo){
-        MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.getMasterIntro(loginInfo.getMemberId());
+    public ResponseEntity<Object> getMasterIntro(@RequestHeader("Authorization") String token){
+        Long memberId = loginUser.extractMemberId(token);
+        MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.getMasterIntro(memberId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "마스터 자기소개서 조회 완료", masterIntroduceResponse));
@@ -54,9 +55,10 @@ public class MasterIntroduceController {
 
     @PatchMapping
     @Operation(summary = "마스터 자기소개서 수정")
-    public ResponseEntity<Object> updateMasterIntro(
-            @Login LoginInfo loginInfo, @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
-        MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.updateMasterIntro(loginInfo.getMemberId(), introduceReqDto);
+    public ResponseEntity<Object> updateMasterIntro(@RequestHeader("Authorization") String token,
+            @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
+        Long memberId = loginUser.extractMemberId(token);
+        MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.updateMasterIntro(memberId, introduceReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "마스터 자기소개서 수정 완료", masterIntroduceResponse));

@@ -48,14 +48,14 @@ public class EmailAuthController {
         return ResponseEntity.ok(mailService.verifyMail(mailCertificationDto));
     }
 
-    @Operation(
-            summary = "회원 비밀번호 재설정",
-            description = "회원의 비밀번호를 새로운 값으로 재설정합니다.")
-    @PostMapping("/password/reset")
-    public ResponseEntity<Boolean> resetMemberPassword(@RequestBody @Valid MemberPasswordResetDto memberPasswordResetDto){
-
-        Member member = memberService.resetMemberPassword(memberPasswordResetDto);
-        return ResponseEntity.ok(Boolean.TRUE);
-    }
+//    @Operation(
+//            summary = "회원 비밀번호 재설정",
+//            description = "회원의 비밀번호를 새로운 값으로 재설정합니다.")
+//    @PostMapping("/password/reset")
+//    public ResponseEntity<Boolean> resetMemberPassword(@RequestBody @Valid MemberPasswordResetDto memberPasswordResetDto){
+//
+//        Member member = memberService.resetMemberPassword(memberPasswordResetDto);
+//        return ResponseEntity.ok(Boolean.TRUE);
+//    }
 
 }

@@ -8,13 +8,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.detail.controller.response.BaseCareerDetailResponse;
 import umc.kkijuk.server.detail.controller.response.CareerDetailResponse;
 import umc.kkijuk.server.detail.dto.CareerDetailReqDto;
 import umc.kkijuk.server.detail.dto.CareerDetailUpdateReqDto;
 import umc.kkijuk.server.detail.service.BaseCareerDetailService;
-import umc.kkijuk.server.login.argumentresolver.Login;
-import umc.kkijuk.server.login.controller.dto.LoginInfo;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 
@@ -25,6 +24,7 @@ import umc.kkijuk.server.member.service.MemberService;
 public class CareerDetailController {
     private final MemberService memberService;
     private final BaseCareerDetailService careerDetailService;
+    private final LoginUser loginUser;
 
     @PostMapping("/{careerId}")
     @Operation(summary = "활동 기록 생성", description = "주어진 정보를 바탕으로 활동기록을 생성합니다.")
@@ -32,11 +32,12 @@ public class CareerDetailController {
             @Parameter(name = "careerId", description = "활동 Id, path variable 입니다."),
     })
     public CareerDetailResponse<BaseCareerDetailResponse> create(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long careerId,
             @RequestBody @Valid CareerDetailReqDto request
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerDetailResponse.success(HttpStatus.CREATED, "활동 기록을 성공적으로 생성했습니다.",
                 careerDetailService.createDetail(requestMember, request, careerId)
         );
@@ -48,11 +49,12 @@ public class CareerDetailController {
             @Parameter(name = "detailId", description = "활동 기록 Id, path variable 입니다.")
     })
     public CareerDetailResponse<Object> delete(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long careerId,
             @PathVariable Long detailId
     ) {
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         careerDetailService.deleteDetail(requestMember, careerId ,detailId);
         return CareerDetailResponse.success(HttpStatus.OK, "활동 기록을 성공적으로 삭제했습니다.",null);
     }
@@ -64,12 +66,13 @@ public class CareerDetailController {
             @Parameter(name = "detailId", description = "활동 기록 Id, path variable 입니다. ")
     })
     public CareerDetailResponse<BaseCareerDetailResponse> update(
-            @Login LoginInfo loginInfo,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long careerId,
             @PathVariable Long detailId,
             @RequestBody @Valid CareerDetailUpdateReqDto request
     ){
-        Member requestMember = memberService.getById(loginInfo.getMemberId());
+        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = memberService.getById(memberId);
         return CareerDetailResponse.success(
                 HttpStatus.OK,
                 "활동 기록을 성공적으로 수정했습니다.",

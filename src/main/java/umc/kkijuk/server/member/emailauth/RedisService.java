@@ -8,8 +8,9 @@ import java.time.Duration;
 
 @RequiredArgsConstructor
 @Repository
-public class MailCertification {
+public class RedisService {
     private final String PREFIX = "email:"; // key값이 중복되지 않도록 상수 선언
+    private final String REFRESH_TOKEN_PREFIX = "social_id:";
     private final int LIMIT_TIME = 3 * 60; // 인증번호 유효 시간
 
     private final StringRedisTemplate stringRedisTemplate;
@@ -33,5 +34,25 @@ public class MailCertification {
     // Redis에 해당 이메일로 저장된 인증번호가 존재하는지 확인
     public boolean hasKey(String email) {
         return stringRedisTemplate.hasKey(PREFIX + email);
+    }
+    public void saveRefreshToken(String socialId, String refreshToken,long durationMillis){
+        String key = REFRESH_TOKEN_PREFIX+socialId;
+        stringRedisTemplate.opsForValue().set(key,refreshToken, Duration.ofMillis(durationMillis));
+    }
+    public String getRefreshToken(String socialId){
+        String key = REFRESH_TOKEN_PREFIX+socialId;
+        return stringRedisTemplate.opsForValue().get(key);
+    }
+    public boolean deleteRefreshToken(String socialId){
+        try {
+            String key = REFRESH_TOKEN_PREFIX + socialId;
+            Boolean wasDeleted = stringRedisTemplate.delete(key);
+            if (Boolean.TRUE.equals(wasDeleted)) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

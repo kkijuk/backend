@@ -47,7 +47,20 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	//s3
 	implementation 'software.amazon.awssdk:s3:2.17.285'
+
+	// OAuth2
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	// Spring-security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Jwt
+	implementation group:'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+	implementation group:'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+	implementation group:'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 }
 
 tasks.named('test') {

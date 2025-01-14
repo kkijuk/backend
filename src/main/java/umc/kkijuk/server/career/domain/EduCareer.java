@@ -19,8 +19,6 @@ public class EduCareer extends BaseCareer {
     private String organizer;
     private int time;
 
-//    @OneToMany(mappedBy = "eduCareer", cascade = CascadeType.ALL)
-//    private List<BaseCareerDetail> detailList = new ArrayList<>();
     @Override
     public Long getId() {
         return id;
