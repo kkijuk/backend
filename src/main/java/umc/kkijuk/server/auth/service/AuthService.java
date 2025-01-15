@@ -77,46 +77,28 @@ public class AuthService {
 
     @Transactional
     public Map<String, Object> handleKakaoLogin(String code) {
-        try {
-            // 1. 카카오 액세스 토큰 발급
-            String kakaoAccessToken = getKakaoAccessToken(code);
-            if (kakaoAccessToken == null || kakaoAccessToken.isEmpty()) {
-                throw new IllegalArgumentException("카카오 액세스 토큰 발급 실패");
-            }
-
-            // 2. 카카오 사용자 정보 처리 및 사용자 생성/조회
-            Member member = processKakaoUser(kakaoAccessToken);
-            if (member == null) {
-                throw new IllegalArgumentException("카카오 사용자 정보 처리 실패");
-            }
-
-            // 3. 사용자 상태 확인 및 활성화 처리
-            memberRepository.findById(member.getId())
-                    .ifPresentOrElse(
-                            existingMember -> {
-                                if (existingMember.getUserState().equals(State.INACTIVATE)) {
-                                    existingMember.activate();
-                                    memberRepository.save(existingMember);
-                                }
-                            },
-                            () -> {
-                                throw new ResourceNotFoundException("member", member.getId());
-                            }
-                    );
-
-            // 4. JWT 토큰 생성
-            Map<String, Object> tokens = new HashMap<>();
-            tokens.put("Token", generateTokens(member));
-
-            return tokens;
-
-        } catch (IllegalArgumentException | ResourceNotFoundException e) {
-            log.error("카카오 인증 처리 중 오류 발생: {}", e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("알 수 없는 오류 발생: {}", e.getMessage(), e);
-            throw new RuntimeException("카카오 인증 처리 중 오류 발생", e);
+        // 1. 카카오 액세스 토큰 발급
+        String kakaoAccessToken = getKakaoAccessToken(code);
+        if (kakaoAccessToken == null || kakaoAccessToken.isEmpty()) {
+            throw new IllegalArgumentException("카카오 액세스 토큰 발급 실패");
         }
+
+        // 2. 카카오 사용자 정보 처리 및 사용자 생성/조회
+        Member member = processKakaoUser(kakaoAccessToken);
+        if (member == null) {
+            throw new IllegalArgumentException("카카오 사용자 정보 처리 실패");
+        }
+
+        // 3. 사용자 상태 확인 및 활성화 처리
+        if (member.getUserState().equals(State.INACTIVATE)) {
+            member.activate();
+            memberRepository.save(member);
+        }
+
+        // 4. JWT 토큰 생성
+        Map<String, Object> tokens = new HashMap<>();
+        tokens.put("Token", generateTokens(member));
+        return tokens;
     }
 
     @Transactional
