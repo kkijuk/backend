@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.auth.service.AuthService;
+import umc.kkijuk.server.common.domian.exception.ResourceNotFoundException;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.domain.State;
 import umc.kkijuk.server.member.repository.MemberRepository;
@@ -28,17 +30,36 @@ public class AuthController {
     @GetMapping("/kakao/login")
     @Operation(summary = "카카오 로그인", description = "카카오 OAuth 인증을 통해 사용자 정보를 처리하고 JWT 토큰을 생성하여 반환합니다.")
     @Parameter(name = "code", description = "카카오에서 발급된 인증 코드", required = true)
+//    public ResponseEntity<Map<String, Object>> kakaoCallback(@RequestParam("code") String code) {
+//        try {
+//            Map<String, Object> tokens = authService.handleKakaoLogin(code);
+//            log.info("카카오 로그인 성공");
+//            return ResponseEntity.ok(tokens);
+//
+//        } catch (Exception e) {
+//            log.error("카카오 인증 처리 중 오류 발생: {}", e.getMessage(), e);
+//            return ResponseEntity.internalServerError().body(Map.of("error", "카카오 인증 처리 실패"));
+//        }
+//    }
     public ResponseEntity<Map<String, Object>> kakaoCallback(@RequestParam("code") String code) {
         try {
             Map<String, Object> tokens = authService.handleKakaoLogin(code);
             log.info("카카오 로그인 성공");
             return ResponseEntity.ok(tokens);
-
+        } catch (IllegalArgumentException e) {
+            log.warn("카카오 인증 실패: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (ResourceNotFoundException e) {
+            log.warn("리소스 없음: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            log.error("카카오 인증 처리 중 오류 발생: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().body(Map.of("error", "카카오 인증 처리 실패"));
+            log.error("카카오 인증 처리 중 알 수 없는 오류 발생: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "카카오 인증 처리 중 오류 발생"));
         }
     }
+
+
     @GetMapping("/naver/login")
     @Operation(summary = "네이버 로그인", description = "네이버 OAuth 인증을 통해 사용자 정보를 처리하고 JWT 토큰을 생성하여 반환합니다.",
             parameters = {
