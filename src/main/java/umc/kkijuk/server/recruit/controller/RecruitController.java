@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.common.LoginUser;
+import umc.kkijuk.server.introduce.service.IntroduceService;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 import umc.kkijuk.server.recruit.controller.port.RecruitService;
@@ -23,6 +24,7 @@ import umc.kkijuk.server.review.domain.Review;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Tag(name = "recruit", description = "모집 공고 API")
 @Slf4j
@@ -35,6 +37,7 @@ public class RecruitController {
     private final ReviewService reviewService;
     private final MemberService memberService;
     private final LoginUser loginUser;
+    private final IntroduceService introduceService;
 
     @Operation(
             summary = "지원 공고 생성",
@@ -110,10 +113,11 @@ public class RecruitController {
         Member requestMember = memberService.getById(memberId);
         Recruit recruit = recruitService.getById(recruitId);
         List<Review> reviews = reviewService.findAllByRecruit(requestMember, recruit);
+        int state = introduceService.findStateByRecruitId(recruitId);
 
         return ResponseEntity
                 .ok()
-                .body(RecruitInfoResponse.from(recruit, reviews));
+                .body(RecruitInfoResponse.from(recruit, reviews, state));
     }
 
     @Operation(

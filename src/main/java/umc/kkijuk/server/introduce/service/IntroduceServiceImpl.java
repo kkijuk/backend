@@ -14,9 +14,15 @@ import umc.kkijuk.server.introduce.repository.IntroduceRepository;
 import umc.kkijuk.server.introduce.repository.MasterIntroduceRepository;
 import umc.kkijuk.server.introduce.repository.QuestionRepository;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.recruit.domain.Recruit;
 import umc.kkijuk.server.recruit.infrastructure.RecruitEntity;
 import umc.kkijuk.server.recruit.infrastructure.RecruitJpaRepository;
+import umc.kkijuk.server.review.controller.port.ReviewService;
+import umc.kkijuk.server.review.domain.Review;
+import umc.kkijuk.server.review.domain.ReviewCreate;
+import umc.kkijuk.server.review.service.port.ReviewRepository;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,12 +34,15 @@ public class IntroduceServiceImpl implements IntroduceService {
     private final RecruitJpaRepository recruitJpaRepository;
     private final QuestionRepository questionRepository;
     private final MasterIntroduceRepository masterIntroduceRepository;
+    private final ReviewService reviewService;
+    private final ReviewRepository reviewRepository;
 
     @Override
     @Transactional
     public IntroduceResponse saveIntro(Member requestMember, Long recruitId, IntroduceReqDto introduceReqDto) {
-        RecruitEntity recruit = recruitJpaRepository.findById(recruitId)
+        RecruitEntity recruitEntity = recruitJpaRepository.findById(recruitId)
                 .orElseThrow(() -> new ResourceNotFoundException("recruit ", recruitId));
+
         if (introduceRepository.findByRecruitId(recruitId).isPresent()) {
             throw new IntroFoundException("이미 자기소개서가 존재합니다");
         }
@@ -44,12 +53,30 @@ public class IntroduceServiceImpl implements IntroduceService {
 
         Introduce introduce = Introduce.builder()
                 .memberId(requestMember.getId())
-                .recruit(recruit)
+                .recruit(recruitEntity)
                 .questions(questions)
                 .state(introduceReqDto.getState())
                 .build();
 
         introduceRepository.save(introduce);
+
+        //작성 완료 처리 됐을 때 '서류'라는 이름의 공고 리뷰 자동 생성
+
+        Recruit recruit = recruitEntity.toModel();
+
+        if (introduceReqDto.getState() == 1) {
+            // '서류' 제목의 리뷰가 이미 존재하는지 확인
+            Optional<Review> existingReview = reviewRepository.findByRecruitAndTitle(recruit, "서류");
+            if (existingReview.isEmpty()) {
+                ReviewCreate reviewCreate = ReviewCreate.builder()
+                        .title("서류")
+                        .content("전형 후기가 없습니다.")
+                        .date(LocalDate.now())
+                        .build();
+                reviewService.create(requestMember, recruit, reviewCreate);
+            }
+        }
+
         return new IntroduceResponse(introduce, introduceReqDto.getQuestionList());
     }
 
@@ -132,6 +159,23 @@ public class IntroduceServiceImpl implements IntroduceService {
 
         introduceRepository.save(introduce);
 
+        // "서류" 리뷰 자동 생성 로직 추가
+        RecruitEntity recruitEntity = introduce.getRecruit(); // Introduce 엔티티에서 Recruit 가져오기
+        Recruit recruit = recruitEntity.toModel();
+
+        if (introduceReqDto.getState() == 1) {
+            // "서류" 제목의 리뷰가 이미 존재하는지 확인
+            Optional<Review> existingReview = reviewRepository.findByRecruitAndTitle(recruit, "서류");
+            if (existingReview.isEmpty()) {
+                ReviewCreate reviewCreate = ReviewCreate.builder()
+                        .title("서류")
+                        .content("전형 후기가 없습니다.")
+                        .date(LocalDate.now())
+                        .build();
+                reviewService.create(requestMember, recruit, reviewCreate);
+            }
+        }
+
         List<QuestionDto> responseQuestionList = introduce.getQuestions().stream()
                 .map(question -> QuestionDto.builder()
                         .title(question.getTitle())
@@ -139,6 +183,7 @@ public class IntroduceServiceImpl implements IntroduceService {
                         .number(question.getNumber())
                         .build())
                 .collect(Collectors.toList());
+
 
         return IntroduceResponse.builder()
                 .introduce(introduce)
@@ -197,5 +242,13 @@ public class IntroduceServiceImpl implements IntroduceService {
         response.put("data", result);
 
         return response;
+    }
+
+    @Override
+    @Transactional
+    public int findStateByRecruitId(Long recruitId) {
+        return introduceRepository.findByRecruitId(recruitId)
+                .map(Introduce::getState)
+                .orElse(0);
     }
 }
