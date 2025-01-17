@@ -60,7 +60,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000", "http://localhost:8080", "exp://*"));
+                "http://localhost:3000", "https://www.kkijuk.com", "https://api.kkijuk.com", "https://test.kkijuk.com", "exp://*"));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true); // 중요한 설정
