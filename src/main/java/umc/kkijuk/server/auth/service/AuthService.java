@@ -33,7 +33,7 @@ public class AuthService {
     private final MemberService memberService;
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
-    private final RedisService redisTokenService;
+//    private final RedisService redisTokenService;
 
     @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
     private String kakaoGrantType;
@@ -262,19 +262,19 @@ public class AuthService {
 
         log.info("JWT 토큰 생성 완료 - social ID: {}, accessToken: {}, refreshToken: {}", kakaoId, accessToken, refreshToken);
 
-//        member.setRefreshToken(refreshToken);
-//        memberRepository.save(member);
-        try {
-            boolean deleted = redisTokenService.deleteRefreshToken(kakaoId);
-            if (deleted) {
-                log.info("기존 리프레시 토큰 삭제 완료 - social ID: {}", kakaoId);
-            } else {
-                log.info("기존 리프레시 토큰이 존재하지 않음 - social ID: {}", kakaoId);
-            }
-        } catch (Exception e) {
-            log.warn("기존 리프레시 토큰 삭제 중 예외 발생 - social ID: {}", kakaoId, e);
-        }
-        redisTokenService.saveRefreshToken(kakaoId, refreshToken, 7 * 24 * 60 * 60 * 1000 );
+        member.setRefreshToken(refreshToken);
+        memberRepository.save(member);
+//        try {
+//            boolean deleted = redisTokenService.deleteRefreshToken(kakaoId);
+//            if (deleted) {
+//                log.info("기존 리프레시 토큰 삭제 완료 - social ID: {}", kakaoId);
+//            } else {
+//                log.info("기존 리프레시 토큰이 존재하지 않음 - social ID: {}", kakaoId);
+//            }
+//        } catch (Exception e) {
+//            log.warn("기존 리프레시 토큰 삭제 중 예외 발생 - social ID: {}", kakaoId, e);
+//        }
+//        redisTokenService.saveRefreshToken(kakaoId, refreshToken, 7 * 24 * 60 * 60 * 1000 );
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
