@@ -11,6 +11,5 @@ public interface ActivityRepository {
     Activity save(Activity activity);
 
     Optional<Activity> findById(Long activityId);
-
     void delete(Activity activity);
 }
