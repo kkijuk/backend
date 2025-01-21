@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import umc.kkijuk.server.member.domain.MarketingAgree;
 import umc.kkijuk.server.member.domain.MemberJob;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class ProfileInputDto {
@@ -28,7 +30,7 @@ public class ProfileInputDto {
     private MarketingAgree isMarketingAgreed;
 
     @NotNull(message = "회원 직업 정보는 필수 값입니다.")
-    @Schema(description = "회원 직업 정보", example = "JOB_SEEKER", type = "string", allowableValues = {
+    @Schema(description = "회원 직업 정보", example = "JOB_SEEKER", type = "array", allowableValues = {
             "MIDDLE_OR_HIGH_SCHOOL", // 중/고등학생
             "JOB_SEEKER",            // 취준생
             "UNIVERSITY_STUDENT",    // 대학 재/휴학생
@@ -37,6 +39,6 @@ public class ProfileInputDto {
             "FREELANCER",            // 프리랜서
             "ENTREPRENEUR",          // 창업/사업 중
             "OTHER"     })
-    private MemberJob MemberJob;
+    private List<MemberJob> memberJob;
 }
 
