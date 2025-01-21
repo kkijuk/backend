@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import umc.kkijuk.server.common.converter.MemberJobListConverter;
 import umc.kkijuk.server.common.domian.base.BaseEntity;
 import umc.kkijuk.server.common.converter.StringListToStringConverter;
 
@@ -48,8 +49,11 @@ public class Member extends BaseEntity {
     private MarketingAgree marketingAgree; //마케팅 정보 수신 동의 여부
     private Boolean termsAgree; //이용약관 동의 여부
     private Boolean privacyAgree; //개인정보 수집 동의 여부
-    @Enumerated(EnumType.STRING)
-    private MemberJob memberJob;
+
+//    @Column(name = "member_job", columnDefinition = "TEXT")
+    @Convert(converter = MemberJobListConverter.class)
+    private List<MemberJob> memberJob;
+
     //그리고 사용자가 4개의 정보를 입력하였는지를 확인할 수 있는 상태
     private Boolean isProfileComplete;
 
@@ -138,7 +142,7 @@ public class Member extends BaseEntity {
         this.privacyAgree = privacyAgree;
     }
 
-    public void setMemberJob(MemberJob memberJob) {
+    public void setMemberJob(List<MemberJob> memberJob) {
         this.memberJob = memberJob;
     }
 
