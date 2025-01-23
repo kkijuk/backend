@@ -86,14 +86,33 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberEmailResponse getMemberEmail(Long memberId) {
-        Member member = this.getById(memberId);
+    public MemberEmailResponse getMemberEmail(Member member) {
         if(member.getEmail() == null){
             throw new InvalidMemberDataException();
         }
+        String maskEmail = maskEmail(member.getEmail());
+
+        SocialType socialType = member.getSocialType();
         return MemberEmailResponse.builder()
-                .email(member.getEmail())
+                .email(maskEmail)
+                .socialType(socialType)
                 .build();
+    }
+
+    private static String maskEmail(String email) {
+        String[] parts = email.split("@");
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다.");
+        }
+
+        String localPart = parts[0];
+        String domainPart = parts[1];
+
+        String maskedLocalPart = localPart.length() > 2
+                ? localPart.substring(0, 2) + "*".repeat(localPart.length() - 2)
+                : localPart;
+
+        return maskedLocalPart + "@" + domainPart;
     }
 
     @Override
