@@ -149,6 +149,18 @@ public class MemberController {
     }
 
     @Operation(
+            summary = "내정보 조회 이메일, 소셜 타입 조회",
+            description = "내 정보를 조회를 위해 이메일 일치 여부를 확인합니다.")
+    @GetMapping("/getEmail")
+    public ResponseEntity<MemberEmailResponse> getEmail(@RequestHeader("Authorization") String token) {
+
+        Member member = memberService.getById(loginUser.extractMemberId(token));
+        MemberEmailResponse response = memberService.getMemberEmail(member);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
         summary = "내정보 조회 이메일 일치 확인",
         description = "내 정보를 조회를 위해 이메일 일치 여부를 확인합니다.")
     @PostMapping("/checkEmail")
