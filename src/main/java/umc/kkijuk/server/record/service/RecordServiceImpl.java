@@ -214,6 +214,7 @@ public class RecordServiceImpl implements RecordService {
         record.update(
                 recordReqDto.getAddress(),
                 recordReqDto.getProfileImageUrl());
+        member.setEmail(recordReqDto.getEmail());
 
         //학력
         List<EducationResponse> educationList = educationRepository.findByMemberId(memberId)
