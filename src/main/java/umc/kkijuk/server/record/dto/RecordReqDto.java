@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class RecordReqDto {
     private String address;
     private String profileImageUrl;
+    private String email;
 }
