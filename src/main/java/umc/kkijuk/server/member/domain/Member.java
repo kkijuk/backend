@@ -51,8 +51,8 @@ public class Member extends BaseEntity {
     private Boolean privacyAgree; //개인정보 수집 동의 여부
 
 //    @Column(name = "member_job", columnDefinition = "TEXT")
-    @Convert(converter = MemberJobListConverter.class)
-    private List<MemberJob> memberJob;
+    @Convert(converter = StringListToStringConverter.class)
+    private List<String> memberJob;
 
     //그리고 사용자가 4개의 정보를 입력하였는지를 확인할 수 있는 상태
     private Boolean isProfileComplete;
@@ -142,7 +142,7 @@ public class Member extends BaseEntity {
         this.privacyAgree = privacyAgree;
     }
 
-    public void setMemberJob(List<MemberJob> memberJob) {
+    public void setMemberJob(List<String> memberJob) {
         this.memberJob = memberJob;
     }
 
