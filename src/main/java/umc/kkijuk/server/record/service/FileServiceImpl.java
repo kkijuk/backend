@@ -51,15 +51,18 @@ public class FileServiceImpl implements FileService{
         }
 
         String keyName = bucketPath + "/" + UUID.randomUUID().toString() + "-" + fileName;
+
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(keyName)
-                .contentType("application/pdf") //일단 pdf 파일만 업로드
+                .serverSideEncryption("AES256") // sse-s3 암호화 적용
                 .build();
+
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(10))
                 .putObjectRequest(objectRequest)
                 .build();
+
         String presignedUrl = s3Presigner.presignPutObject(presignRequest).url().toString();
 
         Map<String, String> response = new HashMap<>();
