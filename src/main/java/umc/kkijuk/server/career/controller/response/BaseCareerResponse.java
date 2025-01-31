@@ -4,4 +4,6 @@ import java.time.LocalDate;
 
 public interface BaseCareerResponse {
     LocalDate getEndDate();
+
+    LocalDate getStartDate();
 }

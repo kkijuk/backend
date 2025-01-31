@@ -66,4 +66,9 @@ public class ActivityResponse implements BaseCareerResponse{
         return enddate;
     }
 
+    @Override
+    public LocalDate getStartDate() {
+        return startdate;
+    }
+
 }

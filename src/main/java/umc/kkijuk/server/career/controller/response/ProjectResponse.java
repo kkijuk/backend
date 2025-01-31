@@ -55,4 +55,8 @@ public class ProjectResponse implements BaseCareerResponse {
     public LocalDate getEndDate() {
         return enddate;
     }
+    @Override
+    public LocalDate getStartDate() {
+        return startdate;
+    }
 }
