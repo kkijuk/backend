@@ -56,4 +56,8 @@ public class CompetitionResponse implements BaseCareerResponse {
     public LocalDate getEndDate() {
         return enddate;
     }
+    @Override
+    public LocalDate getStartDate() {
+        return startdate;
+    }
 }

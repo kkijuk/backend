@@ -98,7 +98,7 @@ public class CareerServiceTest {
                 () -> assertThat(response.getId()).isEqualTo(3L),
                 () -> assertThat(response.getName()).isEqualTo("대외활동"),
                 () -> assertThat(response.getAlias()).isEqualTo("연합동아리"),
-                () -> assertThat(response.getStartdate()).isEqualTo(LocalDate.of(2023,5,1)),
+                () -> assertThat(response.getStartDate()).isEqualTo(LocalDate.of(2023,5,1)),
                 () -> assertThat(response.getEndDate()).isEqualTo(LocalDate.of(2023,12,12)),
                 () -> assertThat(response.getIsTeam()).isEqualTo(true),
                 () -> assertThat(response.getUnknown()).isEqualTo(false),

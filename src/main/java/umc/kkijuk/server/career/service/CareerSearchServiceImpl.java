@@ -62,19 +62,33 @@ public class CareerSearchServiceImpl implements CareerSearchService{
     @Override
     public Map<String, List<?>> findAllCareerGroupedCategory(Long memberId) {
         List<EduCareerResponse> eduCareers = eduCareerJpaRepository.findByMemberId(memberId)
-                .stream().map(EduCareerResponse::new).collect(Collectors.toList());
+                .stream().map(EduCareerResponse::new)
+                .sorted(Comparator.comparing(EduCareerResponse::getStartDate).reversed())
+                .collect(Collectors.toList());
         List<EmploymentResponse> employments = employmentJpaRepository.findByMemberId(memberId)
-                .stream().map(EmploymentResponse::new).collect(Collectors.toList());
+                .stream().map(EmploymentResponse::new)
+                .sorted(Comparator.comparing(EmploymentResponse::getStartDate).reversed())
+                .collect(Collectors.toList());
         List<ProjectResponse> projects = projectJpaRepository.findByMemberId(memberId)
-                .stream().map(ProjectResponse::new).collect(Collectors.toList());
+                .stream().map(ProjectResponse::new)
+                .sorted(Comparator.comparing(ProjectResponse::getStartDate).reversed())
+                .collect(Collectors.toList());
         List<ActivityResponse> activities = activityRepository.findByMemberId(memberId)
-                .stream().map(ActivityResponse::new).collect(Collectors.toList());
+                .stream().map(ActivityResponse::new)
+                .sorted(Comparator.comparing(ActivityResponse::getStartDate).reversed())
+                .collect(Collectors.toList());
         List<CircleResponse> circles = circleRepository.findByMemberId(memberId)
-                .stream().map(CircleResponse::new).collect(Collectors.toList());
+                .stream().map(CircleResponse::new)
+                .sorted(Comparator.comparing(CircleResponse::getStartDate).reversed())
+                .collect(Collectors.toList());
         List<CompetitionResponse> competitions = competitionJpaRepository.findByMemberId(memberId)
-                .stream().map(CompetitionResponse::new).collect(Collectors.toList());
+                .stream().map(CompetitionResponse::new)
+                .sorted(Comparator.comparing(CompetitionResponse::getStartDate).reversed())
+                .collect(Collectors.toList());
         List<EtcResponse> etcs = etcRepository.findByMemberId(memberId)
-                .stream().map(EtcResponse::new).collect(Collectors.toList());
+                .stream().map(EtcResponse::new)
+                .sorted(Comparator.comparing(EtcResponse::getStartDate).reversed())
+                .collect(Collectors.toList());
 
 
         Map<String, List<?>> careerList = new HashMap<>();
@@ -109,13 +123,13 @@ public class CareerSearchServiceImpl implements CareerSearchService{
 
 
         baseCareers = baseCareers.stream()
-                .sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed())
+                .sorted(Comparator.comparing(BaseCareerResponse::getStartDate).reversed())
                 .collect(Collectors.toList());
 
 
         Map<String, List<BaseCareerResponse>> groupedCareers = baseCareers.stream()
                 .collect(Collectors.groupingBy(
-                        career -> String.valueOf(career.getEndDate().getYear())
+                        career -> String.valueOf(career.getStartDate().getYear())
                 ));
 
 

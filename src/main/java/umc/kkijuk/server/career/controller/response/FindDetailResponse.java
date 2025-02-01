@@ -38,4 +38,8 @@ public class FindDetailResponse implements BaseCareerResponse {
         this.detailList = detailList;
         this.category = new CategoryResponse(type.getId(),type.getDescription(),type.name());
     }
+    @Override
+    public LocalDate getStartDate() {
+        return startdate;
+    }
 }
