@@ -36,6 +36,7 @@ public class BaseCareerDetail extends BaseEntity {
     @Column(nullable = false)
     private Long memberId;
 
+    @Builder.Default
     @OneToMany(mappedBy = "baseCareerDetail", cascade = CascadeType.ALL)
     private List<CareerDetailTag> careerTagList = new ArrayList<>();
 
