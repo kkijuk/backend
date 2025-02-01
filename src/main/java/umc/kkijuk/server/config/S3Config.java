@@ -1,4 +1,4 @@
-package umc.kkijuk.server.s3;
+package umc.kkijuk.server.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

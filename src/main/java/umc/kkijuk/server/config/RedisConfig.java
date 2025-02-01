@@ -1,4 +1,4 @@
-package umc.kkijuk.server.member.emailauth;
+package umc.kkijuk.server.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
