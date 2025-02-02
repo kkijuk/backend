@@ -8,7 +8,7 @@ public enum CareerType {
     EDU(3,"교육", EduCareer.class),
     EMP(4,"경력", Employment.class),
     CIRCLE(5,"동아리", Circle.class),
-    COM(6,"대회", Competition.class),
+    COM(6,"공모전/대회", Competition.class),
     ETC(7,"기타", CareerEtc.class);
 
     private final int id;
