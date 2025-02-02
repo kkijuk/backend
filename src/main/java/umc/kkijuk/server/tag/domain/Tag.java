@@ -22,6 +22,7 @@ public class Tag {
     @Column(nullable = false)
     private Long memberId;
 
+    @Builder.Default
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
     private List<CareerDetailTag> careerDetailTagList = new ArrayList<>();
 
