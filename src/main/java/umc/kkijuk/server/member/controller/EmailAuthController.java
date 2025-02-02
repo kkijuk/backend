@@ -6,8 +6,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import umc.kkijuk.server.member.domain.Member;
-import umc.kkijuk.server.member.dto.MemberPasswordResetDto;
 import umc.kkijuk.server.member.emailauth.MailAddressDto;
 import umc.kkijuk.server.member.emailauth.MailCertificationDto;
 import umc.kkijuk.server.member.emailauth.MailCertificationResponse;

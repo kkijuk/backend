@@ -13,13 +13,11 @@ import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.common.domian.exception.*;
 import umc.kkijuk.server.member.controller.response.MemberEmailResponse;
 import umc.kkijuk.server.member.controller.response.MemberInfoResponse;
-import umc.kkijuk.server.member.controller.response.MemberStateResponse;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.domain.Role;
 import umc.kkijuk.server.member.domain.SocialType;
 import umc.kkijuk.server.member.domain.State;
 import umc.kkijuk.server.member.dto.*;
-import umc.kkijuk.server.member.emailauth.RedisService;
 import umc.kkijuk.server.member.repository.MemberRepository;
 
 import java.time.LocalDate;
@@ -36,48 +34,12 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-//    private final RedisService redisTokenService;
 
     @Override
     public Member getById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Member", memberId));
     }
-
-//    @Override
-//    @Transactional
-//    public Member join(MemberJoinDto memberJoinDto) {
-//        String passwordConfirm = memberJoinDto.getPasswordConfirm();
-//        if (!passwordConfirm.equals(memberJoinDto.getPassword())) {
-//            throw new ConfirmPasswordMismatchException();
-//        }
-//
-//        Member joinMember = memberJoinDto.toEntity();
-//
-//        String encodedPassword = passwordEncoder.encode(memberJoinDto.getPassword());
-//        joinMember.changeMemberPassword(encodedPassword);
-//
-//        Optional<Member> member = memberRepository.findByEmail(memberJoinDto.getEmail());
-//        if (member.isPresent()){
-//            throw new EmailAlreadyExistsException();
-//        }
-//
-//        return memberRepository.save(joinMember);
-//    }
-
-//    @Override
-//    public MemberInfoResponse getMemberInfo(Long memberId) {
-//        Member member = this.getById(memberId);
-//        if(member.getEmail() == null || member.getName() == null || member.getPhoneNumber() == null || member.getBirthDate() == null){
-//            throw new InvalidMemberDataException();
-//        }
-//        return MemberInfoResponse.builder()
-//                .email(member.getEmail())
-//                .name(member.getName())
-//                .phoneNumber(member.getPhoneNumber())
-//                .birthDate(member.getBirthDate())
-//                .build();
-//    }
 
     @Override
     public List<String> getMemberField(Long memberId){
@@ -135,73 +97,6 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
     }
 
-//    @Override
-//    @Transactional
-//    public Member changeMemberPassword(Long memberId, MemberPasswordChangeDto memberPasswordChangeDto){
-//        Member member = this.getById(memberId);
-//        if(!memberPasswordChangeDto.getNewPassword().equals(memberPasswordChangeDto.getNewPasswordConfirm())){
-//            throw new ConfirmPasswordMismatchException();
-//        }
-//        if(!passwordEncoder.matches(memberPasswordChangeDto.getCurrentPassword(), member.getPassword())){
-//            throw new CurrentPasswordMismatchException();
-//        }
-//
-//        String encodedPassword = passwordEncoder.encode(memberPasswordChangeDto.getNewPassword());
-//        member.changeMemberPassword(encodedPassword);
-//
-//        return memberRepository.save(member);
-//    }
-
-//    @Override
-//    public Member myPagePasswordAuth(Long memberId, MyPagePasswordAuthDto myPagePasswordAuthDto) {
-//        Member member = this.getById(memberId);
-//
-//        if(!passwordEncoder.matches(myPagePasswordAuthDto.getCurrentPassword(), member.getPassword())){
-//            throw new CurrentPasswordMismatchException();
-//        }
-//
-//        return member;
-//    }
-
-    @Override
-    @Transactional
-    public MemberStateResponse changeMemberState(Long memberId){
-        Member member = this.getById(memberId);
-        if(member.getUserState().equals(State.INACTIVATE)){
-            member.activate();
-        }
-        else if(member.getUserState().equals(State.ACTIVATE)){
-            member.inactivate();
-        }
-
-        memberRepository.save(member);
-
-        return MemberStateResponse.builder()
-                .memberState(member.getUserState())
-                .build();
-    }
-
-//    @Override
-//    @Transactional
-//    public Member resetMemberPassword(MemberPasswordResetDto memberPasswordResetDto){
-//        Optional<Member> member = memberRepository.findByEmail(memberPasswordResetDto.getEmail());
-//
-//        if(!memberPasswordResetDto.getNewPassword().equals(memberPasswordResetDto.getNewPasswordConfirm())){
-//            throw new ConfirmPasswordMismatchException();
-//        }
-//
-//        String encodedPassword = passwordEncoder.encode(memberPasswordResetDto.getNewPassword());
-//        member.get().changeMemberPassword(encodedPassword);
-//
-//        return memberRepository.save(member.get());
-//    }
-
-    @Override
-    public Boolean confirmDupEmail(MemberEmailDto memberEmailDto) {
-        Optional<Member> member = memberRepository.findByEmail(memberEmailDto.getEmail());
-        return member.isEmpty();
-    }
-
     @Override
     @Transactional
     public List<String> addRecruitTag(Member member, String tag) {
@@ -226,9 +121,6 @@ public class MemberServiceImpl implements MemberService {
         return member.getRecruitTags();
     }
 
-    /**
-     * 소셜로그인 이후 추가된 기능
-     */
 
     @Override
     @Transactional
@@ -390,7 +282,6 @@ public class MemberServiceImpl implements MemberService {
         // Member 조회
         Member member = this.findBySocialId(socialId);
 
-
         if(!refreshToken.equals(member.getRefreshToken())){
             log.warn("유효하지 않은 Refresh Token - Social ID: {}", socialId);
             throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
@@ -433,7 +324,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     //매일 자정 확인 후 유저 정보 지우는 함수, 실제로 자정에 삭제 되는지는 배포 후 확인 필요
-    @Override
     @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     public void deleteScheduledMembers() {

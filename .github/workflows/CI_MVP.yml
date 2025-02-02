@@ -75,6 +75,10 @@ jobs:
           echo "spring.security.oauth2.client.provider.naver.user-info-uri=${{ secrets.NAVER_USER_INFO_URI }}" >> ./src/main/resources/application.properties
           echo "spring.security.oauth2.client.provider.naver.user-name-attribute=${{ secrets.NAVER_USER_NAME_ATTRIBUTE }}" >> ./src/main/resources/application.properties
 
+          #redis
+          echo "spring.data.redis.host=${{ secrets.REDIS_HOST }}" >> ./src/main/resources/application.properties
+          echo "spring.data.redis.port=${{ secrets.REDIS_PORT }}" >> ./src/main/resources/application.properties
+
       - name: Build with Gradle Wrapper
         run: ./gradlew build
 
