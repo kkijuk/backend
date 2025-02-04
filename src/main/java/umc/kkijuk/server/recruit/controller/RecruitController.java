@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.common.LoginUser;
+import umc.kkijuk.server.introduce.domain.Introduce;
 import umc.kkijuk.server.introduce.service.IntroduceService;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
@@ -113,11 +114,11 @@ public class RecruitController {
         Member requestMember = memberService.getById(memberId);
         Recruit recruit = recruitService.getById(recruitId);
         List<Review> reviews = reviewService.findAllByRecruit(requestMember, recruit);
-        int state = introduceService.findStateByRecruitId(recruitId);
+        Introduce introduce = introduceService.findByRecruitId(recruitId);
 
         return ResponseEntity
                 .ok()
-                .body(RecruitInfoResponse.from(recruit, reviews, state));
+                .body(RecruitInfoResponse.from(recruit, reviews, introduce));
     }
 
     @Operation(
