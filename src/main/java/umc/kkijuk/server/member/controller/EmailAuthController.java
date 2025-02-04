@@ -30,15 +30,6 @@ public class EmailAuthController {
     }
 
     @Operation(
-            summary = "비밀번호 재설정시 이메일 인증번호 요청",
-            description = "이메일 인증정보를 요청합니다.")
-    @PostMapping("/password/send")
-    public ResponseEntity<MailCertificationResponse> resetPasswordSendMail(@RequestBody @Valid MailAddressDto mailAddressDto) {
-        MailCertificationResponse mailCertificationResponse = mailService.sendMailPasswordReset(mailAddressDto.getEmail());
-        return ResponseEntity.ok(mailCertificationResponse);
-    }
-
-    @Operation(
             summary = "이메일 인증번호 인증",
             description = "이메일 인증번호를 인증합니다.")
     @PostMapping({"/auth/confirm", "/password/confirm"})
@@ -46,14 +37,5 @@ public class EmailAuthController {
         return ResponseEntity.ok(mailService.verifyMail(mailCertificationDto));
     }
 
-//    @Operation(
-//            summary = "회원 비밀번호 재설정",
-//            description = "회원의 비밀번호를 새로운 값으로 재설정합니다.")
-//    @PostMapping("/password/reset")
-//    public ResponseEntity<Boolean> resetMemberPassword(@RequestBody @Valid MemberPasswordResetDto memberPasswordResetDto){
-//
-//        Member member = memberService.resetMemberPassword(memberPasswordResetDto);
-//        return ResponseEntity.ok(Boolean.TRUE);
-//    }
 
 }

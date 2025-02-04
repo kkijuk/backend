@@ -31,6 +31,7 @@ public class RecruitInfoResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private final LocalDate applyDate;
 
+    private final Long introduceId; // 자기소개서 id 반환값 추가
     private final RecruitStatus status;
     private final List<String> tags;
     private final int reviewCount;
@@ -38,7 +39,7 @@ public class RecruitInfoResponse {
     private final List<ReviewResponse> reviews;
     private final int introduceState;
 
-    public static RecruitInfoResponse from(Recruit recruit, List<Review> reviews, int introduceState) {
+    public static RecruitInfoResponse from(Recruit recruit, List<Review> reviews, Introduce introduce) {
         return RecruitInfoResponse.builder()
                 .title(recruit.getTitle())
                 .startTime(recruit.getStartTime())
@@ -49,7 +50,8 @@ public class RecruitInfoResponse {
                 .link(recruit.getLink())
                 .reviewCount(reviews.size())
                 .reviews(reviews.stream().map(ReviewResponse::from).toList())
-                .introduceState(introduceState)
+                .introduceState(introduce.getState())
+                .introduceId(introduce.getId())
                 .build();
     }
 }

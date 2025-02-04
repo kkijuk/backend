@@ -246,9 +246,8 @@ public class IntroduceServiceImpl implements IntroduceService {
 
     @Override
     @Transactional
-    public int findStateByRecruitId(Long recruitId) {
+    public Introduce findByRecruitId(Long recruitId) {
         return introduceRepository.findByRecruitId(recruitId)
-                .map(Introduce::getState)
-                .orElse(0);
+                .orElseThrow(() -> new IllegalArgumentException("Introduce not found for recruitId: " + recruitId));
     }
 }
