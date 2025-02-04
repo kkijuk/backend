@@ -17,6 +17,7 @@ import java.util.List;
 public class MasterIntroduceResponse {
     private Long id;
     private Long memberId;
+    private String oneLiner;
     private List<QuestionDto> questionList;
     private String updatedAt;
     private int state;
@@ -24,6 +25,7 @@ public class MasterIntroduceResponse {
     @Builder
     public MasterIntroduceResponse(MasterIntroduce masterIntroduce, List<QuestionDto> questionList) {
         this.id = masterIntroduce.getId();
+        this.oneLiner = masterIntroduce.getOneLiner();
         this.memberId=masterIntroduce.getMemberId();
         this.questionList = questionList;
         this.updatedAt = formatUpdatedAt(masterIntroduce.getUpdatedAt());
