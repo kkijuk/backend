@@ -50,8 +50,8 @@ public class RecruitInfoResponse {
                 .link(recruit.getLink())
                 .reviewCount(reviews.size())
                 .reviews(reviews.stream().map(ReviewResponse::from).toList())
-                .introduceState(introduce.getState())
-                .introduceId(introduce.getId())
+                .introduceState(introduce != null ? introduce.getState() : 0)
+                .introduceId(introduce != null ? introduce.getId() : 0L)
                 .build();
     }
 }
