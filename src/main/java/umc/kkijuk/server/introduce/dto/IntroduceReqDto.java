@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class IntroduceReqDto {
+    private String oneLiner;
     private List<QuestionDto> questionList;
     private int state;
 }

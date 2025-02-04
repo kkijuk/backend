@@ -72,7 +72,10 @@ public class MasterIntroduceServiceImpl implements MasterIntroduceService {
         }
 
         // 상태 업데이트
-        masterIntroduce.update(introduceReqDto.getState());
+        masterIntroduce.setState(introduceReqDto.getState());
+
+        // 한줄 소개 업데이트
+        masterIntroduce.setOneLiner(introduceReqDto.getOneLiner());
 
         List<MasterQuestion> existingQuestions = masterIntroduce.getMasterQuestion();
         Map<Integer, MasterQuestion> existingQuestionsMap = existingQuestions.stream()
