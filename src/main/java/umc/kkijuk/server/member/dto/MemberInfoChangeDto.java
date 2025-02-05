@@ -12,6 +12,9 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 public class MemberInfoChangeDto {
+
+    @NotNull
+    private String email;
     @NotNull
     private String phoneNumber;
     @NotNull
@@ -20,7 +23,8 @@ public class MemberInfoChangeDto {
     private MarketingAgree marketingAgree;
 
     @Builder
-    public MemberInfoChangeDto(String phoneNumber, LocalDate birthDate, MarketingAgree marketingAgree) {
+    public MemberInfoChangeDto(String email,String phoneNumber, LocalDate birthDate, MarketingAgree marketingAgree) {
+        this.email = email;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
         this.marketingAgree = marketingAgree;
