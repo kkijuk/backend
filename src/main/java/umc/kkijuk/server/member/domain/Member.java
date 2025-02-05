@@ -86,7 +86,8 @@ public class Member extends BaseEntity {
         this.field = field;
     }
 
-    public void changeMemberInfo(String phoneNumber, LocalDate birthDate, MarketingAgree marketingAgree){
+    public void changeMemberInfo(String email, String phoneNumber, LocalDate birthDate, MarketingAgree marketingAgree){
+        this.email = email;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
         this.marketingAgree = marketingAgree;

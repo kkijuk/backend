@@ -90,10 +90,10 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public Member updateMemberInfo(Long memberId, MemberInfoChangeDto memberInfoChangeDto){
         Member member = this.getById(memberId);
-        if(member.getPhoneNumber() == null || member.getBirthDate() == null || member.getMarketingAgree() == null){
+        if(member.getEmail() == null || member.getPhoneNumber() == null || member.getBirthDate() == null || member.getMarketingAgree() == null){
             throw new InvalidMemberDataException();
         }
-        member.changeMemberInfo(memberInfoChangeDto.getPhoneNumber(), memberInfoChangeDto.getBirthDate(), memberInfoChangeDto.getMarketingAgree());
+        member.changeMemberInfo(memberInfoChangeDto.getEmail(), memberInfoChangeDto.getPhoneNumber(), memberInfoChangeDto.getBirthDate(), memberInfoChangeDto.getMarketingAgree());
         return memberRepository.save(member);
     }
 
