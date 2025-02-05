@@ -5,16 +5,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.auth.service.AuthService;
-import umc.kkijuk.server.common.domian.exception.ResourceNotFoundException;
-import umc.kkijuk.server.member.domain.Member;
-import umc.kkijuk.server.member.domain.State;
-import umc.kkijuk.server.member.repository.MemberRepository;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -25,7 +19,6 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-    private final MemberRepository memberRepository;
 
     @GetMapping("/kakao/login")
     @Operation(summary = "카카오 로그인", description = "카카오 OAuth 인증을 통해 사용자 정보를 처리하고 JWT 토큰을 생성하여 반환합니다.")

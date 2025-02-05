@@ -132,6 +132,7 @@ public class MemberServiceImpl implements MemberService {
         String birthday = (String) kakaoAccount.get("birthday");
         String birthyear = (String) kakaoAccount.get("birthyear");
 
+
         LocalDate birthDate = null;
         if (birthday != null && !birthday.isEmpty()) {
             int year = (birthyear != null && !birthyear.isEmpty())
@@ -140,6 +141,10 @@ public class MemberServiceImpl implements MemberService {
             int month = Integer.parseInt(birthday.substring(0, 2));
             int day = Integer.parseInt(birthday.substring(2, 4));
             birthDate = LocalDate.of(year, month, day);
+        }
+
+        if (phoneNumber != null && phoneNumber.startsWith("+82")) {
+            phoneNumber = phoneNumber.replace("+82 ", "0");
         }
 
         Member newMember = new Member();
