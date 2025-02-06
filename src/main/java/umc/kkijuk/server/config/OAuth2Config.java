@@ -1,6 +1,8 @@
 package umc.kkijuk.server.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 public class OAuth2Config {
+
+    private static final Logger log = LoggerFactory.getLogger(OAuth2Config.class);
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -35,32 +39,39 @@ public class OAuth2Config {
     @Value("${test.server.domain}")
     private String testServerDomain;
 
-    @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        ClientRegistration kakaoRegistration = ClientRegistration.withRegistrationId("kakao")
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .scope(scope)
-                .authorizationGrantType(new AuthorizationGrantType(grantType))
-                .authorizationUri("https://kauth.kakao.com/oauth/authorize")
-                .tokenUri("https://kauth.kakao.com/oauth/token")
-                .userInfoUri("https://kapi.kakao.com/v2/user/me")
-                .userNameAttributeName("id")
-                .clientName(clientName)
-                .redirectUri(determineRedirectUri())
-                .build();
+@Bean
+public ClientRegistrationRepository clientRegistrationRepository() {
+    String resolvedRedirectUri = determineBaseUrl() + "/login/oauth2/code/kakao";
 
-        return new InMemoryClientRegistrationRepository(kakaoRegistration);
-    }
+    ClientRegistration kakaoRegistration = ClientRegistration.withRegistrationId("kakao")
+            .clientId(clientId)
+            .clientSecret(clientSecret)
+            .scope(scope)
+            .authorizationGrantType(new AuthorizationGrantType(grantType))
+            .authorizationUri("https://kauth.kakao.com/oauth/authorize")
+            .tokenUri("https://kauth.kakao.com/oauth/token")
+            .userInfoUri("https://kapi.kakao.com/v2/user/me")
+            .userNameAttributeName("id")
+            .clientName(clientName)
+            .redirectUri(resolvedRedirectUri)
+            .build();
 
-    private String determineRedirectUri() {
+    log.info("✅ Kakao OAuth2 Client Registration Created: {}", kakaoRegistration);
+    return new InMemoryClientRegistrationRepository(kakaoRegistration);
+}
+
+    private String determineBaseUrl() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
             HttpServletRequest request = attributes.getRequest();
+            String scheme = request.getScheme();
             String serverName = request.getServerName();
+            int serverPort = request.getServerPort();
 
-            if (testServerDomain.equals(serverName)) {
-                return "https://" + testServerDomain + "/login/oauth2/code/kakao";
+            if (serverPort == 80 || serverPort == 443) {
+                return scheme + "://" + serverName;
+            } else {
+                return scheme + "://" + serverName + ":" + serverPort;
             }
         }
         return defaultRedirectUri;
