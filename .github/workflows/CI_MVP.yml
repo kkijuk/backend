@@ -78,6 +78,9 @@ jobs:
           #redis
           echo "spring.data.redis.host=${{ secrets.REDIS_HOST }}" >> ./src/main/resources/application.properties
           echo "spring.data.redis.port=${{ secrets.REDIS_PORT }}" >> ./src/main/resources/application.properties
+          
+          #Test server domain
+          echo "test.server.domain=${{ secrets.TEST_SERVER_DOMAIN }}" >> ./src/main/resources/application.properties
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build
