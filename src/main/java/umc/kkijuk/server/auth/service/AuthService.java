@@ -127,7 +127,6 @@ public class AuthService {
         params.add("grant_type", kakaoGrantType);
         params.add("client_id", kakaoClientId);
         params.add("client_secret", kakaoClientSecret);
-        params.add("redirect_uri", kakaoRedirectUri);
         params.add("code", code);
 
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
