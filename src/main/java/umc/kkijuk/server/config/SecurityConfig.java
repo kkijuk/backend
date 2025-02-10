@@ -17,10 +17,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import umc.kkijuk.server.auth.handler.CustomSuccessHandler;
+//import umc.kkijuk.server.auth.handler.CustomSuccessHandler;
 import umc.kkijuk.server.auth.jwt.JwtCustomFilter;
 import umc.kkijuk.server.auth.jwt.JwtFilter;
-import umc.kkijuk.server.auth.service.CustomOAuth2UserService;
+//import umc.kkijuk.server.auth.service.CustomOAuth2UserService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,8 +31,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomSuccessHandler customSuccessHandler;
+//    private final CustomOAuth2UserService customOAuth2UserService;
+//    private final CustomSuccessHandler customSuccessHandler;
     private final JwtFilter jwtFilter;
 
     @Bean

@@ -55,25 +55,6 @@ public class AuthService {
     @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}")
     private String naverGrantType;
 
-//    @Transactional
-//    public Map<String, Object> handleKakaoLogin(String code) {
-//        // 1. 카카오 액세스 토큰 발급
-//        String kakaoAccessToken = getKakaoAccessToken(code);
-//
-//        // 2. 카카오 사용자 정보 처리 및 사용자 생성/조회
-//        Member member = processKakaoUser(kakaoAccessToken);
-//
-//        // 3. 사용자 상태 확인 및 활성화 처리
-//        if (member.getUserState().equals(State.INACTIVATE)) {
-//            member.activate();
-//            memberRepository.save(member);
-//        }
-//        // 4. JWT 토큰 생성
-//        Map<String, Object> tokens = new HashMap<>();
-//        tokens.put("Token", generateTokens(member));
-//
-//        return tokens;
-//    }
 
     @Transactional
     public Map<String, Object> handleKakaoLogin(String code) {
