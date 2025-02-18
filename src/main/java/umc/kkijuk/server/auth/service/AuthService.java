@@ -3,6 +3,7 @@ package umc.kkijuk.server.auth.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,16 +14,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 import umc.kkijuk.server.auth.dto.NaverTokenResponse;
 import umc.kkijuk.server.auth.dto.NaverUserResponse;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
-import umc.kkijuk.server.common.domian.exception.ResourceNotFoundException;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.domain.State;
-import umc.kkijuk.server.member.emailauth.RedisService;
 import umc.kkijuk.server.member.repository.MemberRepository;
 import umc.kkijuk.server.member.service.MemberService;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,11 @@ public class AuthService {
     private final MemberService memberService;
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
-//    private final RedisService redisTokenService;
+    private final RedisTemplate<String,String> redisTemplate;
+
+    private static final String REFRESH_TOKEN_PREFIX = "REFRESH:";
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;
+
 
     @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
     private String kakaoGrantType;
@@ -77,8 +82,7 @@ public class AuthService {
         }
 
         // 4. JWT 토큰 생성
-        Map<String, Object> tokens = new HashMap<>();
-        tokens.put("Token", generateTokens(member));
+        Map<String, Object> tokens = new HashMap<>(generateTokens(member));
         return tokens;
     }
 
@@ -92,8 +96,7 @@ public class AuthService {
             memberRepository.save(member);
         }
 
-        Map<String, Object> tokens = new HashMap<>();
-        tokens.put("Token", generateTokens(member));
+        Map<String, Object> tokens = new HashMap<>(generateTokens(member));
         return tokens;
     }
 
@@ -233,34 +236,32 @@ public class AuthService {
 
     @Transactional
     public Map<String, String> generateTokens(Member member) {
-        String kakaoId = String.valueOf(member.getSocialId());
+        String socialId = String.valueOf(member.getSocialId());
+        String tokenId = UUID.randomUUID().toString();
 
         boolean isProfileComplete = member.getIsProfileComplete();
 
-        String accessToken = jwtUtil.createAccessToken(kakaoId,isProfileComplete);
-        String refreshToken = jwtUtil.createRefreshToken(kakaoId);
+        String accessToken = jwtUtil.createAccessToken(socialId, isProfileComplete);
+        String refreshToken = jwtUtil.createRefreshToken(socialId, tokenId);
 
-        log.info("JWT 토큰 생성 완료 - social ID: {}, accessToken: {}, refreshToken: {}", kakaoId, accessToken, refreshToken);
+        log.info("JWT 토큰 생성 완료 - social ID: {}, accessToken: {}, refreshToken: {}", socialId, accessToken, refreshToken);
 
-        member.setRefreshToken(refreshToken);
-        memberRepository.save(member);
-//        try {
-//            boolean deleted = redisTokenService.deleteRefreshToken(kakaoId);
-//            if (deleted) {
-//                log.info("기존 리프레시 토큰 삭제 완료 - social ID: {}", kakaoId);
-//            } else {
-//                log.info("기존 리프레시 토큰이 존재하지 않음 - social ID: {}", kakaoId);
-//            }
-//        } catch (Exception e) {
-//            log.warn("기존 리프레시 토큰 삭제 중 예외 발생 - social ID: {}", kakaoId, e);
-//        }
-//        redisTokenService.saveRefreshToken(kakaoId, refreshToken, 7 * 24 * 60 * 60 * 1000 );
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
+        redisTemplate
+                .opsForValue()
+                .set(
+                        REFRESH_TOKEN_PREFIX + socialId + ":" + tokenId,
+                        refreshToken,
+                        1,
+                        TimeUnit.DAYS);
 
-        return tokens;
+        log.info("Refresh Token 저장 완료 - key : {}", REFRESH_TOKEN_PREFIX + socialId + ":" + tokenId);
+
+
+        return Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refreshToken
+        );
     }
 
 
