@@ -26,7 +26,7 @@ public class JwtUtil {
   }
 
   public String createAccessToken(String socialId, boolean isProfileComplete) {
-    Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS)); // 1시간 유효
+    Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
     return Jwts.builder()
             .setId(String.valueOf(socialId))
             .setIssuedAt(new Date())
@@ -36,50 +36,54 @@ public class JwtUtil {
             .compact();
   }
 
-  public String createRefreshToken(String socialId) {
-    Date expiration = Date.from(Instant.now().plus(7, ChronoUnit.DAYS)); // 7일 유효
+  public String createRefreshToken(String socialId, String tokenId) {
+    Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
     return Jwts.builder()
-            .setId(String.valueOf(socialId))
+            .setSubject(String.valueOf(socialId))
+            .setId(tokenId)
             .setIssuedAt(new Date())
             .setExpiration(expiration)
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact();
   }
 
-  public boolean validateToken(String token, String socialId) {
+  public boolean validateToken(String token) {
     try {
-      Claims claims =
-              Jwts.parserBuilder()
-                      .setSigningKey(getSigningKey())
-                      .build()
-                      .parseClaimsJws(token)
-                      .getBody();
-
-      String extractedSocialId = claims.getId();
-      if (!extractedSocialId.equals(socialId)) {
-        log.warn("JWT Token validation failed: socialId mismatch");
-        return false;
-      }
-
-      if (claims.getExpiration().before(new Date())) {
-        log.warn("JWT Token validation failed: Token expired");
-        return false;
-      }
-
+      Jwts.parserBuilder()
+              .setSigningKey(getSigningKey())
+              .build()
+              .parseClaimsJws(token);
       return true;
+    } catch (ExpiredJwtException e) {
+      log.warn("JWT 검증 실패 - 만료된 토큰: {}", e.getMessage());
+      return false;
+    } catch (SignatureException e) {
+      log.warn("JWT 검증 실패 - 서명 불일치: {}", e.getMessage());
+      return false;
+    } catch (MalformedJwtException e) {
+      log.warn("JWT 검증 실패 - 잘못된 형식의 토큰: {}", e.getMessage());
+      return false;
     } catch (JwtException e) {
-      log.warn("JWT validation failed: {}", e.getMessage());
+      log.warn("JWT 검증 실패 - 기타 오류: {}", e.getMessage());
       return false;
     }
   }
 
-  public String extractSocialId(String token) {
+  public String extractId(String token) {
     return Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody()
                     .getId();
+  }
+  public String extractSubject(String token) {
+    return Jwts.parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
   }
 
 }

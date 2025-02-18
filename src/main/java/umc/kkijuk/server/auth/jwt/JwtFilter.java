@@ -49,13 +49,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
       if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
         jwt = authorizationHeader.substring(7);
-        socialId = jwtUtil.extractSocialId(jwt);
+        socialId = jwtUtil.extractId(jwt);
       }
 
       if (socialId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
         Member member = memberRepository.findBySocialId(socialId).orElse(null);
 
-        if (member != null && jwtUtil.validateToken(jwt, String.valueOf(member.getSocialId()))) {
+        if (member != null && jwtUtil.validateToken(jwt)) {
           UserDetails userDetails =
                   new org.springframework.security.core.userdetails.User(
                           String.valueOf(member.getSocialId()),

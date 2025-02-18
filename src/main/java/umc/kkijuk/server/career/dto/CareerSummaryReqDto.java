@@ -19,7 +19,7 @@ public class CareerSummaryReqDto {
     @Schema(description = "활동의 유형을 나타내는 타입", example = "ACTIVITY", type = "string", allowableValues = {"ACTIVITY", "PROJECT", "EDU", "EMP","CIRCLE","COM"})
     private CareerType type;
 
-    @Size(max = 100)
-    @Schema(description = "활동 내역", example = "주요 활동 내용을 요약하여 작성해주세요. 최대 50자 까지 입력 가능 선택사항입니다.", type = "string")
+    @Size(max = 500)
+    @Schema(description = "활동 내역", example = "주요 활동 내용을 요약하여 작성해주세요. 최대 500자 까지 입력 가능 선택사항입니다.", type = "string")
     private String summary;
 }
