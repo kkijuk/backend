@@ -137,4 +137,16 @@ public class ExceptionControllerAdvice {
     public ErrorResponse RecordNotFoundException(RecordNotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EmailMismatchException.class)
+    public ErrorResponse EmailMismatchException(EmailMismatchException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidBirthDateException.class)
+    public ErrorResponse InvalidBirthDateException(InvalidBirthDateException e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }

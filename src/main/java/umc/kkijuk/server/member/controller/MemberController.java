@@ -13,6 +13,7 @@ import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.auth.service.AuthService;
 import umc.kkijuk.server.common.LoginUser;
+import umc.kkijuk.server.common.domian.exception.EmailMismatchException;
 import umc.kkijuk.server.member.controller.response.*;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.dto.*;
@@ -70,11 +71,15 @@ public class MemberController {
         description = "내 정보를 조회를 위해 이메일 일치 여부를 확인합니다.")
     @PostMapping("/checkEmail")
     public ResponseEntity<Boolean> checkEmail(@RequestHeader("Authorization") String token,
-                                              @RequestBody MemberEmailDto memberEmailDto) {
+                                              @Valid @RequestBody MemberEmailDto memberEmailDto) {
 
         Member member = memberService.getById(loginUser.extractMemberId(token));
 
-        return ResponseEntity.ok(member.getEmail().equals(memberEmailDto.getEmail()));
+        if (!member.getEmail().equals(memberEmailDto.getEmail())) {
+            throw new EmailMismatchException();
+        }
+
+        return ResponseEntity.ok(true);
     }
 
     @Operation(
@@ -94,7 +99,7 @@ public class MemberController {
             description = "내 정보 수정 요청을 받아 성공/실패를 반환합니다.")
     @PutMapping("/myPage/info")
     public ResponseEntity<Boolean> changeMemberInfo(@RequestHeader("Authorization") String token,
-                                                    @RequestBody @Valid  MemberInfoChangeDto memberInfoChangeDto) {
+                                                    @Valid @RequestBody MemberInfoChangeDto memberInfoChangeDto) {
         Long memberId = loginUser.extractMemberId(token);
         memberService.updateMemberInfo(memberId, memberInfoChangeDto);
         return ResponseEntity.ok(Boolean.TRUE);
