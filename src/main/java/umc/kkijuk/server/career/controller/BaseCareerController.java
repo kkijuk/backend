@@ -50,7 +50,7 @@ public class BaseCareerController {
         Member requestMember = memberService.getById(memberId);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
-                baseCareerService.updateActivity(requestMember, activityId, activityReqDto)
+                baseCareerService.updateActivity(requestMember, activityId,  activityReqDto)
         );
     }
 
