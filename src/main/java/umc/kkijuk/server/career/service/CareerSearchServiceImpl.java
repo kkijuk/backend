@@ -342,6 +342,11 @@ public class CareerSearchServiceImpl implements CareerSearchService{
         else {
             throw new IllegalArgumentException("지원하지 않는 타입입니다.");
         }
+
+        details = details.stream()
+            .sorted(Comparator.comparing(BaseCareerDetail::getStartDate).reversed())
+            .collect(Collectors.toList());
+
         return responseConstructor.apply(career,details);
     }
     private List<FindDetailResponse> buildDetailResponse(List<BaseCareerDetail> detailList, String sort) {
