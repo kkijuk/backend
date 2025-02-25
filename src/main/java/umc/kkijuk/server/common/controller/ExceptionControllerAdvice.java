@@ -120,11 +120,6 @@ public class ExceptionControllerAdvice {
         return new ErrorResponse(e.getMessage());
     }
 
-//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-//    @ExceptionHandler(UnauthorizedException.class)
-//    public ErrorResponse UnauthorizedException(UnauthorizedException exception) {
-//        return new ErrorResponse(exception.getMessage());
-//    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(EmailAlreadyExistsException.class)
@@ -148,5 +143,11 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler(InvalidBirthDateException.class)
     public ErrorResponse InvalidBirthDateException(InvalidBirthDateException e) {
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(CustomAuthException.class)
+    public ErrorResponse handleCustomAuthException(CustomAuthException exception) {
+        return new ErrorResponse(exception.getErrorStatus().getMessage());
     }
 }

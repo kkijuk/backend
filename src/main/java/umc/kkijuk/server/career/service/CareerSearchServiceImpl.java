@@ -94,7 +94,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
         Map<String, List<?>> careerList = new HashMap<>();
         careerList.put("대외활동",activities);
         careerList.put("동아리",circles);
-        careerList.put("대회",competitions);
+        careerList.put("공모전대회",competitions);
         careerList.put("교육",eduCareers);
         careerList.put("인턴",employments);
         careerList.put("프로젝트",projects);
@@ -342,6 +342,11 @@ public class CareerSearchServiceImpl implements CareerSearchService{
         else {
             throw new IllegalArgumentException("지원하지 않는 타입입니다.");
         }
+
+        details = details.stream()
+            .sorted(Comparator.comparing(BaseCareerDetail::getStartDate).reversed())
+            .collect(Collectors.toList());
+
         return responseConstructor.apply(career,details);
     }
     private List<FindDetailResponse> buildDetailResponse(List<BaseCareerDetail> detailList, String sort) {

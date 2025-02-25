@@ -20,10 +20,8 @@ public interface MemberService {
     List<String> deleteRecruitTag(Member Member, String tag);
     Member createUserWithKakaoId(String kakaoId, Map<String, Object> kakaoUserInfo);
     MemberInfoResponse getMemberInfo(Long memberId);
-    void invalidateRefreshToken(String socialId);
     Long extractMemberId(String bearerToken);
     public Member findBySocialId(String SocialId);
-    AuthResponse refreshAuthToken(String refreshToken, String socialId);
     Member createUserWithNaverId(String naverId, NaverUserResponse.NaverUserDetail naverUserInfo);
     Member completeProfile(Long memberId, ProfileInputDto profileInputDto);
     void memberInactivation(Long memberId, String token);

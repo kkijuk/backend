@@ -12,6 +12,7 @@ import umc.kkijuk.server.auth.dto.AuthResponse;
 import umc.kkijuk.server.auth.dto.RefreshTokenRequest;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.auth.service.AuthService;
+import umc.kkijuk.server.auth.service.TokenService;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.common.domian.exception.EmailMismatchException;
 import umc.kkijuk.server.member.controller.response.*;
@@ -37,6 +38,7 @@ public class MemberController {
     private final MemberService memberService;
     private final AuthService authService;
     private final MailServiceImpl mailService;
+    private final TokenService tokenService;
     private final JwtUtil jwtUtil;
     private final LoginUser loginUser;
 
@@ -45,12 +47,7 @@ public class MemberController {
             description = "Refresh Token을 받아서 새로운 Access,Refresh Token을 발급(Refresh Token Rotation)")
     @PostMapping("/refreshToken")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
-
-        String refreshToken = request.getRefreshToken();
-        String socialId = jwtUtil.extractSocialId(refreshToken);
-
-        AuthResponse response = memberService.refreshAuthToken(refreshToken, socialId);
-
+        AuthResponse response = tokenService.rotateRefreshToken(request.getRefreshToken());
         return ResponseEntity.ok(response);
     }
 
@@ -128,9 +125,10 @@ public class MemberController {
 
     @Operation(summary = "로그아웃", description = "사용자 로그아웃")
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        String socialId = jwtUtil.extractSocialId(token.substring(7));
-        memberService.invalidateRefreshToken(socialId);
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token,
+                                         @RequestBody RefreshTokenRequest request) {
+        String socialId = jwtUtil.extractId(token.substring(7));
+        tokenService.logout(request.getRefreshToken());
         return ResponseEntity.ok("Logout successful");
     }
 
@@ -161,9 +159,3 @@ public class MemberController {
     }
 
 }
-
-
-
-
-
-
