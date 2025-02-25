@@ -41,11 +41,12 @@ public class BaseCareerDetailServiceImpl implements BaseCareerDetailService{
     @Override
     @Transactional
     public BaseCareerDetailResponse createDetail(Member requestMember, CareerDetailReqDto request, Long careerId) {
-        BaseCareer career = findBaseCareerByType(request.getCareerType(), careerId);
+        CareerType type = changeToCareerType(request.getCareerType());
+        BaseCareer career = findBaseCareerByType(type, careerId);
         validateOwner(career, requestMember);
 
         List<CareerDetailTag> detailTagList = returnCareerTagList(request.getTagList());
-        BaseCareerDetail newBaseCareerDetail = BaseCareerDetailConverter.toBaseCareerDetail(requestMember, request, careerId);
+        BaseCareerDetail newBaseCareerDetail = BaseCareerDetailConverter.toBaseCareerDetail(requestMember, request, careerId, type);
 
 //        addDetailToCareer(career, newBaseCareerDetail);
         detailTagList.forEach(tag -> tag.setBaseCareerDetail(newBaseCareerDetail));
@@ -96,23 +97,6 @@ public class BaseCareerDetailServiceImpl implements BaseCareerDetailService{
         }
     }
 
-//    private void addDetailToCareer(BaseCareer career, BaseCareerDetail detail) {
-//        if (career instanceof Competition) {
-//            ((Competition) career).getDetailList().add(detail);
-//        } else if (career instanceof Activity) {
-//            ((Activity) career).getDetailList().add(detail);
-//        } else if (career instanceof EduCareer) {
-//            ((EduCareer) career).getDetailList().add(detail);
-//        } else if (career instanceof Employment) {
-//            ((Employment) career).getDetailList().add(detail);
-//        } else if (career instanceof Circle) {
-//            ((Circle) career).getDetailList().add(detail);
-//        } else if (career instanceof Project) {
-//            ((Project) career).getDetailList().add(detail);
-//        } else {
-//            throw new IllegalArgumentException("지원하지 않는 활동 유형입니다.");
-//        }
-//    }
     private BaseCareer findBaseCareerByType(CareerType careerType, Long careerId) {
         return switch (careerType) {
             case ACTIVITY -> activityRepository.findById(careerId)
@@ -136,5 +120,17 @@ public class BaseCareerDetailServiceImpl implements BaseCareerDetailService{
             return tagRepository.findById(tagId).orElseThrow(() -> new ResourceNotFoundException("Tag", tagId));
         }).collect(Collectors.toList());
         return CareerDetailTagConverter.toCareerDetailTagList(tagList);
+    }
+
+    private CareerType changeToCareerType(String type) {
+        return switch (type){
+            case "activity" -> CareerType.ACTIVITY;
+            case "circle" -> CareerType.CIRCLE;
+            case "project" -> CareerType.PROJECT;
+            case "edu" -> CareerType.EDU;
+            case "competition" -> CareerType.COM;
+            case "employment" -> CareerType.EMP;
+            default -> throw new IllegalArgumentException("지원하지 않는 활동 유형입니다.");
+        };
     }
 }
