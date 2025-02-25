@@ -18,22 +18,21 @@ import umc.kkijuk.server.member.service.MemberService;
 public class EmailAuthController {
 
     private final MailServiceImpl mailService;
-    private final MemberService memberService;
 
     @Operation(
-            summary = "회원가입시 이메일 인증번호 요청",
-            description = "이메일 인증정보를 요청합니다.")
+            summary = "이메일 인증번호 요청",
+            description = "이메일 수정 시 이메일 인증정보를 요청합니다.")
     @PostMapping("/auth")
-    public ResponseEntity<MailCertificationResponse> joinSendMail(@RequestBody @Valid MailAddressDto mailAddressDto) {
+    public ResponseEntity<MailCertificationResponse> joinSendMail(@Valid @RequestBody MailAddressDto mailAddressDto) {
         MailCertificationResponse mailCertificationResponse = mailService.sendMailJoin(mailAddressDto.getEmail());
         return ResponseEntity.ok(mailCertificationResponse);
     }
 
     @Operation(
-            summary = "이메일 인증번호 인증",
-            description = "이메일 인증번호를 인증합니다.")
-    @PostMapping({"/auth/confirm", "/password/confirm"})
-    public ResponseEntity<Boolean> confirmMailNumber(@RequestBody @Valid MailCertificationDto mailCertificationDto){
+            summary = "이메일 인증번호 확인",
+            description = "이메일 인증번호의 일치 여부를 확인합니다.")
+    @PostMapping("/auth/confirm")
+    public ResponseEntity<Boolean> confirmMailNumber(@Valid @RequestBody MailCertificationDto mailCertificationDto){
         return ResponseEntity.ok(mailService.verifyMail(mailCertificationDto));
     }
 

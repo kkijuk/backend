@@ -228,12 +228,6 @@ public class AuthService {
                     return memberService.createUserWithNaverId(naverId,naverUserInfo);
                 });
     }
-
-
-
-
-
-
     @Transactional
     public Map<String, String> generateTokens(Member member) {
         String socialId = String.valueOf(member.getSocialId());
@@ -263,8 +257,6 @@ public class AuthService {
                 "refreshToken", refreshToken
         );
     }
-
-
 
     public String extractEmail(Map<String, Object> kakaoUserInfo) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) kakaoUserInfo.get("kakao_account");
@@ -322,6 +314,5 @@ public class AuthService {
 
         return LocalDate.of(year, month, day);
     }
-
 
 }
