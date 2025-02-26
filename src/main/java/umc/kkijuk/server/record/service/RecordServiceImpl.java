@@ -324,6 +324,10 @@ public class RecordServiceImpl implements RecordService {
 
         educationRepository.save(education);
 
+        //해당 값 변경 시 record의 updatedAt 값 변경
+        record.updateTimestamp();
+        recordRepository.save(record);
+
         // 기존 학력 리스트 가져오기
         List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
 
@@ -351,6 +355,8 @@ public class RecordServiceImpl implements RecordService {
                 educationReqDto.getAdmissionDate(),
                 educationReqDto.getGraduationDate());
 
+        updateRecordTimestamp(requestMember.getId());
+
         // 해당 사용자의 모든 학력 데이터 가져오기
         List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
 
@@ -372,6 +378,8 @@ public class RecordServiceImpl implements RecordService {
         }
 
         educationRepository.delete(education);
+
+        updateRecordTimestamp(requestMember.getId());
 
         // 해당 사용자의 모든 학력 데이터 가져오기
         List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
@@ -407,6 +415,10 @@ public class RecordServiceImpl implements RecordService {
 
         licenseRepository.save(license);
 
+        //해당 값 변경 시 record의 updatedAt 값 변경
+        record.updateTimestamp();
+        recordRepository.save(record);
+
         // 해당 사용자의 모든 자격증 데이터 가져오기
         List<License> licenses = licenseRepository.findByMemberId(requestMember.getId());
 
@@ -438,6 +450,8 @@ public class RecordServiceImpl implements RecordService {
                 licenseReqDto.getLicenseGrade(),
                 licenseReqDto.getAcquireDate());
 
+        updateRecordTimestamp(requestMember.getId());
+
         // 해당 사용자의 모든 자격증 데이터 가져오기
         List<License> licenses = licenseRepository.findByMemberId(requestMember.getId());
 
@@ -462,6 +476,8 @@ public class RecordServiceImpl implements RecordService {
         }
 
         licenseRepository.delete(license);
+
+        updateRecordTimestamp(requestMember.getId());
 
         // 해당 사용자의 모든 자격증 데이터 가져오기
         List<License> licenses = licenseRepository.findByMemberId(requestMember.getId());
@@ -496,6 +512,10 @@ public class RecordServiceImpl implements RecordService {
 
         awardRepository.save(award);
 
+        //해당 값 변경 시 record의 updatedAt 값 변경
+        record.updateTimestamp();
+        recordRepository.save(record);
+
         // 해당 사용자의 모든 수상 데이터 가져오기
         List<Award> awards = awardRepository.findByMemberId(requestMember.getId());
 
@@ -526,6 +546,8 @@ public class RecordServiceImpl implements RecordService {
                 awardReqDto.getAcquireDate()
         );
 
+        updateRecordTimestamp(requestMember.getId());
+
         // 해당 사용자의 모든 수상 데이터 가져오기
         List<Award> awards = awardRepository.findByMemberId(requestMember.getId());
 
@@ -550,6 +572,8 @@ public class RecordServiceImpl implements RecordService {
         }
 
         awardRepository.delete(award);
+
+        updateRecordTimestamp(requestMember.getId());
 
         // 해당 사용자의 모든 수상 데이터 가져오기
         List<Award> awards = awardRepository.findByMemberId(requestMember.getId());
@@ -583,6 +607,10 @@ public class RecordServiceImpl implements RecordService {
 
         skillRepository.save(skill);
 
+        //해당 값 변경 시 record의 updatedAt 값 변경
+        record.updateTimestamp();
+        recordRepository.save(record);
+
         return new SkillResponse(skill);
     }
 
@@ -603,6 +631,8 @@ public class RecordServiceImpl implements RecordService {
                 skillReqDto.getWorkmanship()
         );
 
+        updateRecordTimestamp(requestMember.getId());
+
         return new SkillResponse(skill);
     }
 
@@ -619,8 +649,18 @@ public class RecordServiceImpl implements RecordService {
 
         skillRepository.delete(skill);
 
+        updateRecordTimestamp(requestMember.getId());
+
         return skill.getId();
     }
 
+    private void updateRecordTimestamp(Long memberId) {
+        Record record = recordRepository.findByMemberId(memberId);
+        if (record == null) {
+            throw new ResourceNotFoundException("Record", memberId);
+        }
+        record.updateTimestamp();
+        recordRepository.save(record);
+    }
 
 }
