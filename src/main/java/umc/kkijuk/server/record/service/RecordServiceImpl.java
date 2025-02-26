@@ -274,6 +274,7 @@ public class RecordServiceImpl implements RecordService {
         List<EducationResponse> educationList = educationRepository.findByMemberId(memberId)
                 .stream()
                 .map(EducationResponse::new)
+                .sorted(Comparator.comparing(EducationResponse::getAdmissionDate).reversed())
                 .collect(Collectors.toList());
 
         // 수상
