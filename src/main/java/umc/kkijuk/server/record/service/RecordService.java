@@ -17,12 +17,12 @@ public interface RecordService {
     List<EducationResponse> updateEducation(Member requestMember, Long educationId, EducationReqDto educationReqDto);
     RecordResponse getRecord(Long memberId);
     RecordResponse updateRecord(Long memberId, Long recordId, RecordReqDto recordReqDto);
-    LicenseResponse saveLicense(Member requestMember, Long recordId, LicenseReqDto licenseReqDto);
-    LicenseResponse updateLicense(Member requestMember, Long licenseId, LicenseReqDto licenseReqDto);
-    Long deleteLicense(Member requestMember, Long licenseId);
-    AwardResponse saveAward(Member requestMember, Long recordId, AwardReqDto awardReqDto);
-    AwardResponse updateAward(Member requestMember, Long awardId, AwardReqDto awardReqDto);
-    Long deleteAward(Member requestMember, Long awardId);
+    List<LicenseResponse> saveLicense(Member requestMember, Long recordId, LicenseReqDto licenseReqDto);
+    List<LicenseResponse> updateLicense(Member requestMember, Long licenseId, LicenseReqDto licenseReqDto);
+    List<LicenseResponse> deleteLicense(Member requestMember, Long licenseId);
+    List<AwardResponse> saveAward(Member requestMember, Long recordId, AwardReqDto awardReqDto);
+    List<AwardResponse> updateAward(Member requestMember, Long awardId, AwardReqDto awardReqDto);
+    List<AwardResponse> deleteAward(Member requestMember, Long awardId);
     SkillResponse saveSkill(Member requestMember, Long recordId, SkillReqDto skillReqDto);
     SkillResponse updateSkill(Member requestMember, Long skillId, SkillReqDto skillReqDto);
     Long deleteSkill(Member requestMember, Long skillId);
