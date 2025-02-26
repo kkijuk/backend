@@ -14,6 +14,8 @@ import umc.kkijuk.server.record.controller.response.*;
 import umc.kkijuk.server.record.dto.*;
 import umc.kkijuk.server.record.service.RecordService;
 
+import java.util.List;
+
 @Tag(name = "record", description = "이력서 API")
 @RestController
 @RequiredArgsConstructor
@@ -72,7 +74,7 @@ public class RecordController {
                                                 @RequestBody EducationReqDto educationReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        EducationResponse educationResponse = recordService.saveEducation(requestMember,
+        List<EducationResponse> educationResponse = recordService.saveEducation(requestMember,
                 recordService.findByMemberId(memberId).getId(), educationReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -86,7 +88,7 @@ public class RecordController {
                                                  @RequestBody EducationReqDto educationReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        EducationResponse educationResponse = recordService.updateEducation(requestMember, educationId, educationReqDto);
+        List<EducationResponse> educationResponse = recordService.updateEducation(requestMember, educationId, educationReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "학력 수정 완료", educationResponse));
@@ -98,10 +100,10 @@ public class RecordController {
                                                   Long educationId) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        Long id = recordService.deleteEducation(requestMember, educationId);
+        List<EducationResponse> educationResponse = recordService.deleteEducation(requestMember, educationId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new BaseResponse<>(HttpStatus.OK.value(), "학력 삭제 완료", "id: " + id));
+                .body(new BaseResponse<>(HttpStatus.OK.value(), "학력 삭제 완료", educationResponse));
     }
 
     @PostMapping("/license")

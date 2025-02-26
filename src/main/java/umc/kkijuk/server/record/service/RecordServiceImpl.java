@@ -298,14 +298,13 @@ public class RecordServiceImpl implements RecordService {
                 .map(FileResponse::new)
                 .collect(Collectors.toList());
 
-
         return new RecordDownResponse(record, member, educationList, employments,
                 activitiesAndExperiences, projectsAndComp, eduCareers, awards, licenses, skills, files);
     }
 
     @Override
     @Transactional
-    public EducationResponse saveEducation(Member requestMember, Long recordId, EducationReqDto educationReqDto) {
+    public List<EducationResponse> saveEducation(Member requestMember, Long recordId, EducationReqDto educationReqDto) {
         Record record = recordRepository.findById(recordId)
                 .orElseThrow(() -> new ResourceNotFoundException("Record", recordId));
         if (!record.getMemberId().equals(requestMember.getId())) {
@@ -324,12 +323,20 @@ public class RecordServiceImpl implements RecordService {
 
         educationRepository.save(education);
 
-        return new EducationResponse(education);
+        // 기존 학력 리스트 가져오기
+        List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
+
+        // admissionDate 기준 최신순 정렬
+        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
+
+        return educations.stream()
+                .map(EducationResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public EducationResponse updateEducation(Member requestMember, Long educationId, EducationReqDto educationReqDto) {
+    public List<EducationResponse> updateEducation(Member requestMember, Long educationId, EducationReqDto educationReqDto) {
         Education education = educationRepository.findById(educationId)
                 .orElseThrow(() -> new ResourceNotFoundException("education ", educationId));
         if (!education.getMemberId().equals(requestMember.getId())) {
@@ -343,11 +350,20 @@ public class RecordServiceImpl implements RecordService {
                 educationReqDto.getAdmissionDate(),
                 educationReqDto.getGraduationDate());
 
-        return new EducationResponse(education);
+        // 해당 사용자의 모든 학력 데이터 가져오기
+        List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
+
+        // 최신 admissionDate 기준으로 정렬
+        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
+
+        // 정렬된 전체 데이터를 List<EducationResponse> 형태로 반환
+        return educations.stream()
+                .map(EducationResponse::new)
+                .collect(Collectors.toList());
     }
     @Override
     @Transactional
-    public Long deleteEducation(Member requestMember, Long educationId) {
+    public List<EducationResponse> deleteEducation(Member requestMember, Long educationId) {
         Education education = educationRepository.findById(educationId)
                 .orElseThrow(() -> new ResourceNotFoundException("education ", educationId));
         if (!education.getMemberId().equals(requestMember.getId())) {
@@ -356,7 +372,16 @@ public class RecordServiceImpl implements RecordService {
 
         educationRepository.delete(education);
 
-        return education.getId();
+        // 해당 사용자의 모든 학력 데이터 가져오기
+        List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
+
+        // 최신 admissionDate 기준으로 정렬
+        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
+
+        // 정렬된 전체 데이터를 List<EducationResponse> 형태로 반환
+        return educations.stream()
+                .map(EducationResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
