@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.kkijuk.server.record.domain.LicenseTag;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Builder
@@ -18,5 +19,5 @@ public class LicenseReqDto {
     private String administer;
     private String licenseNumber;
     private String licenseGrade;
-    private YearMonth acquireDate;
+    private LocalDate acquireDate;
 }

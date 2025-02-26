@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Getter
@@ -16,5 +17,5 @@ public class AwardReqDto {
     private String competitionName;
     private String administer;
     private String awardName;
-    private YearMonth acquireDate;
+    private LocalDate acquireDate;
 }

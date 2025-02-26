@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Builder
@@ -18,8 +19,8 @@ public class EducationReqDto {
     private String major;
     private String state;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
-    private YearMonth admissionDate;
+    private LocalDate admissionDate;
 
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
-    private YearMonth graduationDate;
+    private LocalDate graduationDate;
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.kkijuk.server.common.domian.base.BaseEntity;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Entity
@@ -38,10 +39,10 @@ public class License extends BaseEntity {
     private String licenseNumber;
     @Size(max = 10)
     private String licenseGrade;
-    private YearMonth acquireDate;
+    private LocalDate acquireDate;
 
 
-    public void changeLicenseInfo(LicenseTag licenseTag, String licenseName, String administer, String licenseNumber, String licenseGrade, YearMonth acquireDate){
+    public void changeLicenseInfo(LicenseTag licenseTag, String licenseName, String administer, String licenseNumber, String licenseGrade, LocalDate acquireDate){
         this.licenseTag = licenseTag;
         this.licenseName = licenseName;
         this.administer = administer;
