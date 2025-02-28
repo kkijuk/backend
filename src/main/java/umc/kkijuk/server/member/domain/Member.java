@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import umc.kkijuk.server.common.converter.MemberJobListConverter;
@@ -63,8 +64,9 @@ public class Member extends BaseEntity {
 
     private LocalDate deleteDate;
 
+    @Builder.Default
     @Convert(converter = StringListToStringConverter.class)
-    private List<String> recruitTags;
+    private List<String> recruitTags=new ArrayList<>();
 
 
 //    @NotNull
@@ -154,4 +156,8 @@ public class Member extends BaseEntity {
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+    public void setRecruitTags(List<String> recruitTags) {
+        this.recruitTags = (recruitTags != null) ? recruitTags : new ArrayList<>();
+    }
+
 }
