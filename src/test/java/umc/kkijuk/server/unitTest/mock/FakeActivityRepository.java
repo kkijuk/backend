@@ -68,6 +68,12 @@ public class FakeActivityRepository implements ActivityRepository {
     public void delete(Activity activity) {
         data.removeIf(item -> Objects.equals(item.getId(), activity.getId()));
     }
+
+    @Override
+    public void updateUnknownEndDates(LocalDate today) {
+
+    }
+
     private void assignId(Activity activity, Long id) {
         try {
             var field = Activity.class.getDeclaredField("id");

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import umc.kkijuk.server.career.domain.Competition;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,5 +34,10 @@ public class CompetitionRepositoryImpl implements CompetitionRepository{
     @Override
     public void delete(Competition comp) {
         competitionJpaRepository.delete(comp);
+    }
+
+    @Override
+    public void updateUnknownEndDates(LocalDate today) {
+        competitionJpaRepository.updateUnknownEndDates(today);
     }
 }

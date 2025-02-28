@@ -2,6 +2,7 @@ package umc.kkijuk.server.career.repository;
 
 import umc.kkijuk.server.career.domain.Employment;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +15,5 @@ public interface EmploymentRepository {
     Optional<Employment> findById(Long employmentId);
 
     void delete(Employment employment);
+    void updateUnknownEndDates(LocalDate today);
 }
