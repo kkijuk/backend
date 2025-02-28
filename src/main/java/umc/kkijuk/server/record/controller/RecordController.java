@@ -2,6 +2,7 @@ package umc.kkijuk.server.record.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class RecordController {
     @PatchMapping
     @Operation(summary = "이력서 정보 수정")
     public ResponseEntity<Object> update(@RequestHeader("Authorization") String token,
-                                         @RequestBody RecordReqDto recordReqDto) {
+                                         @Valid @RequestBody RecordReqDto recordReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         RecordResponse recordResponse = recordService.updateRecord(memberId,
                 recordService.findByMemberId(memberId).getId(), recordReqDto);
@@ -71,7 +72,7 @@ public class RecordController {
     @PostMapping("/education")
     @Operation(summary = "학력 생성")
     public ResponseEntity<Object> saveEducation(@RequestHeader("Authorization") String token,
-                                                @RequestBody EducationReqDto educationReqDto) {
+                                                @Valid @RequestBody EducationReqDto educationReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
         List<EducationResponse> educationResponse = recordService.saveEducation(requestMember,
@@ -85,7 +86,7 @@ public class RecordController {
     @Operation(summary = "학력 수정")
     public ResponseEntity<Object> patchEducation(@RequestHeader("Authorization") String token,
                                                  Long educationId,
-                                                 @RequestBody EducationReqDto educationReqDto) {
+                                                 @Valid @RequestBody EducationReqDto educationReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
         List<EducationResponse> educationResponse = recordService.updateEducation(requestMember, educationId, educationReqDto);
@@ -109,7 +110,7 @@ public class RecordController {
     @PostMapping("/license")
     @Operation(summary = "자격증 생성")
     public ResponseEntity<Object> saveLicense(@RequestHeader("Authorization") String token,
-                                              @RequestBody LicenseReqDto licenseReqDto) {
+                                              @Valid @RequestBody LicenseReqDto licenseReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
         List<LicenseResponse> licenseResponse = recordService.saveLicense(requestMember,
@@ -123,7 +124,7 @@ public class RecordController {
     @Operation(summary = "자격증 수정")
     public ResponseEntity<Object> patchLicense(@RequestHeader("Authorization") String token,
                                                Long licenseId,
-                                               @RequestBody LicenseReqDto licenseReqDto) {
+                                               @Valid @RequestBody LicenseReqDto licenseReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
         List<LicenseResponse> licenseResponse = recordService.updateLicense(requestMember, licenseId, licenseReqDto);
@@ -147,7 +148,7 @@ public class RecordController {
     @PostMapping("/award")
     @Operation(summary = "수상 생성")
     public ResponseEntity<Object> saveAward(@RequestHeader("Authorization") String token,
-                                            @RequestBody AwardReqDto awardReqDto) {
+                                            @Valid @RequestBody AwardReqDto awardReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
         List<AwardResponse> awardResponse = recordService.saveAward(requestMember,
@@ -161,7 +162,7 @@ public class RecordController {
     @Operation(summary = "수상 수정")
     public ResponseEntity<Object> patchAward(@RequestHeader("Authorization") String token,
                                              Long awardId,
-                                             @RequestBody AwardReqDto awardReqDto) {
+                                             @Valid @RequestBody AwardReqDto awardReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
         List<AwardResponse> awardResponse = recordService.updateAward(requestMember, awardId, awardReqDto);
@@ -185,7 +186,7 @@ public class RecordController {
     @PostMapping("/skill")
     @Operation(summary = "스킬 생성")
     public ResponseEntity<Object> saveSkill(@RequestHeader("Authorization") String token,
-                                            @RequestBody SkillReqDto skillReqDto) {
+                                            @Valid @RequestBody SkillReqDto skillReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
         SkillResponse skillResponse = recordService.saveSkill(requestMember,
@@ -199,7 +200,7 @@ public class RecordController {
     @Operation(summary = "스킬 수정")
     public ResponseEntity<Object> patchSkill(@RequestHeader("Authorization") String token,
                                              Long skillId,
-                                             @RequestBody SkillReqDto skillReqDto) {
+                                             @Valid @RequestBody SkillReqDto skillReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
         SkillResponse skillResponse = recordService.updateSkill(requestMember, skillId, skillReqDto);
