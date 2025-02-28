@@ -32,9 +32,6 @@ public class CircleReqDto {
     @Schema(description = "활동 기간 인지 여부", example = "false", type = "boolean")
     private Boolean unknown;
 
-//    @Size(max = 200)
-//    @Schema(description = "활동 내역", example = "주요 활동 내용을 요약하여 작성해주세요. 최대 200자 까지 입력 가능 선택사항입니다.", type = "string")
-//    private String summary;
 
     @NotNull(message = "활동 시작 날짜는 필수 입력 항목입니다.")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")

@@ -2,6 +2,8 @@ package umc.kkijuk.server.career.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -43,7 +45,7 @@ public class ProjectReqDto {
 
     //프로젝트 필수 입력사항
     @NotNull(message = "프로젝트 소속은 필수 입력 항목입니다.")
-    @Schema(description = "프로젝트 소 ", example = "OTHER", type = "string", allowableValues = {"ON_CAMPUS", "OFF_CAMPUS", "OTHER"})
+    @Schema(description = "프로젝트 소속 ", example = "OTHER", type = "string", allowableValues = {"ON_CAMPUS", "OFF_CAMPUS", "OTHER"})
     private ProjectType location;
 
     @NotNull(message = "팀일 경우 true, 팀이 아닐 경우 false")
@@ -51,8 +53,13 @@ public class ProjectReqDto {
     private Boolean isTeam;
 
     //팀 선택시 입력 사항 ( 선택 )
+    @Min(0)
+    @Max(99)
     @Schema(description = "인원, 숫자만, 2자리까지 직접 입력 가능", example = "4", type = "int")
     private int teamSize;
+
+    @Min(0)
+    @Max(100)
     @Schema(description = "기여도, 숫자만, 100이내 직접 입력 가능", example = "80", type = "int")
     private int contribution;
 
