@@ -2,6 +2,7 @@ package umc.kkijuk.server.career.service;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.kkijuk.server.career.controller.response.*;
@@ -28,7 +29,7 @@ public class CareerServiceImpl implements CareerService{
     private final CircleRepository circleRepository;
     private final CompetitionRepository competitionRepository;
     private final EduCareerRepository eduCareerRepository;
-    private final ProjectRepository projectJpaRepository;
+    private final ProjectRepository projectRepository;
     private final EmploymentRepository employmentRepository;
     private final CareerDetailRepository detailRepository;
     private final CareerEtcRepository etcRepository;
@@ -79,7 +80,7 @@ public class CareerServiceImpl implements CareerService{
     public ProjectResponse createProject(Member requestMember, ProjectReqDto projectReqDto) {
         Project project = BaseCareerConverter.toProject(requestMember, projectReqDto);
         setCommonFields(project);
-        return new ProjectResponse(projectJpaRepository.save(project));
+        return new ProjectResponse(projectRepository.save(project));
     }
     @Override
     @Transactional
@@ -167,13 +168,13 @@ public class CareerServiceImpl implements CareerService{
     @Override
     @Transactional
     public void deleteProject(Member requestMember, Long projectId) {
-        Project project = projectJpaRepository.findById(projectId).orElseThrow(
+        Project project = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFoundException("Project",projectId)
         );
         if(!project.getMemberId().equals(requestMember.getId())){
             throw new OwnerMismatchException();
         }
-        projectJpaRepository.delete(project);
+        projectRepository.delete(project);
     }
     @Override
     @Transactional
@@ -321,7 +322,7 @@ public class CareerServiceImpl implements CareerService{
     @Override
     @Transactional
     public ProjectResponse updateProject(Member requestMember, Long projectId, ProjectReqDto request) {
-        Project updateProject = projectJpaRepository.findById(projectId).orElseThrow(
+        Project updateProject = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFoundException("Project",projectId)
         );
         if(!updateProject.getMemberId().equals(requestMember.getId())){
@@ -356,7 +357,7 @@ public class CareerServiceImpl implements CareerService{
                 return getResponse(activity, ActivityResponse::new);
             }
             case PROJECT -> {
-                Project project = projectJpaRepository.findById(careerId)
+                Project project = projectRepository.findById(careerId)
                         .orElseThrow(() -> new ResourceNotFoundException("Project", careerId));
                 if(!project.getMemberId().equals(requestMember.getId())){
                     throw new OwnerMismatchException();
@@ -443,5 +444,17 @@ public class CareerServiceImpl implements CareerService{
         } else {
             activity.setYear(activity.getEnddate().getYear());
         }
+    }
+    @Scheduled(cron = "0 0 0 * * ?")
+    @Transactional
+    public void updateUnknownEndDates() {
+        System.out.println(LocalDate.now());
+        activityRepository.updateUnknownEndDates(LocalDate.now());
+        projectRepository.updateUnknownEndDates(LocalDate.now());
+        circleRepository.updateUnknownEndDates(LocalDate.now());
+        eduCareerRepository.updateUnknownEndDates(LocalDate.now());
+        competitionRepository.updateUnknownEndDates(LocalDate.now());
+        employmentRepository.updateUnknownEndDates(LocalDate.now());
+        etcRepository.updateUnknownEndDates(LocalDate.now());
     }
 }
