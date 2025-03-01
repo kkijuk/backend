@@ -25,8 +25,8 @@ public class EducationReqDto {
     private String major;
     @NotBlank(message = "입력하지 않은 항목이 있습니다.")
     private String state;
-    @NotEmpty(message = "입력하지 않은 항목이 있습니다.")
+    @NotNull(message = "입력하지 않은 항목이 있습니다.")
     private LocalDate admissionDate;
-    @NotEmpty(message = "입력하지 않은 항목이 있습니다.")
+    @NotNull(message = "입력하지 않은 항목이 있습니다.")
     private LocalDate graduationDate;
 }

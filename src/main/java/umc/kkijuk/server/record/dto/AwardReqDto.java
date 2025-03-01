@@ -23,6 +23,6 @@ public class AwardReqDto {
     private String administer;
     @NotBlank(message = "입력하지 않은 항목이 있습니다.")
     private String awardName;
-    @NotEmpty(message = "입력하지 않은 항목이 있습니다.")
+    @NotNull(message = "입력하지 않은 항목이 있습니다.")
     private LocalDate acquireDate;
 }
