@@ -589,7 +589,7 @@ public class RecordServiceImpl implements RecordService {
 
     @Override
     @Transactional
-    public SkillResponse saveSkill(Member requestMember, Long recordId, SkillReqDto skillReqDto) {
+    public List<SkillResponse> saveSkill(Member requestMember, Long recordId, SkillReqDto skillReqDto) {
 
         Record record = recordRepository.findById(recordId)
                 .orElseThrow(() -> new ResourceNotFoundException("Record", recordId));
@@ -611,12 +611,16 @@ public class RecordServiceImpl implements RecordService {
         record.updateTimestamp();
         recordRepository.save(record);
 
-        return new SkillResponse(skill);
+        List<Skill> skills = skillRepository.findByMemberId(requestMember.getId());
+
+        return skills.stream()
+                .map(SkillResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public SkillResponse updateSkill(Member requestMember, Long skillId, SkillReqDto skillReqDto) {
+    public List<SkillResponse> updateSkill(Member requestMember, Long skillId, SkillReqDto skillReqDto) {
 
         Skill skill = skillRepository.findById(skillId)
                 .orElseThrow(() -> new ResourceNotFoundException("Skill", skillId));
@@ -633,12 +637,16 @@ public class RecordServiceImpl implements RecordService {
 
         updateRecordTimestamp(requestMember.getId());
 
-        return new SkillResponse(skill);
+        List<Skill> skills = skillRepository.findByMemberId(requestMember.getId());
+
+        return skills.stream()
+                .map(SkillResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public Long deleteSkill(Member requestMember, Long skillId) {
+    public List<SkillResponse> deleteSkill(Member requestMember, Long skillId) {
 
         Skill skill = skillRepository.findById(skillId)
                 .orElseThrow(() -> new ResourceNotFoundException("Skill", skillId));
@@ -651,7 +659,11 @@ public class RecordServiceImpl implements RecordService {
 
         updateRecordTimestamp(requestMember.getId());
 
-        return skill.getId();
+        List<Skill> skills = skillRepository.findByMemberId(requestMember.getId());
+
+        return skills.stream()
+                .map(SkillResponse::new)
+                .collect(Collectors.toList());
     }
 
     private void updateRecordTimestamp(Long memberId) {

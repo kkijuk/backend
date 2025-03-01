@@ -88,6 +88,9 @@ public class FileServiceImpl implements FileService{
                 .fileTitle(request.getTitle())
                 .keyName(request.getKeyName())
                 .build();
+
+        updateRecordTimestamp(memberId);
+
         return new FileResponse(fileRepository.save(file));
     }
 
@@ -126,6 +129,8 @@ public class FileServiceImpl implements FileService{
         s3Client.deleteObject(builder -> builder.bucket(bucketName).key(file.getKeyName()).build());
         fileRepository.delete(file);
 
+        updateRecordTimestamp(memberId);
+
         return new FileResponse(file);
     }
 
@@ -145,6 +150,7 @@ public class FileServiceImpl implements FileService{
                 .url(urlReqDto.getUrl())
                 .build();
         fileRepository.save(file);
+        updateRecordTimestamp(memberId);
         return new FileResponse(file);
     }
 
@@ -154,9 +160,17 @@ public class FileServiceImpl implements FileService{
         File file = fileRepository.findByMemberIdAndUrlTitle(memberId, urlReqDto.getUrlTitle())
                 .orElseThrow(() -> new IllegalArgumentException("해당 URL이 존재하지 않습니다: " + urlReqDto.getUrlTitle()));
         fileRepository.delete(file);
-
+        updateRecordTimestamp(memberId);
         return new FileResponse(file);
 
     }
 
+    private void updateRecordTimestamp(Long memberId) {
+        Record record = recordRepository.findByMemberId(memberId);
+        if (record == null) {
+            throw new ResourceNotFoundException("Record", memberId);
+        }
+        record.updateTimestamp();
+        recordRepository.save(record);
+    }
 }
