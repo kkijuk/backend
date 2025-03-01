@@ -23,6 +23,7 @@ import umc.kkijuk.server.member.dto.*;
 import umc.kkijuk.server.member.repository.MemberRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -104,7 +105,12 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public List<String> addRecruitTag(Member member, String tag) {
+        if (member.getRecruitTags() == null) {
+            member.setRecruitTags(new ArrayList<>());
+        }
+
         List<String> recruitTags = member.getRecruitTags();
+
         if (recruitTags.contains(tag)) {
             throw new RecruitTagAlreadyExistException(tag);
         }

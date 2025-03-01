@@ -2,6 +2,8 @@ package umc.kkijuk.server.career.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -33,10 +35,6 @@ public class EduCareerReqDto {
     @Schema(description = "활동 기간 인지 여부", example = "false", type = "boolean")
     private Boolean unknown;
 
-//    @Size(max = 200)
-//    @Schema(description = "활동 내역", example = "주요 활동 내용을 요약하여 작성해주세요. 최대 200자 까지 입력 가능 선택사항입니다.", type = "string")
-//    private String summary;
-
     @NotNull(message = "활동 시작 날짜는 필수 입력 항목입니다.")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     @Schema(description = "활동 시작 날짜", example = "2024-04-14", type="string")
@@ -55,5 +53,7 @@ public class EduCareerReqDto {
 
     @NotNull(message = "교육시간는 필수 입력 항목입니다. 최대 4자리까지 숫자 입력 가능")
     @Schema(description = "4자리까지 직접 입력 가능", example = "126", type = "int")
+    @Max(9999)
+    @Min(0)
     private Integer time;
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import umc.kkijuk.server.career.domain.Activity;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,5 +32,10 @@ public class ActivityRepositoryImpl implements ActivityRepository{
     @Override
     public void delete(Activity activity) {
         activityJpaRepository.delete(activity);
+    }
+
+    @Override
+    public void updateUnknownEndDates(LocalDate today) {
+        activityJpaRepository.updateUnknownEndDates(today);
     }
 }

@@ -1,6 +1,5 @@
 package umc.kkijuk.server.detail.dto.converter;
 
-import umc.kkijuk.server.career.domain.*;
 import umc.kkijuk.server.detail.domain.BaseCareerDetail;
 import umc.kkijuk.server.detail.domain.CareerType;
 import umc.kkijuk.server.detail.dto.CareerDetailReqDto;
@@ -10,8 +9,7 @@ import java.util.ArrayList;
 
 public class BaseCareerDetailConverter {
 
-    public static BaseCareerDetail toBaseCareerDetail(Member requestMember,
-        CareerDetailReqDto request, Long careerId, CareerType type) {
+    public static BaseCareerDetail toBaseCareerDetail(Member requestMember, CareerDetailReqDto request, Long careerId, CareerType type) {
 
         return BaseCareerDetail.builder()
             .careerType(type)

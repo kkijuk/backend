@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import umc.kkijuk.server.career.domain.Circle;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,5 +35,10 @@ public class CircleRepositoryImpl implements CircleRepository{
     @Override
     public void delete(Circle circle) {
         circleJpaRepository.delete(circle);
+    }
+
+    @Override
+    public void updateUnknownEndDates(LocalDate today) {
+        circleJpaRepository.updateUnknownEndDates(today);
     }
 }
