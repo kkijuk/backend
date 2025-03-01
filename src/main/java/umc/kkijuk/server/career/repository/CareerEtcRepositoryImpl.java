@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import umc.kkijuk.server.career.domain.CareerEtc;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,5 +32,10 @@ public class CareerEtcRepositoryImpl implements CareerEtcRepository{
     @Override
     public void delete(CareerEtc etc) {
         careerEtcJpaRepository.delete(etc);
+    }
+
+    @Override
+    public void updateUnknownEndDates(LocalDate today) {
+        careerEtcJpaRepository.updateUnknownEndDates(today);
     }
 }

@@ -37,6 +37,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
     private final CareerDetailRepository detailRepository;
     private final TagRepository tagRepository;
 
+    // 타임라인 관련
     @Override
     public List<TimelineResponse> findCareerForTimeline(Member requestMember) {
         Long memberId = requestMember.getId();
@@ -174,6 +175,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
 
         return baseCareers;
     }
+    //활동 상세
     @Override
     public BaseCareerResponse findCareer(Member requestMember, Long careerId, String type) {
         switch (type.toLowerCase()) {
@@ -230,6 +232,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
         }
     }
 
+    //태그 조회
     @Override
     public FindTagResponse.SearchTagResponse findAllTag(Member requestMember, String keyword) {
         List<Tag> tags = tagRepository.findByKeywordAndMemberId(keyword, requestMember.getId());
@@ -281,9 +284,9 @@ public class CareerSearchServiceImpl implements CareerSearchService{
         careers.addAll(etcRepository.findByMemberIdAndNameContaining(requestMember.getId(),keyword));
 
         if ("new".equalsIgnoreCase(sort)) {
-            careers.sort(Comparator.comparing(BaseCareer::getEnddate).reversed());
+            careers = careers.stream().sorted(Comparator.comparing(BaseCareer::getStartdate).reversed()).collect(Collectors.toList());
         } else {
-            careers.sort(Comparator.comparing(BaseCareer::getEnddate));
+            careers = careers.stream().sorted(Comparator.comparing(BaseCareer::getStartdate)).collect(Collectors.toList());
         }
 
         return careers.stream()
@@ -382,11 +385,10 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             }
         }
         if (sort.equals("new")) {
-            result.stream().sorted(Comparator.comparing(FindDetailResponse::getEndDate).reversed());
+            return result.stream().sorted(Comparator.comparing(FindDetailResponse::getStartDate).reversed()).collect(Collectors.toList());
         } else {
-            result.stream().sorted(Comparator.comparing(FindDetailResponse::getEndDate).reversed());
+            return result.stream().sorted(Comparator.comparing(FindDetailResponse::getStartDate)).collect(Collectors.toList());
         }
-        return result;
 
     }
 
@@ -402,18 +404,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             default: return null;
         }
     }
-//    private Long getCareerId(BaseCareerDetail detail) {
-//        switch (detail.getCareerType()) {
-//            case ACTIVITY: return detail.getActivity().getId();
-//            case PROJECT: return detail.getProject().getId();
-//            case EMP: return detail.getEmployment().getId();
-//            case EDU: return detail.getEduCareer().getId();
-//            case COM: return detail.getCompetition().getId();
-//            case CIRCLE: return detail.getCircle().getId();
-//            case ETC: return detail.getEtc().getId();
-//            default: return null;
-//        }
-//    }
+
     private CareerSearchServiceImpl.FindDetailInfo extractDetailInfo(List<BaseCareerDetail> details) {
         if (details.isEmpty()) {
             return new CareerSearchServiceImpl.FindDetailInfo(null, null, null, null);

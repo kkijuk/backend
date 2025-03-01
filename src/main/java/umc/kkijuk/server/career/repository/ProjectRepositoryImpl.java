@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import umc.kkijuk.server.career.domain.Project;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,5 +35,10 @@ public class ProjectRepositoryImpl implements ProjectRepository{
     @Override
     public void delete(Project project) {
         projectJpaRepository.delete(project);
+    }
+
+    @Override
+    public void updateUnknownEndDates(LocalDate today) {
+        projectJpaRepository.updateUnknownEndDates(today);
     }
 }

@@ -2,6 +2,8 @@ package umc.kkijuk.server.career.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,7 +21,7 @@ import java.time.LocalDate;
 public class ActivityReqDto {
     @NotBlank(message = "활동명은 필수 입력 항목입니다. 최대 20자 까지 입력 가능")
     @Size(max = 20)
-    @Schema(description = "활동명", example = "대외활동", type="string")
+    @Schema(description = "활동명", example = "광고 기획 동아리", type="string")
     private String name;
 
     @NotBlank(message = "활동 별칭은 필수 입력 항목입니다. 최대 20자 까지 입력 가능")
@@ -30,10 +32,6 @@ public class ActivityReqDto {
     @NotNull(message = "활동 기간을 알고 있는지 여부를 나타냅니다.")
     @Schema(description = "활동 기간 인지 여부", example = "false", type = "boolean")
     private Boolean unknown;
-
-//    @Size(max = 200)
-//    @Schema(description = "활동 내역", example = "주요 활동 내용을 요약하여 작성해주세요. 최대 50자 까지 입력 가능 선택사항입니다.", type = "string")
-//    private String summary;
 
     @NotNull(message = "활동 시작 날짜는 필수 입력 항목입니다.")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
@@ -59,7 +57,12 @@ public class ActivityReqDto {
 
     //팀 선택시 입력 사항인
     @Schema(description = "인원, 숫자만, 2자리까지 직접 입력 가능", example = "30", type = "int")
+    @Min(0)
+    @Max(99)
     private int teamSize;
+
     @Schema(description = "기여도, 숫자만, 100이내 직접 입력 가능", example = "20", type = "int")
+    @Min(0)
+    @Max(100)
     private int contribution;
 }
