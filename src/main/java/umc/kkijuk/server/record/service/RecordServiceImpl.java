@@ -84,7 +84,7 @@ public class RecordServiceImpl implements RecordService {
         // 경력
         List<EmploymentResponse> employments = employmentJpaRepository.findByMemberId(memberId).stream()
                 .map(EmploymentResponse::new)
-                .sorted(Comparator.comparing(EmploymentResponse::getEndDate).reversed())
+                .sorted(Comparator.comparing(EmploymentResponse::getStartDate).reversed())
                 .toList();
 
         // 활동 및 경험 ( 동아리, 대외활동, 기타 )
@@ -97,7 +97,8 @@ public class RecordServiceImpl implements RecordService {
         activitiesAndExperiences.addAll(etcRepository.findByMemberId(memberId).stream()
                 .map(EtcResponse::new).collect(Collectors.toList()));
 
-        activitiesAndExperiences.stream().sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed());
+        activitiesAndExperiences = activitiesAndExperiences.stream()
+                .sorted(Comparator.comparing(BaseCareerResponse::getStartDate).reversed()).collect(Collectors.toList());
 
         // 프로젝트 ( 프로젝트, 공모전/대회)
         List<BaseCareerResponse> projectsAndComp = projectJpaRepository.findByMemberId(memberId).stream()
@@ -105,12 +106,13 @@ public class RecordServiceImpl implements RecordService {
                 .collect(Collectors.toList());
         projectsAndComp.addAll(competitionJpaRepository.findByMemberId(memberId).stream()
                 .map(CompetitionResponse::new).collect(Collectors.toList()));
-        projectsAndComp.stream().sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed());
+        projectsAndComp = projectsAndComp.stream()
+                .sorted(Comparator.comparing(BaseCareerResponse::getStartDate).reversed()).collect(Collectors.toList());
 
         // 교육 ( 교육)
         List<EduCareerResponse> eduCareers = eduCareerJpaRepository.findByMemberId(memberId).stream()
                 .map(EduCareerResponse::new)
-                .sorted(Comparator.comparing(EduCareerResponse::getEndDate).reversed())
+                .sorted(Comparator.comparing(EduCareerResponse::getStartDate).reversed())
                 .toList();
 
         // 수상
@@ -173,7 +175,7 @@ public class RecordServiceImpl implements RecordService {
         activitiesAndExperiences.addAll(etcRepository.findByMemberId(memberId).stream()
                 .map(EtcResponse::new).collect(Collectors.toList()));
 
-        activitiesAndExperiences.stream().sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed());
+        activitiesAndExperiences = activitiesAndExperiences.stream().sorted(Comparator.comparing(BaseCareerResponse::getStartDate).reversed()).collect(Collectors.toList());
 
         //프로젝트 ( 프로젝트, 공모전/대회)
         List<BaseCareerResponse> projectsAndComp = projectJpaRepository.findByMemberId(memberId).stream()
@@ -181,12 +183,12 @@ public class RecordServiceImpl implements RecordService {
                 .collect(Collectors.toList());
         projectsAndComp.addAll(competitionJpaRepository.findByMemberId(memberId).stream()
                 .map(CompetitionResponse::new).collect(Collectors.toList()));
-        projectsAndComp.stream().sorted(Comparator.comparing(BaseCareerResponse::getEndDate).reversed());
+        projectsAndComp = projectsAndComp.stream().sorted(Comparator.comparing(BaseCareerResponse::getStartDate).reversed()).collect(Collectors.toList());
 
         //교육 ( 교육)
         List<EduCareerResponse> eduCareers = eduCareerJpaRepository.findByMemberId(memberId).stream()
                 .map(EduCareerResponse::new)
-                .sorted(Comparator.comparing(EduCareerResponse::getEndDate).reversed())
+                .sorted(Comparator.comparing(EduCareerResponse::getStartDate).reversed())
                 .toList();
 
         // 수상
@@ -233,12 +235,14 @@ public class RecordServiceImpl implements RecordService {
                 .orElseThrow(() -> new ResourceNotFoundException("member ", memberId));
         Record record = recordRepository.findByMemberId(memberId);
 
+        //경력
         List<ResumeResponse> employments = employmentJpaRepository.findByMemberId(memberId).stream()
                 .map(employment -> new ResumeResponse(employment.getId(),CareerType.EMP.getDescription(),employment.getName(),
                         employment.getAlias(),employment.getSummary(),employment.getStartdate(),
-                        employment.getEnddate())).collect(Collectors.toList());
-        //활동 및 경험 ( 대외 활동, 동아리, 기타 )
+                        employment.getEnddate())).sorted(Comparator.comparing(ResumeResponse::getStartdate).reversed()).collect(Collectors.toList());
 
+
+        //활동 및 경험 ( 대외 활동, 동아리, 기타 )
         List<ResumeResponse> activitiesAndExperiences = activityRepository.findByMemberId(memberId).stream()
                 .map(activity -> new ResumeResponse(activity.getId(), CareerType.ACTIVITY.getDescription(), activity.getName(),
                         activity.getAlias(),activity.getSummary(),activity.getStartdate(),
@@ -254,6 +258,9 @@ public class RecordServiceImpl implements RecordService {
                         etc.getAlias(), etc.getSummary(), etc.getStartdate(),
                         etc.getEnddate())).collect(Collectors.toList()));
 
+        activitiesAndExperiences = activitiesAndExperiences.stream()
+                .sorted(Comparator.comparing(ResumeResponse::getStartdate).reversed()).collect(Collectors.toList());
+
         //프로젝트 ( 프로젝트, 공모전/대회)
         List<ResumeResponse> projectsAndComp = projectJpaRepository.findByMemberId(memberId).stream()
                 .map(project->new ResumeResponse(project.getId(),CareerType.PROJECT.getDescription(), project.getName(),
@@ -265,10 +272,18 @@ public class RecordServiceImpl implements RecordService {
                         comp.getAlias(),comp.getSummary(),comp.getStartdate(),
                         comp.getEnddate())).collect(Collectors.toList()));
 
+        projectsAndComp = projectsAndComp.stream()
+                .sorted(Comparator.comparing(ResumeResponse::getStartdate).reversed())
+                .collect(Collectors.toList());
+
+        //교육
         List<ResumeResponse> eduCareers = eduCareerJpaRepository.findByMemberId(memberId).stream()
                 .map(edu-> new ResumeResponse(edu.getId(),CareerType.EDU.getDescription(),edu.getName(),
                         edu.getAlias(),edu.getSummary(),edu.getStartdate(),
                         edu.getEnddate())).collect(Collectors.toList());
+        eduCareers = eduCareers.stream().sorted(Comparator.comparing(ResumeResponse::getStartdate).reversed()).collect(Collectors.toList());
+
+
 
         // 학력
         List<EducationResponse> educationList = educationRepository.findByMemberId(memberId)
