@@ -189,7 +189,7 @@ public class RecordController {
                                             @Valid @RequestBody SkillReqDto skillReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        SkillResponse skillResponse = recordService.saveSkill(requestMember,
+        List<SkillResponse> skillResponse = recordService.saveSkill(requestMember,
                 recordService.findByMemberId(memberId).getId(), skillReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -203,7 +203,7 @@ public class RecordController {
                                              @Valid @RequestBody SkillReqDto skillReqDto) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        SkillResponse skillResponse = recordService.updateSkill(requestMember, skillId, skillReqDto);
+        List<SkillResponse> skillResponse = recordService.updateSkill(requestMember, skillId, skillReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "스킬 수정 완료", skillResponse));
@@ -215,9 +215,9 @@ public class RecordController {
                                               Long skillId) {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        Long id = recordService.deleteSkill(requestMember, skillId);
+        List<SkillResponse> skillResponse = recordService.deleteSkill(requestMember, skillId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new BaseResponse<>(HttpStatus.OK.value(), "스킬 삭제 완료", "id: " + id));
+                .body(new BaseResponse<>(HttpStatus.OK.value(), "스킬 삭제 완료", skillResponse));
     }
 }

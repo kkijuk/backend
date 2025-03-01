@@ -23,8 +23,8 @@ public interface RecordService {
     List<AwardResponse> saveAward(Member requestMember, Long recordId, AwardReqDto awardReqDto);
     List<AwardResponse> updateAward(Member requestMember, Long awardId, AwardReqDto awardReqDto);
     List<AwardResponse> deleteAward(Member requestMember, Long awardId);
-    SkillResponse saveSkill(Member requestMember, Long recordId, SkillReqDto skillReqDto);
-    SkillResponse updateSkill(Member requestMember, Long skillId, SkillReqDto skillReqDto);
-    Long deleteSkill(Member requestMember, Long skillId);
+    List<SkillResponse> saveSkill(Member requestMember, Long recordId, SkillReqDto skillReqDto);
+    List<SkillResponse> updateSkill(Member requestMember, Long skillId, SkillReqDto skillReqDto);
+    List<SkillResponse> deleteSkill(Member requestMember, Long skillId);
     RecordDownResponse downloadResume(Long recordId, Long memberId);
 }
