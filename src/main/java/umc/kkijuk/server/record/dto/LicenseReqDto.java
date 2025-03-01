@@ -17,7 +17,7 @@ import java.time.YearMonth;
 @NoArgsConstructor
 @Getter
 public class LicenseReqDto {
-    @NotEmpty(message = "입력하지 않은 항목이 있습니다.")
+    @NotNull(message = "입력하지 않은 항목이 있습니다.")
     private LicenseTag licenseTag;
     @NotBlank(message = "입력하지 않은 항목이 있습니다.")
     private String licenseName;

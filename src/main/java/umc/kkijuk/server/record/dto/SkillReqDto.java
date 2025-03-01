@@ -15,10 +15,10 @@ import umc.kkijuk.server.record.domain.Workmanship;
 @NoArgsConstructor
 @Getter
 public class SkillReqDto {
-    @NotEmpty(message = "입력하지 않은 항목이 있습니다.")
+    @NotNull(message = "입력하지 않은 항목이 있습니다.")
     private SkillTag skillTag;
     @NotBlank(message = "입력하지 않은 항목이 있습니다.")
     private String skillName;
-    @NotEmpty(message = "입력하지 않은 항목이 있습니다.")
+    @NotNull(message = "입력하지 않은 항목이 있습니다.")
     private Workmanship workmanship;
 }
