@@ -24,6 +24,6 @@ public class LicenseReqDto {
     private String administer;
     private String licenseNumber;
     private String licenseGrade;
-    @NotEmpty(message = "입력하지 않은 항목이 있습니다.")
+    @NotNull(message = "입력하지 않은 항목이 있습니다.")
     private LocalDate acquireDate;
 }
