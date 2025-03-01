@@ -2,6 +2,7 @@ package umc.kkijuk.server.record.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,12 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileReqDto {
-    @NotBlank(message = "첨부파일 제목은 필수 입력 항목입니다. 최대 20자 까지 입력 가능")
+    @NotBlank(message = "입력하지 않은 항목이 있습니다.")
     @Size(max = 20)
     @Schema(description = "첨부파일 제목", example = "이력서 최종", type="string")
     private String title;
 
-    @NotBlank(message = "필수 입력 항목입니다.")
+    @NotBlank(message = "입력하지 않은 항목이 있습니다.")
     @Schema(description = "파일 keyName",type="string")
     private String keyName;
 }

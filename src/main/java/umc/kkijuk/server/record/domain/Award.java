@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.kkijuk.server.common.domian.base.BaseEntity;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Entity
@@ -31,9 +32,9 @@ public class Award extends BaseEntity {
     private String administer;
     @Size(max = 15)
     private String awardName;
-    private YearMonth acquireDate;
+    private LocalDate acquireDate;
 
-    public void changeAwardInfo(String competitionName, String administer, String awardName, YearMonth acquireDate) {
+    public void changeAwardInfo(String competitionName, String administer, String awardName, LocalDate acquireDate) {
         this.competitionName = competitionName;
         this.administer = administer;
         this.awardName = awardName;

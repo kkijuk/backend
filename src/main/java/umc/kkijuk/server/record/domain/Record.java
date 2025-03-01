@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import umc.kkijuk.server.common.domian.base.BaseEntity;
 import umc.kkijuk.server.common.domian.exception.ResourceNotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,5 +37,9 @@ public class Record extends BaseEntity {
     public void update(String address, String profileImageUrl) {
         this.address = address;
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateTimestamp() {
+        setUpdatedAt(LocalDateTime.now());
     }
 }

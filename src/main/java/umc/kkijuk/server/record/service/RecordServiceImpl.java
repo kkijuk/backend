@@ -274,6 +274,7 @@ public class RecordServiceImpl implements RecordService {
         List<EducationResponse> educationList = educationRepository.findByMemberId(memberId)
                 .stream()
                 .map(EducationResponse::new)
+                .sorted(Comparator.comparing(EducationResponse::getAdmissionDate).reversed())
                 .collect(Collectors.toList());
 
         // 수상
@@ -298,14 +299,13 @@ public class RecordServiceImpl implements RecordService {
                 .map(FileResponse::new)
                 .collect(Collectors.toList());
 
-
         return new RecordDownResponse(record, member, educationList, employments,
                 activitiesAndExperiences, projectsAndComp, eduCareers, awards, licenses, skills, files);
     }
 
     @Override
     @Transactional
-    public EducationResponse saveEducation(Member requestMember, Long recordId, EducationReqDto educationReqDto) {
+    public List<EducationResponse> saveEducation(Member requestMember, Long recordId, EducationReqDto educationReqDto) {
         Record record = recordRepository.findById(recordId)
                 .orElseThrow(() -> new ResourceNotFoundException("Record", recordId));
         if (!record.getMemberId().equals(requestMember.getId())) {
@@ -324,12 +324,24 @@ public class RecordServiceImpl implements RecordService {
 
         educationRepository.save(education);
 
-        return new EducationResponse(education);
+        //해당 값 변경 시 record의 updatedAt 값 변경
+        record.updateTimestamp();
+        recordRepository.save(record);
+
+        // 기존 학력 리스트 가져오기
+        List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
+
+        // admissionDate 기준 최신순 정렬
+        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
+
+        return educations.stream()
+                .map(EducationResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public EducationResponse updateEducation(Member requestMember, Long educationId, EducationReqDto educationReqDto) {
+    public List<EducationResponse> updateEducation(Member requestMember, Long educationId, EducationReqDto educationReqDto) {
         Education education = educationRepository.findById(educationId)
                 .orElseThrow(() -> new ResourceNotFoundException("education ", educationId));
         if (!education.getMemberId().equals(requestMember.getId())) {
@@ -343,11 +355,22 @@ public class RecordServiceImpl implements RecordService {
                 educationReqDto.getAdmissionDate(),
                 educationReqDto.getGraduationDate());
 
-        return new EducationResponse(education);
+        updateRecordTimestamp(requestMember.getId());
+
+        // 해당 사용자의 모든 학력 데이터 가져오기
+        List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
+
+        // 최신 admissionDate 기준으로 정렬
+        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
+
+        // 정렬된 전체 데이터를 List<EducationResponse> 형태로 반환
+        return educations.stream()
+                .map(EducationResponse::new)
+                .collect(Collectors.toList());
     }
     @Override
     @Transactional
-    public Long deleteEducation(Member requestMember, Long educationId) {
+    public List<EducationResponse> deleteEducation(Member requestMember, Long educationId) {
         Education education = educationRepository.findById(educationId)
                 .orElseThrow(() -> new ResourceNotFoundException("education ", educationId));
         if (!education.getMemberId().equals(requestMember.getId())) {
@@ -356,12 +379,23 @@ public class RecordServiceImpl implements RecordService {
 
         educationRepository.delete(education);
 
-        return education.getId();
+        updateRecordTimestamp(requestMember.getId());
+
+        // 해당 사용자의 모든 학력 데이터 가져오기
+        List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
+
+        // 최신 admissionDate 기준으로 정렬
+        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
+
+        // 정렬된 전체 데이터를 List<EducationResponse> 형태로 반환
+        return educations.stream()
+                .map(EducationResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public LicenseResponse saveLicense(Member requestMember, Long recordId, LicenseReqDto licenseReqDto) {
+    public List<LicenseResponse> saveLicense(Member requestMember, Long recordId, LicenseReqDto licenseReqDto) {
         Record record = recordRepository.findById(recordId)
                 .orElseThrow(() -> new ResourceNotFoundException("Record", recordId));
 
@@ -381,12 +415,25 @@ public class RecordServiceImpl implements RecordService {
 
         licenseRepository.save(license);
 
-        return new LicenseResponse(license);
+        //해당 값 변경 시 record의 updatedAt 값 변경
+        record.updateTimestamp();
+        recordRepository.save(record);
+
+        // 해당 사용자의 모든 자격증 데이터 가져오기
+        List<License> licenses = licenseRepository.findByMemberId(requestMember.getId());
+
+        // 최신 acquireDate 기준으로 정렬
+        licenses.sort((e1, e2) -> e2.getAcquireDate().compareTo(e1.getAcquireDate()));
+
+        // 정렬된 전체 데이터를 List<LicenseResponse> 형태로 반환
+        return licenses.stream()
+                .map(LicenseResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public LicenseResponse updateLicense(Member requestMember, Long licenseId, LicenseReqDto licenseReqDto) {
+    public List<LicenseResponse> updateLicense(Member requestMember, Long licenseId, LicenseReqDto licenseReqDto) {
 
         License license = licenseRepository.findById(licenseId)
                 .orElseThrow(() -> new ResourceNotFoundException("License", licenseId));
@@ -403,12 +450,23 @@ public class RecordServiceImpl implements RecordService {
                 licenseReqDto.getLicenseGrade(),
                 licenseReqDto.getAcquireDate());
 
-        return new LicenseResponse(license);
+        updateRecordTimestamp(requestMember.getId());
+
+        // 해당 사용자의 모든 자격증 데이터 가져오기
+        List<License> licenses = licenseRepository.findByMemberId(requestMember.getId());
+
+        // 최신 acquireDate 기준으로 정렬
+        licenses.sort((e1, e2) -> e2.getAcquireDate().compareTo(e1.getAcquireDate()));
+
+        // 정렬된 전체 데이터를 List<LicenseResponse> 형태로 반환
+        return licenses.stream()
+                .map(LicenseResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public Long deleteLicense(Member requestMember, Long licenseId) {
+    public List<LicenseResponse> deleteLicense(Member requestMember, Long licenseId) {
 
         License license = licenseRepository.findById(licenseId)
                 .orElseThrow(() -> new ResourceNotFoundException("License", licenseId));
@@ -419,12 +477,23 @@ public class RecordServiceImpl implements RecordService {
 
         licenseRepository.delete(license);
 
-        return license.getId();
+        updateRecordTimestamp(requestMember.getId());
+
+        // 해당 사용자의 모든 자격증 데이터 가져오기
+        List<License> licenses = licenseRepository.findByMemberId(requestMember.getId());
+
+        // 최신 acquireDate 기준으로 정렬
+        licenses.sort((e1, e2) -> e2.getAcquireDate().compareTo(e1.getAcquireDate()));
+
+        // 정렬된 전체 데이터를 List<LicenseResponse> 형태로 반환
+        return licenses.stream()
+                .map(LicenseResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public AwardResponse saveAward(Member requestMember, Long recordId, AwardReqDto awardReqDto) {
+    public List<AwardResponse> saveAward(Member requestMember, Long recordId, AwardReqDto awardReqDto) {
 
         Record record = recordRepository.findById(recordId)
                 .orElseThrow(() -> new ResourceNotFoundException("Record", recordId));
@@ -443,12 +512,25 @@ public class RecordServiceImpl implements RecordService {
 
         awardRepository.save(award);
 
-        return new AwardResponse(award);
+        //해당 값 변경 시 record의 updatedAt 값 변경
+        record.updateTimestamp();
+        recordRepository.save(record);
+
+        // 해당 사용자의 모든 수상 데이터 가져오기
+        List<Award> awards = awardRepository.findByMemberId(requestMember.getId());
+
+        // 최신 acquireDate 기준으로 정렬
+        awards.sort((e1, e2) -> e2.getAcquireDate().compareTo(e1.getAcquireDate()));
+
+        // 정렬된 전체 데이터를 List<AwardResponse> 형태로 반환
+        return awards.stream()
+                .map(AwardResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public AwardResponse updateAward(Member requestMember, Long awardId, AwardReqDto awardReqDto) {
+    public List<AwardResponse> updateAward(Member requestMember, Long awardId, AwardReqDto awardReqDto) {
 
         Award award = awardRepository.findById(awardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Award", awardId));
@@ -464,12 +546,23 @@ public class RecordServiceImpl implements RecordService {
                 awardReqDto.getAcquireDate()
         );
 
-        return new AwardResponse(award);
+        updateRecordTimestamp(requestMember.getId());
+
+        // 해당 사용자의 모든 수상 데이터 가져오기
+        List<Award> awards = awardRepository.findByMemberId(requestMember.getId());
+
+        // 최신 acquireDate 기준으로 정렬
+        awards.sort((e1, e2) -> e2.getAcquireDate().compareTo(e1.getAcquireDate()));
+
+        // 정렬된 전체 데이터를 List<AwardResponse> 형태로 반환
+        return awards.stream()
+                .map(AwardResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public Long deleteAward(Member requestMember, Long awardId) {
+    public List<AwardResponse> deleteAward(Member requestMember, Long awardId) {
 
         Award award = awardRepository.findById(awardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Award", awardId));
@@ -480,7 +573,18 @@ public class RecordServiceImpl implements RecordService {
 
         awardRepository.delete(award);
 
-        return award.getId();
+        updateRecordTimestamp(requestMember.getId());
+
+        // 해당 사용자의 모든 수상 데이터 가져오기
+        List<Award> awards = awardRepository.findByMemberId(requestMember.getId());
+
+        // 최신 acquireDate 기준으로 정렬
+        awards.sort((e1, e2) -> e2.getAcquireDate().compareTo(e1.getAcquireDate()));
+
+        // 정렬된 전체 데이터를 List<AwardResponse> 형태로 반환
+        return awards.stream()
+                .map(AwardResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -503,6 +607,10 @@ public class RecordServiceImpl implements RecordService {
 
         skillRepository.save(skill);
 
+        //해당 값 변경 시 record의 updatedAt 값 변경
+        record.updateTimestamp();
+        recordRepository.save(record);
+
         return new SkillResponse(skill);
     }
 
@@ -523,6 +631,8 @@ public class RecordServiceImpl implements RecordService {
                 skillReqDto.getWorkmanship()
         );
 
+        updateRecordTimestamp(requestMember.getId());
+
         return new SkillResponse(skill);
     }
 
@@ -539,8 +649,18 @@ public class RecordServiceImpl implements RecordService {
 
         skillRepository.delete(skill);
 
+        updateRecordTimestamp(requestMember.getId());
+
         return skill.getId();
     }
 
+    private void updateRecordTimestamp(Long memberId) {
+        Record record = recordRepository.findByMemberId(memberId);
+        if (record == null) {
+            throw new ResourceNotFoundException("Record", memberId);
+        }
+        record.updateTimestamp();
+        recordRepository.save(record);
+    }
 
 }

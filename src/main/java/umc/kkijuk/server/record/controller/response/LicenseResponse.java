@@ -4,6 +4,7 @@ import lombok.*;
 import umc.kkijuk.server.record.domain.License;
 import umc.kkijuk.server.record.domain.LicenseTag;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Data
@@ -17,7 +18,7 @@ public class LicenseResponse {
     private String administer;
     private String licenseNumber;
     private String licenseGrade;
-    private YearMonth acquireDate;
+    private LocalDate acquireDate;
 
     public LicenseResponse(License license) {
         this.id = license.getId();

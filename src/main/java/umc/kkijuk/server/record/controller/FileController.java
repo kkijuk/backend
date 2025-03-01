@@ -78,7 +78,7 @@ public class FileController {
     @PostMapping("/url")
     @Operation(summary = "이력서-추가 자료<URL> 저장", description = "추가자료 중 URL을 저장합니다.")
     public ResponseEntity<Object> saveUrl(@RequestHeader("Authorization") String token,
-                                          @RequestBody UrlReqDto urlReqDto){
+                                          @Valid @RequestBody UrlReqDto urlReqDto){
         Long memberId = loginUser.extractMemberId(token);
         FileResponse fileResponse = fileService.saveUrl(memberId,
                 recordService.findByMemberId(memberId).getId(), urlReqDto);

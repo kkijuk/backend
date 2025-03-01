@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.kkijuk.server.common.domian.base.BaseEntity;
+
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Entity
@@ -26,8 +28,8 @@ public class Education extends BaseEntity {
     private String schoolName;
     private String major;
     private String state;
-    private YearMonth admissionDate;
-    private YearMonth graduationDate;
+    private LocalDate admissionDate;
+    private LocalDate graduationDate;
 
 //    @Builder
 //    public Education(Record record, String category, String schoolName, String major
@@ -46,7 +48,7 @@ public class Education extends BaseEntity {
     }*/
 
     public void changeEducationInfo(String category, String schoolName, String major
-            , String state, YearMonth admissionDate, YearMonth graduationDate) {
+            , String state, LocalDate admissionDate, LocalDate graduationDate) {
         this.category = category;
         this.schoolName = schoolName;
         this.major = major;

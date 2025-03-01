@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import umc.kkijuk.server.record.domain.Award;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Data
@@ -17,7 +18,7 @@ public class AwardResponse {
     private String competitionName;
     private String administer;
     private String awardName;
-    private YearMonth acquireDate;
+    private LocalDate acquireDate;
 
     public AwardResponse(Award award) {
         this.id = award.getId();
