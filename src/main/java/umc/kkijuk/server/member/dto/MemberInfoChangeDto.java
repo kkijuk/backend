@@ -23,7 +23,7 @@ public class MemberInfoChangeDto {
     @NotNull(message = "생년월일을 입력해주세요.")
     private LocalDate birthDate;
 
-    @NotEmpty(message = "마케팅 수신 동의 여부를 입력해주세요.")
+    @NotNull(message = "마케팅 수신 동의 여부를 입력해주세요.")
     private MarketingAgree marketingAgree;
 
     @Builder
