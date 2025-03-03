@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CareerDetailReqDto {
     @NotNull(message = "활동 유형은 필수 입력 항목입니다.")
-    @Schema(description = "활동 유형", example = "activity", type = "string", allowableValues = {"activity", "project", "edu", "employment","competition","circle"})
+    @Schema(description = "활동 유형", example = "activity", type = "string", allowableValues = {"activity", "project", "edu", "employment","competition","circle","etc"})
     private String careerType;
 
     @Size(max = 30)
