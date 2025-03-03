@@ -31,11 +31,12 @@ public class BaseCareerDetailServiceImpl implements BaseCareerDetailService{
     private final CareerDetailRepository careerDetailRepository;
     private final CareerDetailTagRepository careerDetailTagRepository;
     private final ActivityRepository activityRepository;
-    private final EduCareerRepository eduCareerJpaRepository;
-    private final ProjectRepository projectJpaRepository;
+    private final EduCareerRepository eduCareerRepository;
+    private final ProjectRepository projectRepository;
     private final CircleRepository circleRepository;
-    private final EmploymentRepository employmentJpaRepository;
-    private final CompetitionRepository competitionJpaRepository;
+    private final EmploymentRepository employmentRepository;
+    private final CompetitionRepository competitionRepository;
+    private final CareerEtcRepository etcRepository;
     private final TagRepository tagRepository;
 
     @Override
@@ -103,14 +104,16 @@ public class BaseCareerDetailServiceImpl implements BaseCareerDetailService{
                     .orElseThrow(() -> new ResourceNotFoundException("대외활동 : ", careerId));
             case CIRCLE -> circleRepository.findById(careerId)
                     .orElseThrow(() -> new ResourceNotFoundException("동아리 : ", careerId));
-            case PROJECT -> projectJpaRepository.findById(careerId)
+            case PROJECT -> projectRepository.findById(careerId)
                     .orElseThrow(() -> new ResourceNotFoundException("프로젝트 : ", careerId));
-            case EDU -> eduCareerJpaRepository.findById(careerId)
+            case EDU -> eduCareerRepository.findById(careerId)
                     .orElseThrow(() -> new ResourceNotFoundException("교육 : ", careerId));
-            case COM -> competitionJpaRepository.findById(careerId)
+            case COM -> competitionRepository.findById(careerId)
                     .orElseThrow(() -> new ResourceNotFoundException("대회 : ", careerId));
-            case EMP -> employmentJpaRepository.findById(careerId)
+            case EMP -> employmentRepository.findById(careerId)
                     .orElseThrow(() -> new ResourceNotFoundException("경력 : ", careerId));
+            case ETC -> etcRepository.findById(careerId)
+                    .orElseThrow(() -> new ResourceNotFoundException("기타 : ", careerId));
             default -> throw new IllegalArgumentException("지원하지 않는 활동 유형입니다");
         };
     }
@@ -130,6 +133,7 @@ public class BaseCareerDetailServiceImpl implements BaseCareerDetailService{
             case "edu" -> CareerType.EDU;
             case "competition" -> CareerType.COM;
             case "employment" -> CareerType.EMP;
+            case "etc" -> CareerType.ETC;
             default -> throw new IllegalArgumentException("지원하지 않는 활동 유형입니다.");
         };
     }
