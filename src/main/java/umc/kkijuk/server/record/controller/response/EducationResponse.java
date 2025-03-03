@@ -1,5 +1,6 @@
 package umc.kkijuk.server.record.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import umc.kkijuk.server.record.domain.Education;
 
@@ -16,8 +17,10 @@ public class EducationResponse {
     private String schoolName;
     private String major;
     private String state;
-    private LocalDate admissionDate;
-    private LocalDate graduationDate;
+    @JsonFormat(pattern = "yyyy-MM")
+    private YearMonth admissionDate;
+    @JsonFormat(pattern = "yyyy-MM")
+    private YearMonth graduationDate;
     private Boolean isCurrent;
 
     public EducationResponse(Education education) {
@@ -31,7 +34,11 @@ public class EducationResponse {
         this.isCurrent=determineIsCurrent(graduationDate);
     }
 
-    private static Boolean determineIsCurrent(LocalDate graduationDate) {
-        return graduationDate.isAfter(LocalDate.now());
+    private static Boolean determineIsCurrent(YearMonth graduationDate) {
+        if (graduationDate == null) {
+            return false;
+        }
+        LocalDate graduationEndDate = graduationDate.atEndOfMonth();
+        return graduationEndDate.isAfter(LocalDate.now());
     }
 }

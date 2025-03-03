@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import umc.kkijuk.server.common.converter.YearMonthAttributeConverter;
 import umc.kkijuk.server.common.domian.base.BaseEntity;
 
 import java.time.LocalDate;
@@ -28,27 +29,14 @@ public class Education extends BaseEntity {
     private String schoolName;
     private String major;
     private String state;
-    private LocalDate admissionDate;
-    private LocalDate graduationDate;
+    @Convert(converter = YearMonthAttributeConverter.class)
+    private YearMonth admissionDate;
+    @Convert(converter = YearMonthAttributeConverter.class)
+    private YearMonth graduationDate;
 
-//    @Builder
-//    public Education(Record record, String category, String schoolName, String major
-//    , String state, YearMonth admissionDate, YearMonth graduationDate) {
-//        this.record = record;
-//        this.category = category;
-//        this.schoolName = schoolName;
-//        this.major = major;
-//        this.state = state;
-//        this.admissionDate = admissionDate;
-//        this.graduationDate = graduationDate;
-//    }
-
-   /* public void setRecord(Record record) {
-        this.record = record;
-    }*/
 
     public void changeEducationInfo(String category, String schoolName, String major
-            , String state, LocalDate admissionDate, LocalDate graduationDate) {
+            , String state, YearMonth admissionDate, YearMonth graduationDate) {
         this.category = category;
         this.schoolName = schoolName;
         this.major = major;
