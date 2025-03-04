@@ -141,6 +141,7 @@ public class RecordServiceImpl implements RecordService {
         List<EducationResponse> educationList = educationRepository.findByMemberId(memberId)
                 .stream()
                 .map(EducationResponse::new)
+                .sorted(Comparator.comparing(EducationResponse::getGraduationDate).reversed())
                 .collect(Collectors.toList());
 
         return new RecordResponse(record, member, educationList, employments,
@@ -222,6 +223,7 @@ public class RecordServiceImpl implements RecordService {
         List<EducationResponse> educationList = educationRepository.findByMemberId(memberId)
                 .stream()
                 .map(EducationResponse::new)
+                .sorted(Comparator.comparing(EducationResponse::getGraduationDate).reversed())
                 .collect(Collectors.toList());
 
         return new RecordResponse(record, member, educationList, employments,
@@ -289,7 +291,7 @@ public class RecordServiceImpl implements RecordService {
         List<EducationResponse> educationList = educationRepository.findByMemberId(memberId)
                 .stream()
                 .map(EducationResponse::new)
-                .sorted(Comparator.comparing(EducationResponse::getAdmissionDate).reversed())
+                .sorted(Comparator.comparing(EducationResponse::getGraduationDate).reversed())
                 .collect(Collectors.toList());
 
         // 수상
@@ -339,18 +341,14 @@ public class RecordServiceImpl implements RecordService {
 
         educationRepository.save(education);
 
-        //해당 값 변경 시 record의 updatedAt 값 변경
         record.updateTimestamp();
         recordRepository.save(record);
 
-        // 기존 학력 리스트 가져오기
         List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
-
-        // admissionDate 기준 최신순 정렬
-        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
 
         return educations.stream()
                 .map(EducationResponse::new)
+                .sorted(Comparator.comparing(EducationResponse::getGraduationDate).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -372,15 +370,11 @@ public class RecordServiceImpl implements RecordService {
 
         updateRecordTimestamp(requestMember.getId());
 
-        // 해당 사용자의 모든 학력 데이터 가져오기
         List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
 
-        // 최신 admissionDate 기준으로 정렬
-        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
-
-        // 정렬된 전체 데이터를 List<EducationResponse> 형태로 반환
         return educations.stream()
                 .map(EducationResponse::new)
+                .sorted(Comparator.comparing(EducationResponse::getGraduationDate).reversed())
                 .collect(Collectors.toList());
     }
     @Override
@@ -396,15 +390,11 @@ public class RecordServiceImpl implements RecordService {
 
         updateRecordTimestamp(requestMember.getId());
 
-        // 해당 사용자의 모든 학력 데이터 가져오기
         List<Education> educations = educationRepository.findByMemberId(requestMember.getId());
 
-        // 최신 admissionDate 기준으로 정렬
-        educations.sort((e1, e2) -> e2.getAdmissionDate().compareTo(e1.getAdmissionDate()));
-
-        // 정렬된 전체 데이터를 List<EducationResponse> 형태로 반환
         return educations.stream()
                 .map(EducationResponse::new)
+                .sorted(Comparator.comparing(EducationResponse::getGraduationDate).reversed())
                 .collect(Collectors.toList());
     }
 
