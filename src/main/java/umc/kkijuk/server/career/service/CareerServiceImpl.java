@@ -402,6 +402,15 @@ public class CareerServiceImpl implements CareerService{
                 employment.setSummary(request.getSummary());
                 return getResponse(employment,EmploymentResponse::new);
             }
+            case ETC -> {
+                CareerEtc etc = etcRepository.findById(careerId)
+                        .orElseThrow(() -> new ResourceNotFoundException("CareerEtc", careerId));
+                if(!etc.getMemberId().equals(requestMember.getId())){
+                    throw new OwnerMismatchException();
+                }
+                etc.setSummary(request.getSummary());
+                return getResponse(etc, EtcResponse::new);
+            }
             default -> throw new IllegalArgumentException("지원하지 않는 활동 유형입니다 : " + request.getType());
 
         }
