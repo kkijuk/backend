@@ -14,7 +14,10 @@ import umc.kkijuk.server.introduce.repository.IntroduceRepository;
 import umc.kkijuk.server.introduce.repository.MasterIntroduceRepository;
 import umc.kkijuk.server.introduce.repository.QuestionRepository;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.recruit.controller.port.RecruitService;
 import umc.kkijuk.server.recruit.domain.Recruit;
+import umc.kkijuk.server.recruit.domain.RecruitStatus;
+import umc.kkijuk.server.recruit.domain.RecruitStatusUpdate;
 import umc.kkijuk.server.recruit.infrastructure.RecruitEntity;
 import umc.kkijuk.server.recruit.infrastructure.RecruitJpaRepository;
 import umc.kkijuk.server.review.controller.port.ReviewService;
@@ -35,6 +38,7 @@ public class IntroduceServiceImpl implements IntroduceService {
     private final QuestionRepository questionRepository;
     private final MasterIntroduceRepository masterIntroduceRepository;
     private final ReviewService reviewService;
+    private final RecruitService recruitService;
     private final ReviewRepository reviewRepository;
 
     @Override
@@ -59,6 +63,9 @@ public class IntroduceServiceImpl implements IntroduceService {
                 .build();
 
         introduceRepository.save(introduce);
+
+        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
+        recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
 
         //작성 완료 처리 됐을 때 '서류'라는 이름의 공고 리뷰 자동 생성
 
