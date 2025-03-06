@@ -14,7 +14,7 @@ public interface IntroduceService {
     IntroduceResponse saveIntro(Member requestMember, Long recruitId, IntroduceReqDto introduceReqDto);
     IntroduceResponse getIntro(Member requestMember, Long introId);
     List<IntroduceListResponse> getIntroList(Member requestMember);
-    IntroduceResponse updateIntro(Member requestMember, Long introId, IntroduceReqDto introduceReqDto) throws Exception;
+    IntroduceResponse updateIntro(Member requestMember, Long introId, IntroduceReqDto introduceReqDto, Long recruitId) throws Exception;
     Long deleteIntro(Member requestMember, Long introId, Long recruitId);
     Map<String, Object> searchIntroduceAndMasterByKeyword(String keyword, Member requestMember);
     Introduce findByRecruitId(Long recruitId);

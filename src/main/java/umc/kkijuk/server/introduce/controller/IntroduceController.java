@@ -71,7 +71,8 @@ public class IntroduceController {
             @PathVariable("introId") Long introId, @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        IntroduceResponse introduceResponse = introduceService.updateIntro(requestMember, introId, introduceReqDto);
+        Long recruitId = introduceService.getIntro(requestMember, introId).getRecruitId();
+        IntroduceResponse introduceResponse = introduceService.updateIntro(requestMember, introId, introduceReqDto, recruitId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "자기소개서 수정 완료", introduceResponse));

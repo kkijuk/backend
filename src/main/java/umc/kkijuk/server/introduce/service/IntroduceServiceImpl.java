@@ -118,7 +118,8 @@ public class IntroduceServiceImpl implements IntroduceService {
 
     @Override
     @Transactional
-    public IntroduceResponse updateIntro(Member requestMember, Long introId, IntroduceReqDto introduceReqDto) throws Exception {
+    public IntroduceResponse updateIntro(Member requestMember, Long introId,
+                                         IntroduceReqDto introduceReqDto, Long recruitId) throws Exception {
         Introduce introduce = introduceRepository.findById(introId)
                 .orElseThrow(() -> new ResourceNotFoundException("introduce ", introId));
 
@@ -167,6 +168,10 @@ public class IntroduceServiceImpl implements IntroduceService {
 
         introduceRepository.save(introduce);
 
+        // 자기소개서 수정 시 공고 상태 지원 예정으로 변경
+        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
+        recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
+
         // "서류" 리뷰 자동 생성 로직 추가
         RecruitEntity recruitEntity = introduce.getRecruit(); // Introduce 엔티티에서 Recruit 가져오기
         Recruit recruit = recruitEntity.toModel();
@@ -211,7 +216,7 @@ public class IntroduceServiceImpl implements IntroduceService {
         introduceRepository.delete(introduce);
 
         // 자기소개서 삭제 시 공고 상태 미지원으로 변경
-        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
+        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.UNAPPLIED);
         recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
 
         return introduce.getId();
