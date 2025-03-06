@@ -64,6 +64,7 @@ public class IntroduceServiceImpl implements IntroduceService {
 
         introduceRepository.save(introduce);
 
+        // 자기소개서 작성 시 공고 상태 지원 예정으로 변경
         RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
         recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
 
@@ -200,7 +201,7 @@ public class IntroduceServiceImpl implements IntroduceService {
 
     @Override
     @Transactional
-    public Long deleteIntro(Member requestMember, Long introId) {
+    public Long deleteIntro(Member requestMember, Long introId, Long recruitId) {
         Introduce introduce = introduceRepository.findById(introId)
                 .orElseThrow(() -> new ResourceNotFoundException("introduce ", introId));
         if (!introduce.getMemberId().equals(requestMember.getId())) {
@@ -208,6 +209,10 @@ public class IntroduceServiceImpl implements IntroduceService {
         }
 
         introduceRepository.delete(introduce);
+
+        // 자기소개서 삭제 시 공고 상태 미지원으로 변경
+        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
+        recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
 
         return introduce.getId();
     }

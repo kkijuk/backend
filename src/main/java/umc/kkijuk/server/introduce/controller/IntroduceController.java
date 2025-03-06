@@ -83,7 +83,8 @@ public class IntroduceController {
             @PathVariable("introId") Long introId){
         Long memberId = loginUser.extractMemberId(token);
         Member requestMember = memberService.getById(memberId);
-        Long intro_Id = introduceService.deleteIntro(requestMember, introId);
+        Long recruitId = introduceService.getIntro(requestMember, introId).getRecruitId();
+        Long intro_Id = introduceService.deleteIntro(requestMember, introId, recruitId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "자기소개서 삭제 완료", intro_Id));
