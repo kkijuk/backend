@@ -14,7 +14,10 @@ import umc.kkijuk.server.introduce.repository.IntroduceRepository;
 import umc.kkijuk.server.introduce.repository.MasterIntroduceRepository;
 import umc.kkijuk.server.introduce.repository.QuestionRepository;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.recruit.controller.port.RecruitService;
 import umc.kkijuk.server.recruit.domain.Recruit;
+import umc.kkijuk.server.recruit.domain.RecruitStatus;
+import umc.kkijuk.server.recruit.domain.RecruitStatusUpdate;
 import umc.kkijuk.server.recruit.infrastructure.RecruitEntity;
 import umc.kkijuk.server.recruit.infrastructure.RecruitJpaRepository;
 import umc.kkijuk.server.review.controller.port.ReviewService;
@@ -35,6 +38,7 @@ public class IntroduceServiceImpl implements IntroduceService {
     private final QuestionRepository questionRepository;
     private final MasterIntroduceRepository masterIntroduceRepository;
     private final ReviewService reviewService;
+    private final RecruitService recruitService;
     private final ReviewRepository reviewRepository;
 
     @Override
@@ -59,6 +63,10 @@ public class IntroduceServiceImpl implements IntroduceService {
                 .build();
 
         introduceRepository.save(introduce);
+
+        // 자기소개서 작성 시 공고 상태 지원 예정으로 변경
+        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
+        recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
 
         //작성 완료 처리 됐을 때 '서류'라는 이름의 공고 리뷰 자동 생성
 
@@ -110,7 +118,8 @@ public class IntroduceServiceImpl implements IntroduceService {
 
     @Override
     @Transactional
-    public IntroduceResponse updateIntro(Member requestMember, Long introId, IntroduceReqDto introduceReqDto) throws Exception {
+    public IntroduceResponse updateIntro(Member requestMember, Long introId,
+                                         IntroduceReqDto introduceReqDto, Long recruitId) throws Exception {
         Introduce introduce = introduceRepository.findById(introId)
                 .orElseThrow(() -> new ResourceNotFoundException("introduce ", introId));
 
@@ -159,6 +168,10 @@ public class IntroduceServiceImpl implements IntroduceService {
 
         introduceRepository.save(introduce);
 
+        // 자기소개서 수정 시 공고 상태 지원 예정으로 변경
+        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
+        recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
+
         // "서류" 리뷰 자동 생성 로직 추가
         RecruitEntity recruitEntity = introduce.getRecruit(); // Introduce 엔티티에서 Recruit 가져오기
         Recruit recruit = recruitEntity.toModel();
@@ -193,7 +206,7 @@ public class IntroduceServiceImpl implements IntroduceService {
 
     @Override
     @Transactional
-    public Long deleteIntro(Member requestMember, Long introId) {
+    public Long deleteIntro(Member requestMember, Long introId, Long recruitId) {
         Introduce introduce = introduceRepository.findById(introId)
                 .orElseThrow(() -> new ResourceNotFoundException("introduce ", introId));
         if (!introduce.getMemberId().equals(requestMember.getId())) {
@@ -201,6 +214,10 @@ public class IntroduceServiceImpl implements IntroduceService {
         }
 
         introduceRepository.delete(introduce);
+
+        // 자기소개서 삭제 시 공고 상태 미지원으로 변경
+        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.UNAPPLIED);
+        recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
 
         return introduce.getId();
     }
