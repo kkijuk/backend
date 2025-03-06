@@ -1,6 +1,5 @@
 package umc.kkijuk.server.review.domain;
 
-import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
 import umc.kkijuk.server.recruit.domain.Recruit;
