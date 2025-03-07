@@ -99,6 +99,9 @@ jobs:
           #Test server domain
           echo "test.server.domain=${{ secrets.TEST_SERVER_DOMAIN }}" >> ./src/main/resources/application.properties
 
+          #discord logging
+          echo "discord.webhook.error-url=${{ secrets.DISCORD_WEBHOOK_URL }}" >> ./src/main/resources/application-prod.properties
+
       - name: Build with Gradle Wrapper
         run: ./gradlew build
 

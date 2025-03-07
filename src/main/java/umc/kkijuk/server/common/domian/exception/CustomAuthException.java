@@ -1,9 +1,11 @@
 package umc.kkijuk.server.common.domian.exception;
 
 import lombok.Getter;
+import umc.kkijuk.server.common.SkipDiscordNotification;
 import umc.kkijuk.server.common.domian.status.AuthErrorStatus;
 
 @Getter
+@SkipDiscordNotification
 public class CustomAuthException extends RuntimeException {
     private final AuthErrorStatus errorStatus;
 
