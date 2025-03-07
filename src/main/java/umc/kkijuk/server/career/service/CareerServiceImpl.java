@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 @Service
+@Builder
 @RequiredArgsConstructor
 public class CareerServiceImpl implements CareerService{
     private final ActivityRepository activityRepository;
