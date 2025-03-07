@@ -14,7 +14,6 @@ public class LoginUser {
 
     private final JwtUtil jwtUtil;
     private final MemberService memberService;
-    private Long id;
 
     @Autowired
     public LoginUser(JwtUtil jwtUtil, MemberService memberService) {
@@ -22,14 +21,7 @@ public class LoginUser {
         this.memberService = memberService;
     }
 
-//    private static final LoginUser LOGIN_USER = new LoginUser( null, null);
-
-
-//    public static LoginUser get() {
-//        return LOGIN_USER;
-//    }
-
-    public Long extractMemberId(String bearerToken) {
+    public Member extractMemberId(String bearerToken) {
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Authorization 헤더에 올바른 토큰이 없습니다.");
         }
@@ -41,10 +33,7 @@ public class LoginUser {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
 
-        Member member = memberService.findBySocialId(socialId);
-        return member.getId();
+        return memberService.findBySocialId(socialId);
     }
-
-
 
 }

@@ -32,8 +32,7 @@ public class TagController {
             @RequestHeader("Authorization") String token,
             @RequestBody @Valid TagRequestDto.CreateTagDto request
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Tag tag = tagService.createTag(requestMember, request);
 
         return TagResponse.success(HttpStatus.OK, "태그를 성공적으로 생성했습니다.", TagConverter.toTagResult(tag));
@@ -42,8 +41,7 @@ public class TagController {
     @GetMapping("/tag")
     @Operation(summary = "태그 조회 API", description = "태그 - 태그 조회하는 API")
     public TagResponse<TagResponseDto.ResultTagDtoList> read(@RequestHeader("Authorization") String token) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return TagResponse.success(HttpStatus.OK, "모든 태그를 성공적으로 조회했습니다.", tagService.findAllTags(requestMember));
     }
 
@@ -53,8 +51,7 @@ public class TagController {
     public TagResponse<Object> delete(@RequestHeader("Authorization") String token,
             @PathVariable Long tagId
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         tagService.delete(requestMember, tagId);
         return TagResponse.success(HttpStatus.OK, "태그 삭제가 성공적으로 이루어졌습니다.", null);
     }

@@ -36,8 +36,7 @@ public class CareerDetailController {
             @PathVariable Long careerId,
             @RequestBody @Valid CareerDetailReqDto request
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerDetailResponse.success(HttpStatus.CREATED, "활동 기록을 성공적으로 생성했습니다.",
                 careerDetailService.createDetail(requestMember, request, careerId)
         );
@@ -53,8 +52,7 @@ public class CareerDetailController {
             @PathVariable Long careerId,
             @PathVariable Long detailId
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         careerDetailService.deleteDetail(requestMember, careerId ,detailId);
         return CareerDetailResponse.success(HttpStatus.OK, "활동 기록을 성공적으로 삭제했습니다.",null);
     }
@@ -71,8 +69,7 @@ public class CareerDetailController {
             @PathVariable Long detailId,
             @RequestBody @Valid CareerDetailUpdateReqDto request
     ){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerDetailResponse.success(
                 HttpStatus.OK,
                 "활동 기록을 성공적으로 수정했습니다.",

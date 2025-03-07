@@ -12,10 +12,13 @@ import umc.kkijuk.server.career.dto.converter.BaseCareerConverter;
 import umc.kkijuk.server.career.repository.*;
 import umc.kkijuk.server.common.domian.exception.OwnerMismatchException;
 import umc.kkijuk.server.common.domian.exception.ResourceNotFoundException;
+import umc.kkijuk.server.common.service.RecordUpdateManager;
 import umc.kkijuk.server.detail.domain.BaseCareerDetail;
 import umc.kkijuk.server.detail.domain.CareerType;
 import umc.kkijuk.server.detail.repository.CareerDetailRepository;
 import umc.kkijuk.server.member.domain.Member;
+import umc.kkijuk.server.record.domain.Record;
+import umc.kkijuk.server.record.repository.RecordRepository;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -33,12 +36,19 @@ public class CareerServiceImpl implements CareerService{
     private final EmploymentRepository employmentRepository;
     private final CareerDetailRepository detailRepository;
     private final CareerEtcRepository etcRepository;
+    private final RecordUpdateManager recordUpdateManager;
+    private final RecordRepository recordRepository;
+
 
     @Override
     @Transactional
     public ActivityResponse createActivity(Member requestMember, ActivityReqDto activityReqDto) {
         Activity activity = BaseCareerConverter.toAvtivity(requestMember, activityReqDto);
         setCommonFields(activity);
+
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
+
         return new ActivityResponse(activityRepository.save(activity));
 
     }
@@ -47,6 +57,8 @@ public class CareerServiceImpl implements CareerService{
     public CircleResponse createCircle(Member requestMember, CircleReqDto circleReqDto) {
         Circle circle = BaseCareerConverter.toCircle(requestMember, circleReqDto);
         setCommonFields(circle);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         return new CircleResponse(circleRepository.save(circle));
     }
 
@@ -55,6 +67,8 @@ public class CareerServiceImpl implements CareerService{
     public CompetitionResponse createCompetition(Member requestMember, CompetitionReqDto competitionReqDto) {
         Competition competition = BaseCareerConverter.toCompetition(requestMember, competitionReqDto);
         setCommonFields(competition);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         return new CompetitionResponse(competitionRepository.save(competition));
 
     }
@@ -64,6 +78,8 @@ public class CareerServiceImpl implements CareerService{
     public EduCareerResponse crateEduCareer(Member requestMember, EduCareerReqDto eduCareerReqDto) {
         EduCareer edu = BaseCareerConverter.toEduCareer(requestMember,eduCareerReqDto);
         setCommonFields(edu);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         return new EduCareerResponse(eduCareerRepository.save(edu));
     }
 
@@ -72,6 +88,8 @@ public class CareerServiceImpl implements CareerService{
     public EmploymentResponse createEmployment(Member requestMember, EmploymentReqDto employmentReqDto) {
         Employment emp = BaseCareerConverter.toEmployment(requestMember, employmentReqDto);
         setCommonFields(emp);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         return new EmploymentResponse(employmentRepository.save(emp));
     }
 
@@ -80,6 +98,8 @@ public class CareerServiceImpl implements CareerService{
     public ProjectResponse createProject(Member requestMember, ProjectReqDto projectReqDto) {
         Project project = BaseCareerConverter.toProject(requestMember, projectReqDto);
         setCommonFields(project);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         return new ProjectResponse(projectRepository.save(project));
     }
     @Override
@@ -87,6 +107,8 @@ public class CareerServiceImpl implements CareerService{
     public EtcResponse createEtc(Member requestMember, EtcReqDto etcReqDto){
         CareerEtc etc = BaseCareerConverter.toEtc(requestMember, etcReqDto);
         setCommonFields(etc);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         return new EtcResponse(etcRepository.save(etc));
     }
 
@@ -114,7 +136,10 @@ public class CareerServiceImpl implements CareerService{
         if(!activity.getMemberId().equals(requestMember.getId())){
             throw new OwnerMismatchException();
         }
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         activityRepository.delete(activity);
+
     }
 
     @Override
@@ -126,7 +151,10 @@ public class CareerServiceImpl implements CareerService{
         if(!circle.getMemberId().equals(requestMember.getId())){
             throw new OwnerMismatchException();
         }
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         circleRepository.delete(circle);
+
     }
 
     @Override
@@ -138,7 +166,10 @@ public class CareerServiceImpl implements CareerService{
         if(!comp.getMemberId().equals(requestMember.getId())){
             throw new OwnerMismatchException();
         }
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         competitionRepository.delete(comp);
+
     }
 
     @Override
@@ -150,7 +181,10 @@ public class CareerServiceImpl implements CareerService{
         if(!eduCareer.getMemberId().equals(requestMember.getId())){
             throw new OwnerMismatchException();
         }
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         eduCareerRepository.delete(eduCareer);
+
     }
 
     @Override
@@ -162,7 +196,10 @@ public class CareerServiceImpl implements CareerService{
         if(!employment.getMemberId().equals(requestMember.getId())){
             throw new OwnerMismatchException();
         }
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         employmentRepository.delete(employment);
+
     }
 
     @Override
@@ -174,7 +211,10 @@ public class CareerServiceImpl implements CareerService{
         if(!project.getMemberId().equals(requestMember.getId())){
             throw new OwnerMismatchException();
         }
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         projectRepository.delete(project);
+
     }
     @Override
     @Transactional
@@ -185,7 +225,10 @@ public class CareerServiceImpl implements CareerService{
         if(!etc.getMemberId().equals(requestMember.getId())){
             throw new OwnerMismatchException();
         }
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
         etcRepository.delete(etc);
+
     }
     @Override
     @Transactional
@@ -208,6 +251,11 @@ public class CareerServiceImpl implements CareerService{
                 request.getContribution(),
                 request.getIsTeam()
         );
+        setCommonFields(updateActivity);
+
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
+
         return new ActivityResponse(updateActivity);
     }
 
@@ -229,6 +277,10 @@ public class CareerServiceImpl implements CareerService{
                 request.getLocation(),
                 request.getRole()
         );
+        setCommonFields(updateCircle);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
+
         return new CircleResponse(updateCircle);
     }
 
@@ -253,6 +305,10 @@ public class CareerServiceImpl implements CareerService{
                 request.getIsTeam()
 
         );
+        setCommonFields(updateComp);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
+
         return new CompetitionResponse(updateComp);
     }
 
@@ -274,6 +330,10 @@ public class CareerServiceImpl implements CareerService{
                 request.getOrganizer(),
                 request.getTime()
         );
+        setCommonFields(updateEduCareer);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
+
         return new EduCareerResponse(updateEduCareer);
     }
 
@@ -296,6 +356,10 @@ public class CareerServiceImpl implements CareerService{
                 request.getPosition(),
                 request.getField()
         );
+        setCommonFields(updateEmployment);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
+
         return new EmploymentResponse(updateEmployment);
 
     }
@@ -316,6 +380,10 @@ public class CareerServiceImpl implements CareerService{
                 request.getStartdate(),
                 request.getEnddate()
         );
+        setCommonFields(updateEtc);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
+
         return new EtcResponse(updateEtc);
     }
 
@@ -340,6 +408,10 @@ public class CareerServiceImpl implements CareerService{
                 request.getLocation()
 
         );
+        setCommonFields(updateProject);
+        Record record = getRecordByMemberId(requestMember.getId());
+        recordUpdateManager.updateRecordTimestamp(record);
+
         return new ProjectResponse(updateProject);
     }
 
@@ -354,6 +426,8 @@ public class CareerServiceImpl implements CareerService{
                     throw new OwnerMismatchException();
                 }
                 activity.setSummary(request.getSummary());
+                Record record = getRecordByMemberId(requestMember.getId());
+                recordUpdateManager.updateRecordTimestamp(record);
                 return getResponse(activity, ActivityResponse::new);
             }
             case PROJECT -> {
@@ -363,6 +437,8 @@ public class CareerServiceImpl implements CareerService{
                     throw new OwnerMismatchException();
                 }
                 project.setSummary(request.getSummary());
+                Record record = getRecordByMemberId(requestMember.getId());
+                recordUpdateManager.updateRecordTimestamp(record);
                 return getResponse(project, ProjectResponse::new);
 
             }
@@ -373,6 +449,8 @@ public class CareerServiceImpl implements CareerService{
                     throw new OwnerMismatchException();
                 }
                 circle.setSummary(request.getSummary());
+                Record record = getRecordByMemberId(requestMember.getId());
+                recordUpdateManager.updateRecordTimestamp(record);
                 return getResponse(circle, CircleResponse::new);
             }
             case COM -> {
@@ -382,6 +460,8 @@ public class CareerServiceImpl implements CareerService{
                     throw new OwnerMismatchException();
                 }
                 competition.setSummary(request.getSummary());
+                Record record = getRecordByMemberId(requestMember.getId());
+                recordUpdateManager.updateRecordTimestamp(record);
                 return getResponse(competition, CompetitionResponse::new);
             }
             case EDU -> {
@@ -391,6 +471,8 @@ public class CareerServiceImpl implements CareerService{
                     throw new OwnerMismatchException();
                 }
                 eduCareer.setSummary(request.getSummary());
+                Record record = getRecordByMemberId(requestMember.getId());
+                recordUpdateManager.updateRecordTimestamp(record);
                 return getResponse(eduCareer, EduCareerResponse::new);
             }
             case EMP -> {
@@ -400,11 +482,28 @@ public class CareerServiceImpl implements CareerService{
                     throw new OwnerMismatchException();
                 }
                 employment.setSummary(request.getSummary());
+                Record record = getRecordByMemberId(requestMember.getId());
+                recordUpdateManager.updateRecordTimestamp(record);
                 return getResponse(employment,EmploymentResponse::new);
+            }
+            case ETC -> {
+                CareerEtc etc = etcRepository.findById(careerId)
+                        .orElseThrow(() -> new ResourceNotFoundException("CareerEtc", careerId));
+                if(!etc.getMemberId().equals(requestMember.getId())){
+                    throw new OwnerMismatchException();
+                }
+                etc.setSummary(request.getSummary());
+                Record record = getRecordByMemberId(requestMember.getId());
+                recordUpdateManager.updateRecordTimestamp(record);
+                return getResponse(etc, EtcResponse::new);
             }
             default -> throw new IllegalArgumentException("지원하지 않는 활동 유형입니다 : " + request.getType());
 
         }
+    }
+    private Record getRecordByMemberId(Long memberId) {
+        return Optional.ofNullable(recordRepository.findByMemberId(memberId))
+                .orElseThrow(() -> new ResourceNotFoundException("Record", memberId));
     }
 
     private <T extends BaseCareer, R extends BaseCareerResponse> R getResponse(T career,  BiFunction<T, List<BaseCareerDetail>, R> responseConstructor) {

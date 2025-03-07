@@ -354,7 +354,9 @@ public class CareerSearchServiceImpl implements CareerSearchService{
     }
     private List<FindDetailResponse> buildDetailResponse(List<BaseCareerDetail> detailList, String sort) {
         Map<CareerType, Map<Long, List<BaseCareerDetail>>> groupedDetails = new HashMap<>();
+
         for (BaseCareerDetail detail : detailList) {
+
             CareerType careerType = getCareerType(detail);
             Long careerId = detail.getCareerId();
             groupedDetails
@@ -372,6 +374,13 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             for(Map.Entry<Long,List<BaseCareerDetail>> careerEntry : careerMap.entrySet()){
                 Long careerId = careerEntry.getKey();
                 List<BaseCareerDetail> details = careerEntry.getValue();
+
+                if(sort.equals("new")) {
+                    details.sort(Comparator.comparing(BaseCareerDetail::getStartDate).reversed());
+                }else{
+                    details.sort(Comparator.comparing(BaseCareerDetail::getStartDate));
+                }
+
                 List<BaseCareerDetailResponse> detailResponses = new ArrayList<>();
                 CareerSearchServiceImpl.FindDetailInfo detailInfo = extractDetailInfo(details);
 

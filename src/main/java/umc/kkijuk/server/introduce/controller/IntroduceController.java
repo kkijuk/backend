@@ -34,8 +34,7 @@ public class IntroduceController {
     @Operation(summary = "자기소개서 생성")
     public ResponseEntity<Object> save(@RequestHeader("Authorization") String token,
             @PathVariable("recruitId") Long recruitId, @RequestBody IntroduceReqDto introduceReqDto){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         IntroduceResponse introduceResponse = introduceService.saveIntro(requestMember, recruitId, introduceReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -46,8 +45,7 @@ public class IntroduceController {
     @Operation(summary = "자기소개서 개별 조회")
     public ResponseEntity<Object> get(@RequestHeader("Authorization") String token,
             @PathVariable("introId") Long introId){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         IntroduceResponse introduceResponse = introduceService.getIntro(requestMember, introId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -57,8 +55,7 @@ public class IntroduceController {
     @GetMapping("list")
     @Operation(summary = "자기소개서 목록 조회")
     public ResponseEntity<Object> getList(@RequestHeader("Authorization") String token){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<IntroduceListResponse> introduceListResponses = introduceService.getIntroList(requestMember);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -69,8 +66,7 @@ public class IntroduceController {
     @Operation(summary = "자기소개서 수정")
     public ResponseEntity<Object> update(@RequestHeader("Authorization") String token,
             @PathVariable("introId") Long introId, @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Long recruitId = introduceService.getIntro(requestMember, introId).getRecruitId();
         IntroduceResponse introduceResponse = introduceService.updateIntro(requestMember, introId, introduceReqDto, recruitId);
         return ResponseEntity
@@ -82,8 +78,7 @@ public class IntroduceController {
     @Operation(summary = "자기소개서 삭제")
     public ResponseEntity<Object> delete(@RequestHeader("Authorization") String token,
             @PathVariable("introId") Long introId){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Long recruitId = introduceService.getIntro(requestMember, introId).getRecruitId();
         Long intro_Id = introduceService.deleteIntro(requestMember, introId, recruitId);
         return ResponseEntity
@@ -96,8 +91,7 @@ public class IntroduceController {
     public ResponseEntity<Map<String, Object>> searchIntroduceByKeyword(
             @RequestHeader("Authorization") String token,
             @RequestParam String keyword) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Map<String, Object> response = introduceService.searchIntroduceAndMasterByKeyword(keyword, requestMember);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

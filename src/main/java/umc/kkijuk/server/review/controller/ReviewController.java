@@ -26,7 +26,6 @@ import umc.kkijuk.server.common.LoginUser;
 public class ReviewController {
     private final ReviewService reviewService;
     private final RecruitService recruitService;
-    private final MemberService memberService;
     private final LoginUser loginUser;
 
     @Operation(
@@ -39,8 +38,7 @@ public class ReviewController {
             @PathVariable Long recruitId,
             @RequestBody @Valid ReviewCreate reviewCreate
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.getById(recruitId);
         Review review = reviewService.create(requestMember, recruit, reviewCreate);
 
@@ -61,8 +59,7 @@ public class ReviewController {
             @PathVariable Long reviewId,
             @RequestBody @Valid ReviewUpdate reviewUpdate
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.getById(recruitId);
         Review review = reviewService.update(requestMember, recruit, reviewId, reviewUpdate);
 
@@ -82,8 +79,7 @@ public class ReviewController {
             @PathVariable Long recruitId,
             @PathVariable Long reviewId
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.getById(recruitId);
         reviewService.delete(requestMember, recruit, reviewId);
 

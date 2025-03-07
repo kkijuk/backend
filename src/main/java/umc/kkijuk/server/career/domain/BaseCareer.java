@@ -1,6 +1,7 @@
 package umc.kkijuk.server.career.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -25,7 +26,7 @@ public abstract class BaseCareer {
     @Column(length = 20)
     private String alias;
     private Boolean unknown;
-    @Column(length = 100)
+    @Column(length = 500)
     private String summary;
     private int year;
     private LocalDate startdate;
