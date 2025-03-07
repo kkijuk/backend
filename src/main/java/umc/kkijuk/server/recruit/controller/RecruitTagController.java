@@ -25,8 +25,7 @@ public class RecruitTagController {
             description = "사용자의 지원 공고 태그 정보들을 요청합니다")
     @GetMapping
     public ResponseEntity<RecruitTagResponse> getRecruitTag(@RequestHeader("Authorization") String token) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return ResponseEntity
                 .ok()
                 .body(RecruitTagResponse.from(requestMember.getRecruitTags()));
@@ -38,8 +37,7 @@ public class RecruitTagController {
     @PostMapping
     public ResponseEntity<RecruitTagResponse> addRecruitTag(@RequestHeader("Authorization") String token,
                                                             @RequestParam String tag) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<String> tags = memberService.addRecruitTag(requestMember, tag);
         return ResponseEntity
                 .ok()
@@ -52,8 +50,7 @@ public class RecruitTagController {
     @DeleteMapping
     public ResponseEntity<RecruitTagResponse> deleteRecruitTag(@RequestHeader("Authorization") String token,
                                                                @RequestParam String tag) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<String> tags = memberService.deleteRecruitTag(requestMember, tag);
         return ResponseEntity
                 .ok()

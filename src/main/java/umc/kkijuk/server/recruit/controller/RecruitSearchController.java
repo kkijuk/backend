@@ -31,8 +31,7 @@ public class RecruitSearchController {
             @RequestHeader("Authorization") String token,
             @RequestParam String keyword) {
 
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         RecruitReviewListByKeywordResponse result = recruitSearchService.findRecruitByKeyword(requestMember, keyword);
 
         return ResponseEntity

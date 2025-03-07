@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import umc.kkijuk.server.auth.dto.AuthResponse;
 import umc.kkijuk.server.auth.dto.NaverUserResponse;
 import umc.kkijuk.server.auth.jwt.JwtUtil;
 import umc.kkijuk.server.auth.service.TokenService;

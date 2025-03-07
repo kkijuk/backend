@@ -19,7 +19,7 @@ public class ReviewEntity {
     @Column(nullable = false)
     private Long recruitId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30)
     private String title;
 
     private String content;

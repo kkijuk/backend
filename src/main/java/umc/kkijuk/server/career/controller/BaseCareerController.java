@@ -29,8 +29,7 @@ public class BaseCareerController {
     public CareerResponse<ActivityResponse> createActivity(@RequestHeader("Authorization") String token,
             @RequestBody @Valid ActivityReqDto activityReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
 
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
@@ -46,8 +45,8 @@ public class BaseCareerController {
             @PathVariable Long activityId,
             @Valid @RequestBody ActivityReqDto activityReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
+
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateActivity(requestMember, activityId,  activityReqDto)
@@ -60,8 +59,7 @@ public class BaseCareerController {
             @RequestHeader("Authorization") String token,
             @Valid @RequestBody CircleReqDto circleReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createCircle(requestMember, circleReqDto)
@@ -76,8 +74,7 @@ public class BaseCareerController {
             @PathVariable Long circleId,
             @Valid @RequestBody CircleReqDto circleReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateCircle(requestMember, circleId, circleReqDto)
@@ -90,8 +87,7 @@ public class BaseCareerController {
             @RequestHeader("Authorization") String token,
             @Valid @RequestBody CompetitionReqDto competitionReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createCompetition(requestMember, competitionReqDto)
@@ -106,8 +102,7 @@ public class BaseCareerController {
             @PathVariable Long competitionId,
             @Valid @RequestBody CompetitionReqDto competitionReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateComp(requestMember, competitionId, competitionReqDto)
@@ -120,8 +115,7 @@ public class BaseCareerController {
             @RequestHeader("Authorization") String token,
             @Valid @RequestBody EduCareerReqDto eduCareerReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.crateEduCareer(requestMember, eduCareerReqDto)
@@ -136,8 +130,7 @@ public class BaseCareerController {
             @PathVariable Long educareerId,
             @Valid @RequestBody EduCareerReqDto eduCareerReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateEdu(requestMember, educareerId, eduCareerReqDto)
@@ -150,8 +143,7 @@ public class BaseCareerController {
             @RequestHeader("Authorization") String token,
             @Valid @RequestBody EmploymentReqDto employmentReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createEmployment(requestMember, employmentReqDto)
@@ -166,8 +158,7 @@ public class BaseCareerController {
             @PathVariable Long employmentId,
             @Valid @RequestBody EmploymentReqDto employmentReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateEmp(requestMember, employmentId, employmentReqDto)
@@ -180,8 +171,7 @@ public class BaseCareerController {
             @RequestHeader("Authorization") String token,
             @Valid @RequestBody ProjectReqDto projectReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createProject(requestMember, projectReqDto)
@@ -196,8 +186,7 @@ public class BaseCareerController {
             @PathVariable Long projectId,
             @Valid @RequestBody ProjectReqDto projectReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateProject(requestMember, projectId, projectReqDto)
@@ -211,8 +200,7 @@ public class BaseCareerController {
             @RequestHeader("Authorization") String token,
             @Valid @RequestBody EtcReqDto etcReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createEtc(requestMember, etcReqDto)
@@ -227,8 +215,7 @@ public class BaseCareerController {
             @PathVariable Long etcId,
             @Valid @RequestBody EtcReqDto etcReqDto
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_UPDATE_SUCCESS,
                 baseCareerService.updateEtc(requestMember, etcId, etcReqDto)
@@ -242,8 +229,7 @@ public class BaseCareerController {
             @PathVariable String type,
             @PathVariable Long careerId
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         baseCareerService.deleteBaseCareer(requestMember, careerId, type);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_DELETE_SUCCESS,
@@ -259,8 +245,7 @@ public class BaseCareerController {
             @PathVariable Long careerId,
             @Valid @RequestBody CareerSummaryReqDto request
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_CREATE_SUCCESS,
                 baseCareerService.createSummary(requestMember, careerId, request)

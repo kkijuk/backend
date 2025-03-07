@@ -30,8 +30,7 @@ public class RecordController {
     @Operation(summary = "이력서 생성")
     public ResponseEntity<Object> save(@RequestHeader("Authorization") String token,
                                        @RequestBody RecordReqDto recordReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         RecordResponse recordResponse = recordService.saveRecord(requestMember, recordReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -41,7 +40,8 @@ public class RecordController {
     @GetMapping
     @Operation(summary = "이력서 전체 조회")
     public ResponseEntity<Object> get(@RequestHeader("Authorization") String token) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         RecordResponse recordResponse = recordService.getRecord(memberId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -52,7 +52,8 @@ public class RecordController {
     @Operation(summary = "이력서 정보 수정")
     public ResponseEntity<Object> update(@RequestHeader("Authorization") String token,
                                          @Valid @RequestBody RecordReqDto recordReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         RecordResponse recordResponse = recordService.updateRecord(memberId,
                 recordService.findByMemberId(memberId).getId(), recordReqDto);
         return ResponseEntity
@@ -63,7 +64,8 @@ public class RecordController {
     @GetMapping("/download")
     @Operation(summary = "이력서 내보내기", description = "이력서 내보내기에 필요한 정보들을 조회합니다.")
     public ResponseEntity<Object> downloadResume(@RequestHeader("Authorization") String token) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         RecordDownResponse response = recordService.downloadResume(recordService.findByMemberId(memberId).getId(), memberId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "이력서 내보내기 정보 조회 완료", response));
@@ -73,8 +75,8 @@ public class RecordController {
     @Operation(summary = "학력 생성")
     public ResponseEntity<Object> saveEducation(@RequestHeader("Authorization") String token,
                                                 @Valid @RequestBody EducationReqDto educationReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         List<EducationResponse> educationResponse = recordService.saveEducation(requestMember,
                 recordService.findByMemberId(memberId).getId(), educationReqDto);
         return ResponseEntity
@@ -87,8 +89,7 @@ public class RecordController {
     public ResponseEntity<Object> patchEducation(@RequestHeader("Authorization") String token,
                                                  Long educationId,
                                                  @Valid @RequestBody EducationReqDto educationReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<EducationResponse> educationResponse = recordService.updateEducation(requestMember, educationId, educationReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -99,8 +100,7 @@ public class RecordController {
     @Operation(summary = "학력 삭제")
     public ResponseEntity<Object> deleteEducation(@RequestHeader("Authorization") String token,
                                                   Long educationId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<EducationResponse> educationResponse = recordService.deleteEducation(requestMember, educationId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -111,10 +111,10 @@ public class RecordController {
     @Operation(summary = "자격증 생성")
     public ResponseEntity<Object> saveLicense(@RequestHeader("Authorization") String token,
                                               @Valid @RequestBody LicenseReqDto licenseReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
+
         List<LicenseResponse> licenseResponse = recordService.saveLicense(requestMember,
-                recordService.findByMemberId(memberId).getId(), licenseReqDto);
+                recordService.findByMemberId(requestMember.getId()).getId(), licenseReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "자격증 생성 완료", licenseResponse));
@@ -125,8 +125,7 @@ public class RecordController {
     public ResponseEntity<Object> patchLicense(@RequestHeader("Authorization") String token,
                                                Long licenseId,
                                                @Valid @RequestBody LicenseReqDto licenseReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<LicenseResponse> licenseResponse = recordService.updateLicense(requestMember, licenseId, licenseReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -137,8 +136,7 @@ public class RecordController {
     @Operation(summary = "자격증 삭제")
     public ResponseEntity<Object> deleteLicense(@RequestHeader("Authorization") String token,
                                                 Long licenseId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<LicenseResponse> licenseResponses = recordService.deleteLicense(requestMember, licenseId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -149,10 +147,9 @@ public class RecordController {
     @Operation(summary = "수상 생성")
     public ResponseEntity<Object> saveAward(@RequestHeader("Authorization") String token,
                                             @Valid @RequestBody AwardReqDto awardReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<AwardResponse> awardResponse = recordService.saveAward(requestMember,
-                recordService.findByMemberId(memberId).getId(), awardReqDto);
+                recordService.findByMemberId(requestMember.getId()).getId(), awardReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "수상 생성 완료", awardResponse));
@@ -163,8 +160,7 @@ public class RecordController {
     public ResponseEntity<Object> patchAward(@RequestHeader("Authorization") String token,
                                              Long awardId,
                                              @Valid @RequestBody AwardReqDto awardReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<AwardResponse> awardResponse = recordService.updateAward(requestMember, awardId, awardReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -175,8 +171,7 @@ public class RecordController {
     @Operation(summary = "수상 삭제")
     public ResponseEntity<Object> deleteAward(@RequestHeader("Authorization") String token,
                                               Long awardId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<AwardResponse> awardResponse = recordService.deleteAward(requestMember, awardId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -187,10 +182,9 @@ public class RecordController {
     @Operation(summary = "스킬 생성")
     public ResponseEntity<Object> saveSkill(@RequestHeader("Authorization") String token,
                                             @Valid @RequestBody SkillReqDto skillReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<SkillResponse> skillResponse = recordService.saveSkill(requestMember,
-                recordService.findByMemberId(memberId).getId(), skillReqDto);
+                recordService.findByMemberId(requestMember.getId()).getId(), skillReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "스킬 생성 완료", skillResponse));
@@ -201,8 +195,7 @@ public class RecordController {
     public ResponseEntity<Object> patchSkill(@RequestHeader("Authorization") String token,
                                              Long skillId,
                                              @Valid @RequestBody SkillReqDto skillReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<SkillResponse> skillResponse = recordService.updateSkill(requestMember, skillId, skillReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -213,8 +206,7 @@ public class RecordController {
     @Operation(summary = "스킬 삭제")
     public ResponseEntity<Object> deleteSkill(@RequestHeader("Authorization") String token,
                                               Long skillId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<SkillResponse> skillResponse = recordService.deleteSkill(requestMember, skillId);
         return ResponseEntity
                 .status(HttpStatus.OK)

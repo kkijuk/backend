@@ -29,8 +29,7 @@ public class CareerSearchController {
             @RequestHeader("Authorization") String token,
             @RequestParam(name="status") String value
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         if(value.equals("category")){
             return CareerResponse.success(
                     CareerResponseMessage.CAREER_FINDALL_SUCCESS,
@@ -55,8 +54,7 @@ public class CareerSearchController {
             @PathVariable String type,
             @PathVariable Long careerId
     ){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findCareer(requestMember, careerId, type)
@@ -71,8 +69,7 @@ public class CareerSearchController {
             @RequestParam(name="keyword")String keyword,
             @RequestParam(name="sort") String sort
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findAllDetail(requestMember,keyword,sort)
@@ -88,8 +85,7 @@ public class CareerSearchController {
             @RequestHeader("Authorization") String token,
             @RequestParam(name="keyword")String keyword
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_SEARCH_SUCCESS,
                 careerSearchService.findAllTag(requestMember, keyword)
@@ -106,8 +102,7 @@ public class CareerSearchController {
             @RequestParam(name="tagId") Long tagId,
             @RequestParam(name="sort") String sort
     ){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findAllDetailByTag(requestMember, tagId, sort)
@@ -122,8 +117,7 @@ public class CareerSearchController {
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "sort") String sort
     ){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findCareerWithKeyword(requestMember, keyword, sort)
@@ -137,8 +131,7 @@ public class CareerSearchController {
     public CareerResponse<List<TimelineResponse>> findCareerForTimeline(
             @RequestHeader("Authorization") String token
     ){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_FINDALL_SUCCESS,
                 careerSearchService.findCareerForTimeline(requestMember)

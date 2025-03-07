@@ -2,11 +2,8 @@ package umc.kkijuk.server.career.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc.kkijuk.server.detail.domain.BaseCareerDetail;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter

@@ -27,15 +27,14 @@ public class MasterIntroduceController {
     private final MemberService memberService;
     private final LoginUser loginUser;
 
-//    private final Member requestMember = Member.builder()
-//            .id(LoginUser.get().getId())
-//            .build();
 
     @PostMapping
     @Operation(summary = "마스터 자기소개서 생성")
     public ResponseEntity<Object> saveMasterIntro(@RequestHeader("Authorization") String token,
                                                   @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
-        Long memberId = loginUser.extractMemberId(token);
+        Member member = loginUser.extractMemberId(token);
+        Long memberId = member.getId();
+
         MasterIntroduceResponse masterIntroduceResponse =
                 masterIntroduceService.saveMasterIntro(memberId, introduceReqDto);
         return ResponseEntity
@@ -46,7 +45,9 @@ public class MasterIntroduceController {
     @GetMapping
     @Operation(summary = "마스터 자기소개서 조회")
     public ResponseEntity<Object> getMasterIntro(@RequestHeader("Authorization") String token){
-        Long memberId = loginUser.extractMemberId(token);
+        Member member = loginUser.extractMemberId(token);
+        Long memberId = member.getId();
+
         MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.getMasterIntro(memberId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -57,7 +58,9 @@ public class MasterIntroduceController {
     @Operation(summary = "마스터 자기소개서 수정")
     public ResponseEntity<Object> updateMasterIntro(@RequestHeader("Authorization") String token,
             @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
-        Long memberId = loginUser.extractMemberId(token);
+        Member member = loginUser.extractMemberId(token);
+        Long memberId = member.getId();
+
         MasterIntroduceResponse masterIntroduceResponse = masterIntroduceService.updateMasterIntro(memberId, introduceReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)

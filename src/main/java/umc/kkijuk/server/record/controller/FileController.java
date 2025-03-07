@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.introduce.common.BaseResponse;
+import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.record.controller.response.FileResponse;
 import umc.kkijuk.server.record.dto.FileReqDto;
 import umc.kkijuk.server.record.dto.UrlReqDto;
@@ -32,7 +33,8 @@ public class FileController {
     @Operation(summary = "이력서(S3)-추가 자료<첨부파일> 저장(presignedUrl 생성)", description = "S3에 접근하기 위한 Presigned URL을 반환합니다.")
     public ResponseEntity<BaseResponse<Map<String,String>>> createFileUrl
             (@RequestHeader("Authorization") String token, @RequestParam String fileName) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         Map<String, String> response = fileService.getSignUrl(memberId,fileName);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -44,7 +46,9 @@ public class FileController {
             description = "주어진 keyName을 바탕으로 해당 파일에 대한 정보를 저장합니다.")
     public ResponseEntity<BaseResponse<FileResponse>> createFile
             (@RequestHeader("Authorization") String token, @Valid @RequestBody FileReqDto request) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
+
         FileResponse fileResponse = fileService.saveFile(memberId,
                 recordService.findByMemberId(memberId).getId(), request);
         return ResponseEntity
@@ -57,7 +61,8 @@ public class FileController {
             description = "fileName에 해당하는 presigned URL을 반환합니다.")
     public ResponseEntity<BaseResponse<Map<String,String>>> getDownloadUrl
             (@RequestHeader("Authorization") String token, @RequestParam String fileName) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         Map<String, String> response = fileService.getDownloadUrl(memberId, fileName);
 
         return ResponseEntity
@@ -69,7 +74,8 @@ public class FileController {
     @Operation(summary = "이력서(S3)-추가 자료<첨부파일> 삭제", description = "fileName으로 S3 버킷에서 파일을 삭제합니다.")
     public ResponseEntity<BaseResponse<FileResponse>> deleteFile(@RequestHeader("Authorization") String token,
                                                                  @RequestParam String fileName){
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         FileResponse fileResponse = fileService.deleteFile(memberId, fileName);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "파일 삭제 완료", fileResponse));
@@ -79,7 +85,8 @@ public class FileController {
     @Operation(summary = "이력서-추가 자료<URL> 저장", description = "추가자료 중 URL을 저장합니다.")
     public ResponseEntity<Object> saveUrl(@RequestHeader("Authorization") String token,
                                           @Valid @RequestBody UrlReqDto urlReqDto){
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         FileResponse fileResponse = fileService.saveUrl(memberId,
                 recordService.findByMemberId(memberId).getId(), urlReqDto);
         return ResponseEntity
@@ -91,7 +98,8 @@ public class FileController {
     @Operation(summary = "이력서-추가 자료<URL> 삭제", description = "추가자료 중 URL을 삭제합니다.")
     public ResponseEntity<Object> deleteUrl(@RequestHeader("Authorization") String token,
                                             @RequestBody UrlReqDto urlReqDto) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         FileResponse fileResponse = fileService.deleteUrl(memberId, urlReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)

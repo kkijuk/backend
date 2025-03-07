@@ -56,8 +56,7 @@ public class MemberController {
             description = "내 정보를 조회를 위해 이메일 일치 여부를 확인합니다.")
     @GetMapping("/getEmail")
     public ResponseEntity<MemberEmailResponse> getEmail(@RequestHeader("Authorization") String token) {
-
-        Member member = memberService.getById(loginUser.extractMemberId(token));
+        Member member = loginUser.extractMemberId(token);
         MemberEmailResponse response = memberService.getMemberEmail(member);
 
         return ResponseEntity.ok(response);
@@ -70,7 +69,7 @@ public class MemberController {
     public ResponseEntity<Boolean> checkEmail(@RequestHeader("Authorization") String token,
                                               @Valid @RequestBody MemberEmailDto memberEmailDto) {
 
-        Member member = memberService.getById(loginUser.extractMemberId(token));
+        Member member = loginUser.extractMemberId(token);
 
         if (!member.getEmail().equals(memberEmailDto.getEmail())) {
             throw new EmailMismatchException();
@@ -84,7 +83,8 @@ public class MemberController {
             description = "마이페이지에서 내 정보들을 가져옵니다.")
     @GetMapping("/myPage/info")
     public ResponseEntity<MemberInfoResponse> getInfo(@RequestHeader("Authorization") String token) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         MemberInfoResponse memberInfoResponse = memberService.getMemberInfo(memberId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -97,7 +97,8 @@ public class MemberController {
     @PutMapping("/myPage/info")
     public ResponseEntity<Boolean> changeMemberInfo(@RequestHeader("Authorization") String token,
                                                     @Valid @RequestBody MemberInfoChangeDto memberInfoChangeDto) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         memberService.updateMemberInfo(memberId, memberInfoChangeDto);
         return ResponseEntity.ok(Boolean.TRUE);
     }
@@ -107,7 +108,8 @@ public class MemberController {
             description = "마이페이지에서 관심분야를 조회합니다.")
     @GetMapping("/myPage/field")
     public ResponseEntity<MemberFieldResponse> getField(@RequestHeader("Authorization") String token) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         List<String> memberField = memberService.getMemberField(memberId);
         return ResponseEntity.ok().body(new MemberFieldResponse(memberField));
     }
@@ -118,7 +120,8 @@ public class MemberController {
     @PostMapping({"/field", "/myPage/field"})
     public ResponseEntity<Boolean> postField(@RequestHeader("Authorization") String token,
                                              @RequestBody MemberFieldDto memberFieldDto) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
         memberService.updateMemberField(memberId, memberFieldDto);
         return ResponseEntity.ok(Boolean.TRUE);
     }
@@ -141,8 +144,8 @@ public class MemberController {
     @PostMapping("/profile")
     public ResponseEntity<Map<String, Object>> addProfile(@RequestHeader("Authorization") String token,
                                                    @RequestBody @Valid ProfileInputDto profileInputDto){
-        Long memberId = loginUser.extractMemberId(token);
-        Member member = memberService.completeProfile(memberId, profileInputDto);
+        Member member = loginUser.extractMemberId(token);
+        Long memberId = member.getId();
 
         Map<String, Object> tokens = new HashMap<>();
         tokens.put("Token", authService.generateTokens(member));
@@ -153,7 +156,9 @@ public class MemberController {
     @Operation(summary = "회원 탈퇴 예약", description = "탈퇴 요청을 처리하여 7일 후 탈퇴 예약을 설정합니다.")
     @PostMapping("/inactive")
     public ResponseEntity<String> inactivateMember(@RequestHeader("Authorization") String token) {
-        Long memberId = loginUser.extractMemberId(token);
+        Member member = loginUser.extractMemberId(token);
+        Long memberId = member.getId();
+
         memberService.memberInactivation(memberId,token);
         return ResponseEntity.ok("탈퇴가 예약되었습니다. 7일 후 회원 탈퇴가 처리됩니다.");
     }

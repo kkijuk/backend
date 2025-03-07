@@ -40,8 +40,7 @@ public class DashBoardController {
     public ResponseEntity<DashBoardUserInfoResponse> getUserInfo(
             @RequestHeader("Authorization") String token
             ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         DashBoardUserInfoResponse response = dashBoardService.getUserInfo(requestMember);
         return ResponseEntity
                 .ok()
@@ -56,8 +55,7 @@ public class DashBoardController {
     public ResponseEntity<RecruitRemindResponse> getRemindRecruits(
             @RequestHeader("Authorization") String token
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         RecruitRemindResponse response = dashBoardService.getTopTwoRecruitsByEndTime(requestMember);
         return ResponseEntity
                 .ok()
@@ -68,8 +66,7 @@ public class DashBoardController {
     @Operation(summary = "홈 자기소개서 작성 알림")
     public ResponseEntity<Object> get(@RequestHeader("Authorization") String token
     ){
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<IntroduceRemindResponse> homeIntroduceResDtos = dashBoardService.getHomeIntro(requestMember);
         return ResponseEntity
                 .status(HttpStatus.OK)

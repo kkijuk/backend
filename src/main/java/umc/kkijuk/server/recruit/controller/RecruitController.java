@@ -47,8 +47,7 @@ public class RecruitController {
     public ResponseEntity<RecruitIdResponse> create(@RequestHeader("Authorization") String token,
             @RequestBody @Valid RecruitCreate recruitCreate
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.create(requestMember, recruitCreate);
 
         return ResponseEntity
@@ -64,8 +63,7 @@ public class RecruitController {
     public ResponseEntity<RecruitIdResponse> update(@RequestHeader("Authorization") String token,
             @RequestBody @Valid RecruitUpdate recruitUpdate,
             @PathVariable long recruitId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.update(requestMember, recruitId, recruitUpdate);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -80,8 +78,7 @@ public class RecruitController {
     public ResponseEntity<RecruitIdResponse> updateState(@RequestHeader("Authorization") String token,
             @RequestBody @Valid RecruitStatusUpdate recruitStatusUpdate,
             @PathVariable long recruitId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
         return ResponseEntity
                 .ok()
@@ -95,8 +92,7 @@ public class RecruitController {
     @DeleteMapping("/{recruitId}")
     public ResponseEntity<RecruitIdResponse> delete(@RequestHeader("Authorization") String token,
             @PathVariable long recruitId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.disable(requestMember, recruitId);
         return ResponseEntity
                 .ok()
@@ -110,8 +106,7 @@ public class RecruitController {
     @GetMapping("/{recruitId}")
     public ResponseEntity<RecruitInfoResponse> getRecruitInfo(@RequestHeader("Authorization") String token,
             @PathVariable long recruitId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.getById(recruitId);
         List<Review> reviews = reviewService.findAllByRecruit(requestMember, recruit);
         Introduce introduce = introduceService.findByRecruitId(recruitId);
@@ -129,8 +124,7 @@ public class RecruitController {
             @RequestHeader("Authorization") String token,
             @Parameter(name = "date", description = "지원 공고 마감 날짜", example = "2024-07-20")
             @RequestParam LocalDate date) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Map<Recruit, String> recruits = recruitService.findAllByEndTime(requestMember, date);
         return ResponseEntity
                 .ok()
@@ -146,8 +140,7 @@ public class RecruitController {
             @Parameter(name = "time", description = "이 시간 이후에 마감되는 공고를 요청", example = "2024-07-20 10:30")
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
             @RequestParam LocalDateTime time) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Map<Recruit, String> recruits = recruitService.findAllByEndTimeAfter(requestMember, time);
         return ResponseEntity
                 .ok()
@@ -165,8 +158,7 @@ public class RecruitController {
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
             @RequestParam LocalDateTime time
     ) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<ValidRecruitDto> ValidRecruitDtoList = recruitService.findAllValidRecruitByMember(requestMember, time);
         return ResponseEntity
                 .ok()
@@ -183,8 +175,7 @@ public class RecruitController {
             @RequestParam Integer year,
             @Parameter(name = "month", description = "월", example = "7")
             @RequestParam Integer month) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         List<RecruitListByMonthDto> recruitListByMonthDtoList = recruitService.findAllValidRecruitByYearAndMonth(requestMember, year, month);
         return ResponseEntity
                 .ok()
@@ -199,8 +190,7 @@ public class RecruitController {
             @RequestHeader("Authorization") String token,
             @RequestBody @Valid RecruitApplyDateUpdate recruitApplyDateUpdate,
             @PathVariable long recruitId) {
-        Long memberId = loginUser.extractMemberId(token);
-        Member requestMember = memberService.getById(memberId);
+        Member requestMember = loginUser.extractMemberId(token);
         Recruit recruit = recruitService.updateApplyDate(requestMember, recruitId, recruitApplyDateUpdate);
         return ResponseEntity
                 .ok()
