@@ -22,6 +22,7 @@ public class ReviewEntity {
     @Column(nullable = false, length = 30)
     private String title;
 
+    @Column(length = 1000)
     private String content;
 
     @Column(nullable = false)

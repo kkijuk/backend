@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ public class ReviewUpdate {
     private String title;
 
     @Schema(description = "변경될 공고 후기 내용", example = "변경될 내용", type = "string")
+    @Size(max = 1000, message = "공고 후기 내용은 1000자 이내로 작성해주세요.")
     private String content;
 
     @NotNull(message = "날짜는 필수 입력 항목입니다.")

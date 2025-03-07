@@ -67,7 +67,8 @@ public class IntroduceController {
     public ResponseEntity<Object> update(@RequestHeader("Authorization") String token,
             @PathVariable("introId") Long introId, @RequestBody IntroduceReqDto introduceReqDto) throws Exception {
         Member requestMember = loginUser.extractMemberId(token);
-        IntroduceResponse introduceResponse = introduceService.updateIntro(requestMember, introId, introduceReqDto);
+        Long recruitId = introduceService.getIntro(requestMember, introId).getRecruitId();
+        IntroduceResponse introduceResponse = introduceService.updateIntro(requestMember, introId, introduceReqDto, recruitId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "자기소개서 수정 완료", introduceResponse));
@@ -78,7 +79,8 @@ public class IntroduceController {
     public ResponseEntity<Object> delete(@RequestHeader("Authorization") String token,
             @PathVariable("introId") Long introId){
         Member requestMember = loginUser.extractMemberId(token);
-        Long intro_Id = introduceService.deleteIntro(requestMember, introId);
+        Long recruitId = introduceService.getIntro(requestMember, introId).getRecruitId();
+        Long intro_Id = introduceService.deleteIntro(requestMember, introId, recruitId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "자기소개서 삭제 완료", intro_Id));
