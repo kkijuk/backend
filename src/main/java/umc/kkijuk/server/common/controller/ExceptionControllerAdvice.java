@@ -120,6 +120,12 @@ public class ExceptionControllerAdvice {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(RecruitTagAlreadyExistException.class)
+    public ErrorResponse RecruitTagAlreadyExistException(RecruitTagAlreadyExistException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(EmailAlreadyExistsException.class)
