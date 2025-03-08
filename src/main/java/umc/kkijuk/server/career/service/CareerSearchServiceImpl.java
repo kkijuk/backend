@@ -8,6 +8,7 @@ import umc.kkijuk.server.career.controller.response.*;
 import umc.kkijuk.server.career.domain.*;
 import umc.kkijuk.server.career.dto.converter.BaseCareerConverter;
 import umc.kkijuk.server.career.repository.*;
+import umc.kkijuk.server.common.domian.exception.CareerValidationException;
 import umc.kkijuk.server.common.domian.exception.OwnerMismatchException;
 import umc.kkijuk.server.detail.controller.response.BaseCareerDetailResponse;
 import umc.kkijuk.server.detail.domain.BaseCareerDetail;
@@ -181,7 +182,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
         switch (type.toLowerCase()) {
             case "activity" -> {
                 Activity activity = activityRepository.findById(careerId)
-                    .orElseThrow(() -> new NoSuchElementException("해당 대외활동을 찾을 수 없습니다: " + careerId));
+                    .orElseThrow(() -> new CareerValidationException("해당 대외활동을 찾을 수 없습니다: " + careerId));
                 if(!activity.getMemberId().equals(requestMember.getId())){
                     throw new OwnerMismatchException();
                 }
@@ -189,7 +190,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             }
             case "circle"  -> {
                 Circle circle = circleRepository.findById(careerId)
-                    .orElseThrow(() -> new NoSuchElementException("해당 동아리를 찾을 수 없습니다: " + careerId));
+                    .orElseThrow(() -> new CareerValidationException("해당 동아리를 찾을 수 없습니다: " + careerId));
                 if(!circle.getMemberId().equals(requestMember.getId())){
                     throw new OwnerMismatchException();
                 }
@@ -197,7 +198,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             }
             case "project"  -> {
                 Project project = projectJpaRepository.findById(careerId)
-                    .orElseThrow(() -> new NoSuchElementException("해당 프로젝트를 찾을 수 없습니다: " + careerId));
+                    .orElseThrow(() -> new CareerValidationException("해당 프로젝트를 찾을 수 없습니다: " + careerId));
                 if(!project.getMemberId().equals(requestMember.getId())){
                     throw new OwnerMismatchException();
                 }
@@ -205,7 +206,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             }
             case "edu"  -> {
                 EduCareer eduCareer = eduCareerJpaRepository.findById(careerId)
-                    .orElseThrow(() -> new NoSuchElementException("해당 교육을 찾을 수 없습니다: " + careerId));
+                    .orElseThrow(() -> new CareerValidationException("해당 교육을 찾을 수 없습니다: " + careerId));
                 if(!eduCareer.getMemberId().equals(requestMember.getId())){
                     throw new OwnerMismatchException();
                 }
@@ -213,7 +214,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             }
             case "competition"  -> {
                 Competition competition = competitionJpaRepository.findById(careerId)
-                    .orElseThrow(() -> new NoSuchElementException("해당 공모전/대회를 찾을 수 없습니다: " + careerId));
+                    .orElseThrow(() -> new CareerValidationException("해당 공모전/대회를 찾을 수 없습니다: " + careerId));
                 if(!competition.getMemberId().equals(requestMember.getId())){
                     throw new OwnerMismatchException();
                 }
@@ -221,7 +222,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             }
             case "employment"  -> {
                 Employment employment = employmentJpaRepository.findById(careerId)
-                    .orElseThrow(() -> new NoSuchElementException("해당 경력을 찾을 수 없습니다: " + careerId));
+                    .orElseThrow(() -> new CareerValidationException("해당 경력을 찾을 수 없습니다: " + careerId));
                 if(!employment.getMemberId().equals(requestMember.getId())){
                     throw new OwnerMismatchException();
                 }
@@ -229,13 +230,13 @@ public class CareerSearchServiceImpl implements CareerSearchService{
             }
             case "etc"  -> {
                 CareerEtc etc = etcRepository.findById(careerId)
-                    .orElseThrow(() -> new NoSuchElementException("해당 기타활동을 찾을 수 없습니다: " + careerId));
+                    .orElseThrow(() -> new CareerValidationException("해당 기타활동을 찾을 수 없습니다: " + careerId));
                 if(!etc.getMemberId().equals(requestMember.getId())){
                     throw new OwnerMismatchException();
                 }
                 return getResponse(etc, EtcResponse::new);
             }
-            default -> throw new IllegalArgumentException("지원하지 않는 활동 유형입니다 : " + type);
+            default -> throw new CareerValidationException("지원하지 않는 활동 유형입니다 : " + type);
         }
     }
 
@@ -272,7 +273,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
     @Override
     public List<FindDetailResponse> findAllDetailByTag(Member requestMember, Long tagId, String sort) {
         Tag tag = tagRepository.findById(tagId)
-            .orElseThrow(() -> new NoSuchElementException("해당 태그를 찾을 수 없습니다: " + tagId));
+            .orElseThrow(() -> new CareerValidationException("해당 태그를 찾을 수 없습니다: " + tagId));
         if (!tag.getMemberId().equals(requestMember.getId())) {
             throw new OwnerMismatchException();
         }
@@ -351,7 +352,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
                     .orElseGet(Collections::emptyList);
         }
         else {
-            throw new IllegalArgumentException("지원하지 않는 타입입니다.");
+            throw new CareerValidationException("지원하지 않는 타입입니다.");
         }
 
         details = details.stream()
@@ -436,43 +437,43 @@ public class CareerSearchServiceImpl implements CareerSearchService{
         switch (firstDetail.getCareerType()) {
             case ACTIVITY -> {
                 Activity activity = activityRepository.findById(firstDetail.getCareerId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 대외활동을 찾을 수 없습니다: " + firstDetail.getCareerId()));
+                    .orElseThrow(() -> new CareerValidationException("해당 대외활동을 찾을 수 없습니다: " + firstDetail.getCareerId()));
                 title = activity.getName();
                 alias = activity.getAlias();
             }
             case PROJECT -> {
                 Project project = projectJpaRepository.findById(firstDetail.getCareerId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 프로젝트를 찾을 수 없습니다: " + firstDetail.getCareerId()));
+                    .orElseThrow(() -> new CareerValidationException("해당 프로젝트를 찾을 수 없습니다: " + firstDetail.getCareerId()));
                 title = project.getName();
                 alias = project.getAlias();
             }
             case EMP -> {
                 Employment emp = employmentJpaRepository.findById(firstDetail.getCareerId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 경력을 찾을 수 없습니다: " + firstDetail.getCareerId()));
+                    .orElseThrow(() -> new CareerValidationException("해당 경력을 찾을 수 없습니다: " + firstDetail.getCareerId()));
                 title = emp.getName();
                 alias = emp.getAlias();
             }
             case EDU -> {
                 EduCareer edu = eduCareerJpaRepository.findById(firstDetail.getCareerId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 교육을 찾을 수 없습니다: " + firstDetail.getCareerId()));
+                    .orElseThrow(() -> new CareerValidationException("해당 교육을 찾을 수 없습니다: " + firstDetail.getCareerId()));
                 title = edu.getName();
                 alias = edu.getAlias();
             }
             case COM -> {
                 Competition competition = competitionJpaRepository.findById(firstDetail.getCareerId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 공모전/대회를 찾을 수 없습니다: " + firstDetail.getCareerId()));
+                    .orElseThrow(() -> new CareerValidationException("해당 공모전/대회를 찾을 수 없습니다: " + firstDetail.getCareerId()));
                 title = competition.getName();
                 alias = competition.getAlias();
             }
             case CIRCLE -> {
                 Circle circle = circleRepository.findById(firstDetail.getCareerId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 동아리를 찾을 수 없습니다: " + firstDetail.getCareerId()));
+                    .orElseThrow(() -> new CareerValidationException("해당 동아리를 찾을 수 없습니다: " + firstDetail.getCareerId()));
                 title = circle.getName();
                 alias = circle.getAlias();
             }
             case ETC -> {
                 CareerEtc etc = etcRepository.findById(firstDetail.getCareerId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 기타활동을 찾을 수 없습니다: " + firstDetail.getCareerId()));
+                    .orElseThrow(() -> new CareerValidationException("해당 기타활동을 찾을 수 없습니다: " + firstDetail.getCareerId()));
                 title = etc.getName();
                 alias = etc.getAlias();
             }
