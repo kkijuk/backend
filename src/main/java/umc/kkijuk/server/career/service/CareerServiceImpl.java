@@ -10,6 +10,7 @@ import umc.kkijuk.server.career.domain.*;
 import umc.kkijuk.server.career.dto.*;
 import umc.kkijuk.server.career.dto.converter.BaseCareerConverter;
 import umc.kkijuk.server.career.repository.*;
+import umc.kkijuk.server.common.domian.exception.CareerValidationException;
 import umc.kkijuk.server.common.domian.exception.OwnerMismatchException;
 import umc.kkijuk.server.common.domian.exception.ResourceNotFoundException;
 import umc.kkijuk.server.common.service.RecordUpdateManager;
@@ -123,7 +124,7 @@ public class CareerServiceImpl implements CareerService{
             case "competition" -> deleteComp(requestMember, careerId);
             case "employment" -> deleteEmp(requestMember, careerId);
             case "etc" -> deleteEtc(requestMember, careerId);
-            default -> throw new IllegalArgumentException("지원하지 않는 활동 유형입니다 : " + type);
+            default -> throw new CareerValidationException("지원하지 않는 활동 유형입니다 : " + type);
         }
     }
 
@@ -497,7 +498,7 @@ public class CareerServiceImpl implements CareerService{
                 recordUpdateManager.updateRecordTimestamp(record);
                 return getResponse(etc, EtcResponse::new);
             }
-            default -> throw new IllegalArgumentException("지원하지 않는 활동 유형입니다 : " + request.getType());
+            default -> throw new CareerValidationException("지원하지 않는 활동 유형입니다 : " + request.getType());
 
         }
     }
@@ -531,7 +532,7 @@ public class CareerServiceImpl implements CareerService{
                     .orElseGet(Collections::emptyList);
         }
         else {
-            throw new IllegalArgumentException("지원하지 않는 타입입니다.");
+            throw new CareerValidationException("지원하지 않는 타입입니다.");
         }
         return responseConstructor.apply(career,details);
     }
