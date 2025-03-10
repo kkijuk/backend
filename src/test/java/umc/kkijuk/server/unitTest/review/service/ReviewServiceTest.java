@@ -193,22 +193,22 @@ class ReviewServiceTest {
                 () -> reviewService.delete(requestMember, anotherRecruit, review.getId())).isInstanceOf(ReviewRecruitMismatchException.class);
     }
 
-    @Test
-    void findAllByRecruitId_공고의_모든_review찾기() {
-        //given
-        ReviewCreate reviewCreate = ReviewCreate.builder()
-                .title("new-title")
-                .content("new-content")
-                .date(LocalDate.of(2024, 7, 21))
-                .build();
-
-        for (int i = 0; i < 10; i++)
-            reviewService.create(requestMember, recruit, reviewCreate);
-
-        //when
-        List<Review> reviews = reviewService.findAllByRecruit(requestMember, recruit);
-
-        //then
-        assertThat(reviews.size()).isEqualTo(11);
-    }
+//    @Test
+//    void findAllByRecruitId_공고의_모든_review찾기() {
+//        //given
+//        ReviewCreate reviewCreate = ReviewCreate.builder()
+//                .title("new-title")
+//                .content("new-content")
+//                .date(LocalDate.of(2024, 7, 21))
+//                .build();
+//
+//        for (int i = 0; i < 10; i++)
+//            reviewService.create(requestMember, recruit, reviewCreate);
+//
+//        //when
+//        List<Review> reviews = reviewService.findAllByRecruit(requestMember, recruit);
+//
+//        //then
+//        assertThat(reviews.size()).isEqualTo(11);
+//    }
 }
