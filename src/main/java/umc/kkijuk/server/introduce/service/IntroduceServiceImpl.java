@@ -69,7 +69,6 @@ public class IntroduceServiceImpl implements IntroduceService {
         recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
 
         //작성 완료 처리 됐을 때 '서류'라는 이름의 공고 리뷰 자동 생성
-
         Recruit recruit = recruitEntity.toModel();
 
         if (introduceReqDto.getState() == 1) {
@@ -168,13 +167,15 @@ public class IntroduceServiceImpl implements IntroduceService {
 
         introduceRepository.save(introduce);
 
-        // 자기소개서 수정 시 공고 상태 지원 예정으로 변경
-        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
-        recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
-
         // "서류" 리뷰 자동 생성 로직 추가
         RecruitEntity recruitEntity = introduce.getRecruit(); // Introduce 엔티티에서 Recruit 가져오기
         Recruit recruit = recruitEntity.toModel();
+
+        // 자기소개서 수정 시 공고 상태 지원 예정으로 변경
+        if (recruit.isActive()) {
+            RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.PLANNED);
+            recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
+        }
 
         if (introduceReqDto.getState() == 1) {
             // "서류" 제목의 리뷰가 이미 존재하는지 확인
@@ -215,9 +216,13 @@ public class IntroduceServiceImpl implements IntroduceService {
 
         introduceRepository.delete(introduce);
 
+        RecruitEntity recruitEntity = introduce.getRecruit(); // Introduce 엔티티에서 Recruit 가져오기
+        Recruit recruit = recruitEntity.toModel();
         // 자기소개서 삭제 시 공고 상태 미지원으로 변경
-        RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.UNAPPLIED);
-        recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
+        if (recruit.isActive()) {
+            RecruitStatusUpdate recruitStatusUpdate = new RecruitStatusUpdate(RecruitStatus.UNAPPLIED);
+            recruitService.updateStatus(requestMember, recruitId, recruitStatusUpdate);
+        }
 
         return introduce.getId();
     }
