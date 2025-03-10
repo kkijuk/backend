@@ -156,4 +156,10 @@ public class ExceptionControllerAdvice {
     public ErrorResponse handleCustomAuthException(CustomAuthException exception) {
         return new ErrorResponse(exception.getErrorStatus().getMessage());
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DuplicateReviewTitleException.class)
+    public ErrorResponse DuplicateReviewTitleException(DuplicateReviewTitleException e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }
