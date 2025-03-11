@@ -1,6 +1,7 @@
 package umc.kkijuk.server.record.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,14 +49,15 @@ public class RecordController {
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "이력서 전체 조회 완료", recordResponse));
     }
 
-    @PatchMapping
+    @PatchMapping("/{recordId}")
     @Operation(summary = "이력서 정보 수정")
+    @Parameter(name = "recordId", description = "이력서 Id, path variable 입니다.", example = "1")
     public ResponseEntity<Object> update(@RequestHeader("Authorization") String token,
+                                         @PathVariable Long recordId,
                                          @Valid @RequestBody RecordReqDto recordReqDto) {
         Member requestMember = loginUser.extractMemberId(token);
         Long memberId = requestMember.getId();
-        RecordResponse recordResponse = recordService.updateRecord(memberId,
-                recordService.findByMemberId(memberId).getId(), recordReqDto);
+        RecordResponse recordResponse = recordService.updateRecord(memberId, recordId, recordReqDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "이력서 수정 완료", recordResponse));

@@ -154,6 +154,7 @@ public class RecordServiceImpl implements RecordService {
     public RecordResponse updateRecord(Long memberId, Long recordId, RecordReqDto recordReqDto) {
         Record record = recordRepository.findById(recordId)
                 .orElseThrow(() -> new ResourceNotFoundException("record ", recordId));
+
         if (!record.getMemberId().equals(memberId)) {
             throw new IntroOwnerMismatchException();
         }
