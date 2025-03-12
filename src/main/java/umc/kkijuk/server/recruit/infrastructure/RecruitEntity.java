@@ -40,7 +40,9 @@ public class RecruitEntity {
     @Convert(converter = StringListToStringConverter.class)
     private List<String> tags;
 
+    @Column(length = 1000)
     private String link;
+
     private boolean active;
     private LocalDateTime disabledTime;
 
