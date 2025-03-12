@@ -22,6 +22,7 @@ import umc.kkijuk.server.record.domain.Record;
 import umc.kkijuk.server.record.repository.RecordRepository;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -539,8 +540,9 @@ public class CareerServiceImpl implements CareerService{
 
     private <T extends BaseCareer> void setCommonFields(T activity) {
         if (activity.getUnknown()) {
-            activity.setEnddate(LocalDate.now());
-            activity.setYear(LocalDate.now().getYear());
+            LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+            activity.setEnddate(today);
+            activity.setYear(today.getYear());
         } else {
             activity.setYear(activity.getEnddate().getYear());
         }
@@ -549,12 +551,12 @@ public class CareerServiceImpl implements CareerService{
     @Transactional
     public void updateUnknownEndDates() {
         System.out.println(LocalDate.now());
-        activityRepository.updateUnknownEndDates(LocalDate.now());
-        projectRepository.updateUnknownEndDates(LocalDate.now());
-        circleRepository.updateUnknownEndDates(LocalDate.now());
-        eduCareerRepository.updateUnknownEndDates(LocalDate.now());
-        competitionRepository.updateUnknownEndDates(LocalDate.now());
-        employmentRepository.updateUnknownEndDates(LocalDate.now());
-        etcRepository.updateUnknownEndDates(LocalDate.now());
+        activityRepository.updateUnknownEndDates(LocalDate.now(ZoneId.of("Asia/Seoul")));
+        projectRepository.updateUnknownEndDates(LocalDate.now(ZoneId.of("Asia/Seoul")));
+        circleRepository.updateUnknownEndDates(LocalDate.now(ZoneId.of("Asia/Seoul")));
+        eduCareerRepository.updateUnknownEndDates(LocalDate.now(ZoneId.of("Asia/Seoul")));
+        competitionRepository.updateUnknownEndDates(LocalDate.now(ZoneId.of("Asia/Seoul")));
+        employmentRepository.updateUnknownEndDates(LocalDate.now(ZoneId.of("Asia/Seoul")));
+        etcRepository.updateUnknownEndDates(LocalDate.now(ZoneId.of("Asia/Seoul")));
     }
 }
