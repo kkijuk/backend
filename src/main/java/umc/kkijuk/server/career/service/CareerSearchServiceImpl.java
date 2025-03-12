@@ -300,7 +300,7 @@ public class CareerSearchServiceImpl implements CareerSearchService{
 
         return careers.stream()
                 .map(career -> new FindCareerResponse(career.getId(), career.getName(), career.getAlias(),
-                        career.getStartdate(), career.getEnddate(), CareerType.fromClass(career)))
+                        career.getStartdate(), career.getEnddate(), career.getUnknown(), CareerType.fromClass(career)))
                 .collect(Collectors.toList());
 
     }

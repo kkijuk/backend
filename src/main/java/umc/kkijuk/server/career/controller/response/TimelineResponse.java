@@ -19,11 +19,14 @@ public class TimelineResponse {
     private String title;
     private LocalDate startdate;
     private LocalDate enddate;
+    private Boolean unknown;
     public TimelineResponse(BaseCareer career, CareerType type){
         this.careerId = career.getId();
         this.title = career.getName();
         this.startdate = career.getStartdate();
         this.enddate = career.getEnddate();
+        this.unknown = career.getUnknown();
         this.category = new CategoryResponse(type.getId(),type.getDescription(),type.name());
+
     }
 }
