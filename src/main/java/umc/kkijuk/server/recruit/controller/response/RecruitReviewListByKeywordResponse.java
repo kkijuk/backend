@@ -1,6 +1,7 @@
 package umc.kkijuk.server.recruit.controller.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Comparator;
 import lombok.Builder;
 import lombok.Getter;
 import umc.kkijuk.server.recruit.domain.Recruit;
@@ -36,10 +37,17 @@ public class RecruitReviewListByKeywordResponse {
             else existingReview.addReview(recruitReviewDto);
         }
 
+        List<RecruitByKeyword> sortedRecruitList = recruitMap.entrySet().stream()
+            .sorted(Comparator.comparing(entry -> entry.getKey().getEndTime(), Comparator.nullsLast(Comparator.reverseOrder())))
+            .map(entry -> RecruitByKeyword.from(entry.getKey(), entry.getValue()))
+            .toList();
+
+
+        reviewResult.sort(Comparator.comparing(ReviewByKeyword::getEndTime, Comparator.nullsLast(Comparator.reverseOrder())));
+
         return RecruitReviewListByKeywordResponse.builder()
                 .keyword(keyword)
-                .recruitResult(recruitMap.entrySet().stream().map(entry ->
-                    RecruitByKeyword.from(entry.getKey(), entry.getValue())).toList())
+                .recruitResult(sortedRecruitList)
                 .reviewResult(reviewResult)
                 .build();
     }
