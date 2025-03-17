@@ -6,8 +6,10 @@ import lombok.Setter;
 import umc.kkijuk.server.introduce.domain.Introduce;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 @Getter
 @Setter
@@ -29,7 +31,7 @@ public class IntroduceListResponse {
         this.recruitTitle=introduce.getRecruit().toModel().getTitle();
         this.deadline=formatUpdatedAt(introduce.getRecruit().toModel().getEndTime());
         this.updatedAt = formatUpdatedAt(introduce.getUpdatedAt());
-        this.timeSinceUpdate = calculateTimeUntilDeadline(introduce.getUpdatedAt(), introduce.getRecruit().toModel().getEndTime());
+        this.timeSinceUpdate = calculateTimeUntilDeadline(introduce.getRecruit().toModel().getEndTime());
         this.state=introduce.getState();
     }
 
@@ -38,9 +40,16 @@ public class IntroduceListResponse {
         return updatedAt != null ? updatedAt.format(formatter) : null;
     }
 
-    private String calculateTimeUntilDeadline(LocalDateTime updatedAt, LocalDateTime deadline) {
-        Duration duration = Duration.between(updatedAt, deadline);
-        long days = duration.toDays() + 1;
+    private String calculateTimeUntilDeadline(LocalDateTime deadline) {
+        LocalDate today = LocalDate.now();
+        LocalDate deadlineDate = deadline.toLocalDate();
+
+        long days = ChronoUnit.DAYS.between(today, deadlineDate);
+
+        if (days < 0) {
+            return "D+" + Math.abs(days);
+        }
+
         return "D-" + days;
     }
 }
