@@ -7,8 +7,10 @@ import umc.kkijuk.server.introduce.domain.Introduce;
 import umc.kkijuk.server.introduce.dto.QuestionDto;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Getter
@@ -38,7 +40,7 @@ public class IntroduceResponse {
         this.tags=introduce.getRecruit().toModel().getTags();
         this.link=introduce.getRecruit().toModel().getLink();
         this.updatedAt = formatUpdatedAt(introduce.getUpdatedAt());
-        this.timeSinceUpdate = calculateTimeUntilDeadline(introduce.getUpdatedAt(), introduce.getRecruit().toModel().getEndTime());
+        this.timeSinceUpdate = calculateTimeUntilDeadline(introduce.getRecruit().toModel().getEndTime());
         /*this.introduceList = introduceList;*/
         this.state=introduce.getState();
     }
@@ -48,9 +50,16 @@ public class IntroduceResponse {
         return updatedAt != null ? updatedAt.format(formatter) : null;
     }
 
-    private String calculateTimeUntilDeadline(LocalDateTime updatedAt, LocalDateTime deadline) {
-        Duration duration = Duration.between(updatedAt, deadline);
-        long days = duration.toDays() + 1;
+    private String calculateTimeUntilDeadline(LocalDateTime deadline) {
+        LocalDate today = LocalDate.now();
+        LocalDate deadlineDate = deadline.toLocalDate();
+
+        long days = ChronoUnit.DAYS.between(today, deadlineDate);
+
+        if (days < 0) {
+            return "D+" + Math.abs(days);
+        }
+
         return "D-" + days;
     }
 }
