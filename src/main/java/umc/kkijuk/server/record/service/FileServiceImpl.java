@@ -85,6 +85,7 @@ public class FileServiceImpl implements FileService{
                 .memberId(memberId)
                 .fileType(FileType.File)
                 .fileTitle(request.getTitle())
+                .fileLinkTitle(request.getLinkTitle())
                 .keyName(request.getKeyName())
                 .build();
 

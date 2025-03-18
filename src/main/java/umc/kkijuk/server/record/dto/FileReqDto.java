@@ -20,6 +20,10 @@ public class FileReqDto {
     private String title;
 
     @NotBlank(message = "입력하지 않은 항목이 있습니다.")
+    @Schema(description = "첨부파일 링크 제목", example = "끼적_포트폴리오.png", type="string")
+    private String linkTitle;
+
+    @NotBlank(message = "입력하지 않은 항목이 있습니다.")
     @Schema(description = "파일 keyName",type="string")
     private String keyName;
 }
