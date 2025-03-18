@@ -11,6 +11,7 @@ import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.introduce.common.BaseResponse;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.record.controller.response.FileResponse;
+import umc.kkijuk.server.record.dto.FileRenameDto;
 import umc.kkijuk.server.record.dto.FileReqDto;
 import umc.kkijuk.server.record.dto.UrlReqDto;
 import umc.kkijuk.server.record.service.FileService;
@@ -80,6 +81,23 @@ public class FileController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new BaseResponse<>(HttpStatus.OK.value(), "파일 삭제 완료", fileResponse));
     }
+
+    @PutMapping("/file/rename")
+    @Operation(summary = "이력서(S3)-첨부파일 이름 변경", description = "기존 파일명을 새로운 파일명으로 변경합니다.")
+    public ResponseEntity<BaseResponse<FileResponse>> renameFile(
+            @RequestHeader("Authorization") String token,
+            @Valid @RequestBody FileRenameDto fileRenameDto){
+
+        Member requestMember = loginUser.extractMemberId(token);
+        Long memberId = requestMember.getId();
+
+        FileResponse fileResponse = fileService.renameFile(memberId, fileRenameDto.getOldFileName(), fileRenameDto.getNewFileName());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new BaseResponse<>(HttpStatus.OK.value(), "파일명 변경 완료", fileResponse));
+    }
+
 
     @PostMapping("/url")
     @Operation(summary = "이력서-추가 자료<URL> 저장", description = "추가자료 중 URL을 저장합니다.")

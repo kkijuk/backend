@@ -15,6 +15,7 @@ public class FileResponse {
     private Long id;
     private FileType fileType;
     private String fileTitle;
+    private String fileLinkTitle;
     private String keyName;
     private String urlTitle;
     private String url;
@@ -23,6 +24,7 @@ public class FileResponse {
         this.id = file.getId();
         this.fileType = file.getFileType();
         this.fileTitle = file.getFileTitle();
+        this.fileLinkTitle = file.getFileLinkTitle();
         this.keyName = file.getKeyName();
         this.urlTitle = file.getUrlTitle();
         this.url = file.getUrl();

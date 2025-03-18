@@ -22,6 +22,8 @@ public class File extends BaseEntity {
     @Column(length = 20)
     private String fileTitle;
 
+    private String fileLinkTitle;
+
     private String keyName;
 
     private String urlTitle;
