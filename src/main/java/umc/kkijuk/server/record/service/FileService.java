@@ -12,6 +12,7 @@ public interface FileService {
     FileResponse saveFile(Long memberId, Long recordId, FileReqDto request);
     Map<String, String> getDownloadUrl(Long memberId, String keyName);
     FileResponse deleteFile(Long memberId, String fileName);
+    FileResponse renameFile(Long memberId, String oldFileName, String newFileName);
     FileResponse saveUrl(Long memberId, Long recordId, UrlReqDto urlReqDto);
     FileResponse deleteUrl(Long memberId, UrlReqDto urlReqDto);
 }

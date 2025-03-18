@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -50,7 +51,7 @@ public class FileServiceImpl implements FileService{
             throw new IllegalArgumentException("이미 존재하는 파일 이름입니다: " + fileName);
         }
 
-        String keyName = bucketPath + "/" + UUID.randomUUID().toString() + "-" + fileName;
+        String keyName = bucketPath + "/" + memberId + "/" +  UUID.randomUUID().toString() + "-" + fileName;
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -80,8 +81,6 @@ public class FileServiceImpl implements FileService{
             throw new IllegalArgumentException("이미 존재하는 파일 이름입니다: " + request.getTitle());
         }
 
-//        Record record = recordRepository.findById(recordId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Record", recordId));
         File file = File.builder()
                 .memberId(memberId)
                 .fileType(FileType.File)
@@ -133,6 +132,46 @@ public class FileServiceImpl implements FileService{
 
         return new FileResponse(file);
     }
+
+    @Override
+    @Transactional
+    public FileResponse renameFile(Long memberId, String oldFileName, String newFileName) {
+
+        File existingFile = fileRepository.findByMemberIdAndFileTitle(memberId, oldFileName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 파일이 존재하지 않습니다: " + oldFileName));
+
+        // 새로운 keyName 생성
+        String newKeyName = bucketPath + "/" + memberId + "/" + UUID.randomUUID().toString() + "-" + newFileName;
+
+        // S3에서 기존 파일을 새로운 이름으로 복사
+        CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+                .sourceBucket(bucketName)
+                .sourceKey(existingFile.getKeyName())
+                .destinationBucket(bucketName)
+                .destinationKey(newKeyName)
+                .serverSideEncryption("AES256") // sse-s3 암호화 적용
+                .build();
+        s3Client.copyObject(copyRequest);
+
+        // 기존 파일 삭제
+        s3Client.deleteObject(builder -> builder.bucket(bucketName).key(existingFile.getKeyName()).build());
+
+        File updatedFile = File.builder()
+                .id(existingFile.getId())
+                .memberId(existingFile.getMemberId())
+                .fileType(existingFile.getFileType())
+                .fileTitle(newFileName)
+                .keyName(newKeyName)
+                .build();
+
+        fileRepository.save(updatedFile);
+
+        updateRecordTimestamp(memberId);
+
+        return new FileResponse(updatedFile);
+    }
+
+
 
     @Override
     @Transactional
