@@ -22,6 +22,7 @@ public class IntroduceListResponse {
     private String updatedAt;
     private String timeSinceUpdate;
     private int state;
+    private Boolean recruitEndState;
 
     @Builder
     public IntroduceListResponse(Introduce introduce) {
@@ -33,6 +34,7 @@ public class IntroduceListResponse {
         this.updatedAt = formatUpdatedAt(introduce.getUpdatedAt());
         this.timeSinceUpdate = calculateTimeUntilDeadline(introduce.getRecruit().toModel().getEndTime());
         this.state=introduce.getState();
+        this.recruitEndState = isRecruitEnded(introduce.getRecruit().toModel().getEndTime());
     }
 
     private String formatUpdatedAt(LocalDateTime updatedAt) {
@@ -51,5 +53,8 @@ public class IntroduceListResponse {
         }
 
         return "D-" + days;
+    }
+    private boolean isRecruitEnded(LocalDateTime deadline) {
+        return deadline.isBefore(LocalDateTime.now());
     }
 }

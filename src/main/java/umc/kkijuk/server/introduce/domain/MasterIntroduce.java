@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import umc.kkijuk.server.common.domian.base.BaseEntity;
 import umc.kkijuk.server.recruit.infrastructure.RecruitEntity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,5 +60,8 @@ public class MasterIntroduce extends BaseEntity {
         this.oneLiner = oneLiner;
     }
 
+    public void updateTimestamp() {
+        setUpdatedAt(LocalDateTime.now());
+    }
 
 }

@@ -26,8 +26,6 @@ import java.util.Map;
 @RequestMapping("/history/intro/")
 public class IntroduceController {
     private final IntroduceService introduceService;
-    private final MasterIntroduceService masterIntroduceService;
-    private final MemberService memberService;
     private final LoginUser loginUser;
 
     @PostMapping("/{recruitId}")

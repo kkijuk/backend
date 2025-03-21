@@ -126,6 +126,8 @@ public class MasterIntroduceServiceImpl implements MasterIntroduceService {
                         .build())
                 .collect(Collectors.toList());
 
+        masterIntroduce.updateTimestamp();
+
         return MasterIntroduceResponse.builder()
                 .masterIntroduce(masterIntroduce)
                 .questionList(responseQuestionList)
