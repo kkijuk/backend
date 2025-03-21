@@ -50,10 +50,9 @@ public class DashBoardServiceImpl implements DashBoardService {
     @Override
     public List<IntroduceRemindResponse> getHomeIntro(Member requestMember) {
         Pageable pageable = PageRequest.of(0, 2);  // 첫 페이지에서 2개의 결과만 가져옴
-        Page<Introduce> introduces = introduceRepository.findByMemberIdAndStateOrderByEndTimeAsc(requestMember.getId(), 0, pageable);
+        Page<Introduce> introduces = introduceRepository.findActiveIntroduces(requestMember.getId(), 0, pageable);
 
         return introduces.stream()
-                .filter(introduce -> !isRecruitEnded(introduce.getRecruit().toModel().getEndTime()))
                 .map(IntroduceRemindResponse::new)
                 .collect(Collectors.toList());
     }
