@@ -141,6 +141,10 @@ public class FileServiceImpl implements FileService{
         File existingFile = fileRepository.findByMemberIdAndFileTitle(memberId, oldFileName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 파일이 존재하지 않습니다: " + oldFileName));
 
+        if (fileRepository.existsByMemberIdAndFileTitle(memberId, newFileName)) {
+            throw new IllegalArgumentException("이미 존재하는 파일 이름입니다: " + newFileName);
+        }
+
         // 새로운 keyName 생성
         String newKeyName = bucketPath + "/" + memberId + "/" + UUID.randomUUID().toString() + "-" + newFileName;
 
@@ -162,6 +166,7 @@ public class FileServiceImpl implements FileService{
                 .memberId(existingFile.getMemberId())
                 .fileType(existingFile.getFileType())
                 .fileTitle(newFileName)
+                .fileLinkTitle(existingFile.getFileLinkTitle())
                 .keyName(newKeyName)
                 .build();
 
