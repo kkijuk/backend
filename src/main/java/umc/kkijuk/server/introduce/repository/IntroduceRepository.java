@@ -15,8 +15,8 @@ public interface IntroduceRepository extends JpaRepository<Introduce, Long> {
     Optional<Introduce> findByRecruitId(Long recruitId);
     Optional<List<Introduce>> findAllByMemberId(Long memberId);
 
-    @Query("SELECT i FROM Introduce i WHERE i.memberId = :memberId AND i.state = :state ORDER BY i.recruit.endTime ASC")
-    Page<Introduce> findByMemberIdAndStateOrderByEndTimeAsc(@Param("memberId") Long memberId, @Param("state") int state, Pageable pageable);
+    @Query("SELECT i FROM Introduce i WHERE i.memberId = :memberId AND i.state = :state AND i.recruit.endTime > CURRENT_TIMESTAMP ORDER BY i.recruit.endTime ASC")
+    Page<Introduce> findActiveIntroduces(@Param("memberId") Long memberId, @Param("state") int state, Pageable pageable);
 
     @Query("SELECT i FROM Introduce i " +
             "JOIN i.questions q " +
