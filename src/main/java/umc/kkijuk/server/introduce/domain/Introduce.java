@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.kkijuk.server.common.domian.base.BaseEntity;
 import umc.kkijuk.server.recruit.infrastructure.RecruitEntity;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -51,6 +53,10 @@ public class Introduce extends BaseEntity {
 
     public void update(int state) {
         this.state=state;
+    }
+
+    public void updateTimestamp() {
+        setUpdatedAt(LocalDateTime.now());
     }
 
 }

@@ -198,6 +198,7 @@ public class IntroduceServiceImpl implements IntroduceService {
                         .build())
                 .collect(Collectors.toList());
 
+        introduce.updateTimestamp();
 
         return IntroduceResponse.builder()
                 .introduce(introduce)

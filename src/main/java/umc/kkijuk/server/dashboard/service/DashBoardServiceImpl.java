@@ -53,6 +53,7 @@ public class DashBoardServiceImpl implements DashBoardService {
         Page<Introduce> introduces = introduceRepository.findByMemberIdAndStateOrderByEndTimeAsc(requestMember.getId(), 0, pageable);
 
         return introduces.stream()
+                .filter(introduce -> !isRecruitEnded(introduce.getRecruit().toModel().getEndTime()))
                 .map(IntroduceRemindResponse::new)
                 .collect(Collectors.toList());
     }
@@ -69,5 +70,9 @@ public class DashBoardServiceImpl implements DashBoardService {
                 )
                 .mapToLong(List::size)
                 .sum();
+    }
+
+    private boolean isRecruitEnded(LocalDateTime deadline) {
+        return deadline.isBefore(LocalDateTime.now());
     }
 }
