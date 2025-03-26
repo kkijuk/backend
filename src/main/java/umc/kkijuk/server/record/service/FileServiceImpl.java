@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
+import umc.kkijuk.server.common.domian.exception.FileValidationException;
 import umc.kkijuk.server.common.domian.exception.ResourceNotFoundException;
 import umc.kkijuk.server.record.controller.response.FileResponse;
 import umc.kkijuk.server.record.domain.File;
@@ -48,7 +49,7 @@ public class FileServiceImpl implements FileService{
     public Map<String, String> getSignUrl (Long memberId, String fileName){
 
         if (fileRepository.existsByMemberIdAndFileTitle(memberId, fileName)) {
-            throw new IllegalArgumentException("이미 존재하는 파일 이름입니다: " + fileName);
+            throw new FileValidationException("이미 존재하는 파일 이름입니다: " + fileName);
         }
 
         String keyName = bucketPath + "/" + memberId + "/" +  UUID.randomUUID().toString() + "-" + fileName;
@@ -78,7 +79,7 @@ public class FileServiceImpl implements FileService{
         log.info("Saving file for memberId: {}, recordId: {}, request: {}", memberId, recordId, request);
 
         if (fileRepository.existsByMemberIdAndFileTitle(memberId, request.getTitle())) {
-            throw new IllegalArgumentException("이미 존재하는 파일 이름입니다: " + request.getTitle());
+            throw new FileValidationException("이미 존재하는 파일 이름입니다: " + request.getTitle());
         }
 
         File file = File.builder()
@@ -99,7 +100,7 @@ public class FileServiceImpl implements FileService{
     public Map<String, String> getDownloadUrl(Long memberId, String fileName) {
 
         File file = fileRepository.findByMemberIdAndFileTitle(memberId, fileName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 파일을 찾을 수 없습니다: " + fileName));
+                .orElseThrow(() -> new FileValidationException("해당 파일을 찾을 수 없습니다: " + fileName));
         String keyName = file.getKeyName();
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
@@ -124,7 +125,7 @@ public class FileServiceImpl implements FileService{
     @Transactional
     public FileResponse deleteFile(Long memberId, String fileName){
         File file = fileRepository.findByMemberIdAndFileTitle(memberId, fileName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 파일이 존재하지 않습니다: " + fileName));
+                .orElseThrow(() -> new FileValidationException("해당 파일이 존재하지 않습니다: " + fileName));
 
         s3Client.deleteObject(builder -> builder.bucket(bucketName).key(file.getKeyName()).build());
         fileRepository.delete(file);
@@ -139,10 +140,10 @@ public class FileServiceImpl implements FileService{
     public FileResponse renameFile(Long memberId, String oldFileName, String newFileName) {
 
         File existingFile = fileRepository.findByMemberIdAndFileTitle(memberId, oldFileName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 파일이 존재하지 않습니다: " + oldFileName));
+                .orElseThrow(() -> new FileValidationException("해당 파일이 존재하지 않습니다: " + oldFileName));
 
         if (fileRepository.existsByMemberIdAndFileTitle(memberId, newFileName)) {
-            throw new IllegalArgumentException("이미 존재하는 파일 이름입니다: " + newFileName);
+            throw new FileValidationException("이미 존재하는 파일 이름입니다: " + newFileName);
         }
 
         // 새로운 keyName 생성
@@ -183,7 +184,7 @@ public class FileServiceImpl implements FileService{
     @Transactional
     public FileResponse saveUrl(Long memberId, Long recordId, UrlReqDto urlReqDto){
         if (fileRepository.existsByMemberIdAndUrlTitle(memberId, urlReqDto.getUrlTitle())) {
-            throw new IllegalArgumentException("이미 존재하는 URL 제목입니다: " + urlReqDto.getUrlTitle());
+            throw new FileValidationException("이미 존재하는 URL 제목입니다: " + urlReqDto.getUrlTitle());
         }
 //        Record record = recordRepository.findById(recordId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Record", recordId));
@@ -203,7 +204,7 @@ public class FileServiceImpl implements FileService{
     @Transactional
     public FileResponse deleteUrl(Long memberId, UrlReqDto urlReqDto){
         File file = fileRepository.findByMemberIdAndUrlTitle(memberId, urlReqDto.getUrlTitle())
-                .orElseThrow(() -> new IllegalArgumentException("해당 URL이 존재하지 않습니다: " + urlReqDto.getUrlTitle()));
+                .orElseThrow(() -> new FileValidationException("해당 URL이 존재하지 않습니다: " + urlReqDto.getUrlTitle()));
         fileRepository.delete(file);
         updateRecordTimestamp(memberId);
         return new FileResponse(file);
