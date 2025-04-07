@@ -225,8 +225,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member completeProfile(Long memberId, ProfileInputDto profileInputDto) {
-        Member member = this.getById(memberId);
+    public Member completeProfile(Member member, ProfileInputDto profileInputDto) {
         member.setTermsAgree(profileInputDto.getIsTermsAgreed());
         member.setPrivacyAgree(profileInputDto.getIsPrivacyAgreed());
         member.setMarketingAgree(profileInputDto.getIsMarketingAgreed());

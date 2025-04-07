@@ -23,6 +23,6 @@ public interface MemberService {
     Long extractMemberId(String bearerToken);
     public Member findBySocialId(String SocialId);
     Member createUserWithNaverId(String naverId, NaverUserResponse.NaverUserDetail naverUserInfo);
-    Member completeProfile(Long memberId, ProfileInputDto profileInputDto);
+    Member completeProfile(Member member, ProfileInputDto profileInputDto);
     void memberInactivation(Long memberId, String token);
 }

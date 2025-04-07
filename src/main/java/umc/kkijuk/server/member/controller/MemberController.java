@@ -146,6 +146,7 @@ public class MemberController {
                                                    @RequestBody @Valid ProfileInputDto profileInputDto){
         Member member = loginUser.extractMemberId(token);
         Long memberId = member.getId();
+        memberService.completeProfile(member, profileInputDto);
 
         Map<String, Object> tokens = new HashMap<>();
         tokens.put("Token", authService.generateTokens(member));
