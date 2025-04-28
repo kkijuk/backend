@@ -10,6 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.HandlerMapping;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -42,21 +43,21 @@ public class LogAspect {
             return joinPoint.proceed();
         }
 
-        String controllerName = joinPoint.getSignature().getDeclaringType().getName();
+        String controllerClass = joinPoint.getSignature().getDeclaringType().getName();
         String methodName = joinPoint.getSignature().getName();
         Map<String, Object> params = new HashMap<>();
 
         try{
             String decoder = URLDecoder.decode(request.getRequestURI(), StandardCharsets.UTF_8);
 
-            params.put("controller", controllerName);
+            params.put("controller", controllerClass);
             params.put("method", methodName);
             params.put("params", getParams(request));
             params.put("request_uri", decoder);
             params.put("http_method", request.getMethod());
 
         }catch (Exception e){
-            log.error("Exception in Controller Method {}.{}: {}", controllerName, methodName, e.getMessage());
+            log.error("Exception in Controller Method {}.{}: {}", controllerClass, methodName, e.getMessage());
             throw e;
         }
 
@@ -73,33 +74,46 @@ public class LogAspect {
     @Around("serviceMethods()")
     public Object logService(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
+        String serviceClass = joinPoint.getSignature().getDeclaringTypeName();
         String serviceMethod = joinPoint.getSignature().getName();
 
         try {
             Object result = joinPoint.proceed();
             long elapsedTime = System.currentTimeMillis() - startTime;
-            log.info("[Service] {} executed in {} ms", serviceMethod, elapsedTime);
+            log.info("[Service] {}.{} executed in {} ms", serviceClass, serviceMethod, elapsedTime);
             return result;
 
         } catch (Throwable e) {
             long elapsedTime = System.currentTimeMillis() - startTime;
-            log.error("Exception in Service Method {} after {} ms: {}", serviceMethod, elapsedTime, e.getMessage());
+            log.error("Exception in Service Method {}.{} after {} ms: {}", serviceClass, serviceMethod, elapsedTime, e.getMessage());
             throw e;
 
         }
 
     }
-
     private static JSONObject getParams(HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
-        Enumeration<String> params = request.getParameterNames();
-        while (params.hasMoreElements()) {
-            String param = params.nextElement();
-            String replaceParam = param.replaceAll("\\.","-");
-            jsonObject.put(replaceParam, request.getParameter(param));
+
+        // 쿼리 파라미터 수집
+        Enumeration<String> paramNames = request.getParameterNames();
+        while (paramNames.hasMoreElements()) {
+            String param = paramNames.nextElement();
+            String replacedParam = param.replaceAll("\\.", "-");
+            jsonObject.put(replacedParam, request.getParameter(param));
+        }
+
+        // PathVariable 수집
+        @SuppressWarnings("unchecked")
+        Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if (pathVariables != null) {
+            for (Map.Entry<String, String> entry : pathVariables.entrySet()) {
+                String key = entry.getKey().replaceAll("\\.", "-");
+                jsonObject.put(key, entry.getValue());
+            }
         }
 
         return jsonObject;
     }
+
 
 }
