@@ -65,6 +65,10 @@ dependencies {
 	// grafana
 	implementation "org.springframework.boot:spring-boot-starter-actuator"
 	runtimeOnly "io.micrometer:micrometer-registry-prometheus"
+
+	// aop
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 }
 
 tasks.named('test') {

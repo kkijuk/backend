@@ -110,6 +110,7 @@ public class AuthService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", kakaoGrantType);
         params.add("client_id", kakaoClientId);
+        params.add("redirect_uri",kakaoRedirectUri);
         params.add("client_secret", kakaoClientSecret);
         params.add("code", code);
 
