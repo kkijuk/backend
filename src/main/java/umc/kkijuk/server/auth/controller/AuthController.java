@@ -14,14 +14,13 @@ import java.util.Map;
 @Slf4j
 @Tag(name = "social login", description = "소셜로그인 관련 API")
 @RestController
-//@RequestMapping("/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
 
-//    @GetMapping("/kakao/login")
-    @GetMapping("/login/oauth2/code/kakao")
+    @GetMapping("/kakao/login")
     @Operation(summary = "카카오 로그인", description = "카카오 OAuth 인증을 통해 사용자 정보를 처리하고 JWT 토큰을 생성하여 반환합니다.")
     @Parameter(name = "code", description = "카카오에서 발급된 인증 코드", required = true)
     public ResponseEntity<Map<String, Object>> kakaoCallback(@RequestParam("code") String code) {
