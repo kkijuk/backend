@@ -62,9 +62,9 @@ public class AuthService {
 
 
     @Transactional
-    public Map<String, Object> handleKakaoLogin(String code) {
+    public Map<String, Object> handleKakaoLogin(String code, String redirectUri) {
         // 1. 카카오 액세스 토큰 발급
-        String kakaoAccessToken = getKakaoAccessToken(code);
+        String kakaoAccessToken = getKakaoAccessToken(code, redirectUri);
         if (kakaoAccessToken == null || kakaoAccessToken.isEmpty()) {
             throw new IllegalArgumentException("카카오 액세스 토큰 발급 실패");
         }
@@ -101,7 +101,7 @@ public class AuthService {
     }
 
     @Transactional
-    public String getKakaoAccessToken(String code) {
+    public String getKakaoAccessToken(String code, String redirectUri) {
         String tokenUri = "https://kauth.kakao.com/oauth/token";
 
         HttpHeaders headers = new HttpHeaders();
@@ -110,7 +110,7 @@ public class AuthService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", kakaoGrantType);
         params.add("client_id", kakaoClientId);
-        params.add("redirect_uri",kakaoRedirectUri);
+        params.add("redirect_uri",redirectUri);
         params.add("client_secret", kakaoClientSecret);
         params.add("code", code);
 
