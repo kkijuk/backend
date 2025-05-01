@@ -53,7 +53,7 @@ jobs:
         run: |
           echo "commit.hash=${{ steps.slug.outputs.sha7 }}" >> ./src/main/resources/application-prod.properties
           echo "api.server.url=${{ secrets.API_URL }}" >> ./src/main/resources/application-prod.properties
-          echo "spring.datasource.url=jdbc:mysql://${{ secrets.DATASOURCE_DB_URL }}:3306/kkijuk?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul" >> ./src/main/resources/application-prod.properties
+          echo "spring.datasource.url=jdbc:mysql://${{ secrets.DATASOURCE_DB_URL }}:3306/kkijuk?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false" >> ./src/main/resources/application-prod.properties
           echo "spring.datasource.username=${{ secrets.DATASOURCE_DB_USERNAME }}" >> ./src/main/resources/application-prod.properties
           echo "spring.datasource.password=${{ secrets.DATASOURCE_DB_PASSWORD }}" >> ./src/main/resources/application-prod.properties
           echo "spring.mail.password=${{ secrets.MAIL_PASSWORD }}" >> ./src/main/resources/application.properties
@@ -188,7 +188,7 @@ jobs:
           key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
           port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
           script: | # 실행할 스크립트
-            cd /home/ubuntu/scripts
+            cd /home/ubuntu/spring-cicd/rolling_update
             ./rolling-update.sh
 
       - name: Discord Webhook Action
