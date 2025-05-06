@@ -22,7 +22,8 @@ public interface ReviewJpaRepository extends JpaRepository<ReviewEntity, Long> {
             "JOIN review as rv ON rv.recruit_id = r.id " +
             "WHERE r.member_id = :memberId " +
             "AND r.active = true " +
-            "AND LOWER(rv.content) LIKE CONCAT('%', LOWER(:keyword), '%') " +
+            "AND (LOWER(rv.content) LIKE CONCAT('%', LOWER(:keyword), '%') " +
+            "OR LOWER(rv.title) LIKE CONCAT('%', LOWER(:keyword), '%')) " +
             "ORDER BY rv.date DESC, r.end_time DESC", nativeQuery = true)
     List<RecruitReviewDtoInterface> findActiveRecruitReviewsByMemberIdAndKeyword(@Param("memberId") Long memberId,
                                                                                      @Param("keyword") String keyword);
