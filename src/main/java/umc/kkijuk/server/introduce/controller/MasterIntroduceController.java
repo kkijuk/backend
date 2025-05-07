@@ -3,16 +3,13 @@ package umc.kkijuk.server.introduce.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.introduce.common.BaseResponse;
-import umc.kkijuk.server.introduce.controller.response.IntroduceResponse;
 import umc.kkijuk.server.introduce.controller.response.MasterIntroduceResponse;
 import umc.kkijuk.server.introduce.dto.IntroduceReqDto;
-import umc.kkijuk.server.introduce.dto.MasterIntroduceReqDto;
 import umc.kkijuk.server.introduce.service.MasterIntroduceService;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
@@ -24,7 +21,6 @@ import umc.kkijuk.server.member.service.MemberService;
 @RequestMapping("/history/intro/master")
 public class MasterIntroduceController {
     private final MasterIntroduceService masterIntroduceService;
-    private final MemberService memberService;
     private final LoginUser loginUser;
 
 

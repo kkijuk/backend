@@ -27,8 +27,8 @@ public class MasterIntroduceServiceImpl implements MasterIntroduceService {
     @Override
     @Transactional
     public MasterIntroduceResponse saveMasterIntro(Long memberId, IntroduceReqDto introduceReqDto) {
-        if (masterIntroduceRepository.findByMemberId(memberId).isPresent()) {
-            throw new IntroFoundException("이미 자기소개서가 존재합니다");
+                if (masterIntroduceRepository.findByMemberId(memberId).isPresent()) {
+                    throw new IntroFoundException("이미 자기소개서가 존재합니다");
         }
 
         List<MasterQuestion> masterQuestions = introduceReqDto.getQuestionList().stream()
