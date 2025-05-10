@@ -27,8 +27,8 @@ public class MasterIntroduceServiceImpl implements MasterIntroduceService {
     @Override
     @Transactional
     public MasterIntroduceResponse saveMasterIntro(Long memberId, IntroduceReqDto introduceReqDto) {
-        if (masterIntroduceRepository.findByMemberId(memberId).isPresent()) {
-            throw new IntroFoundException("이미 자기소개서가 존재합니다");
+                if (masterIntroduceRepository.findByMemberId(memberId).isPresent()) {
+                    throw new IntroFoundException("이미 자기소개서가 존재합니다");
         }
 
         List<MasterQuestion> masterQuestions = introduceReqDto.getQuestionList().stream()
@@ -71,66 +71,65 @@ public class MasterIntroduceServiceImpl implements MasterIntroduceService {
             throw new IntroOwnerMismatchException();
         }
 
-        // 상태 업데이트
+        // 상태 및 한줄소개 업데이트
         masterIntroduce.setState(introduceReqDto.getState());
-
-        // 한줄 소개 업데이트
         masterIntroduce.setOneLiner(introduceReqDto.getOneLiner());
 
-        List<MasterQuestion> existingQuestions = masterIntroduce.getMasterQuestion();
-        Map<Integer, MasterQuestion> existingQuestionsMap = existingQuestions.stream()
-                .collect(Collectors.toMap(MasterQuestion::getNumber, q -> q));
+        // 기존 질문 Map 구성 (중복 키 방지)
+        Map<Integer, MasterQuestion> existingQuestionsMap = new HashMap<>();
+        for (MasterQuestion q : masterIntroduce.getMasterQuestion()) {
+            existingQuestionsMap.putIfAbsent(q.getNumber(), q);
+        }
 
-        List<QuestionDto> questionDtos = introduceReqDto.getQuestionList();
-        List<MasterQuestion> updatedQuestions = new ArrayList<>();
-
-        for (QuestionDto questionDto : questionDtos) {
-            Integer number = questionDto.getNumber();
-            MasterQuestion existingQuestion = existingQuestionsMap.get(number);
-
-            if (existingQuestion != null) {
-                existingQuestion.update(questionDto.getTitle(), questionDto.getContent());
-                updatedQuestions.add(existingQuestion);
+        // 요청으로 들어온 질문 리스트 기준으로 수정 및 추가
+        for (QuestionDto dto : introduceReqDto.getQuestionList()) {
+            Integer number = dto.getNumber();
+            MasterQuestion question = existingQuestionsMap.get(number);
+            if (question != null) {
+                question.update(dto.getTitle(), dto.getContent());
             } else {
                 MasterQuestion newQuestion = new MasterQuestion();
-                newQuestion.setTitle(questionDto.getTitle());
-                newQuestion.setContent(questionDto.getContent());
-                newQuestion.setNumber(questionDto.getNumber());
+                newQuestion.setTitle(dto.getTitle());
+                newQuestion.setContent(dto.getContent());
+                newQuestion.setNumber(number);
                 newQuestion.setMasterIntroduce(masterIntroduce);
-                updatedQuestions.add(newQuestion);
+                masterIntroduce.getMasterQuestion().add(newQuestion);
             }
         }
 
-        List<MasterQuestion> toRemove = existingQuestions.stream()
-                .filter(q -> questionDtos.stream().noneMatch(dto -> dto.getNumber() == q.getNumber()))
-                .collect(Collectors.toList());
-
-        for (MasterQuestion question : toRemove) {
-            masterIntroduce.getMasterQuestion().remove(question);
-            masterQuestionRepository.delete(question);
+        // 제거할 질문 필터링
+        List<MasterQuestion> toRemove = new ArrayList<>();
+        for (MasterQuestion q : new ArrayList<>(masterIntroduce.getMasterQuestion())) {
+            boolean existsInDto = introduceReqDto.getQuestionList().stream()
+                    .anyMatch(dto -> dto.getNumber() == (q.getNumber()));
+            if (!existsInDto) {
+                toRemove.add(q);
+            }
         }
 
-        // 기존 질문 리스트에 업데이트된 질문들 추가
-        masterIntroduce.getMasterQuestion().clear();
-        masterIntroduce.getMasterQuestion().addAll(updatedQuestions);
+        // 실제 제거
+        toRemove.forEach(q -> {
+            masterIntroduce.getMasterQuestion().remove(q);
+            masterQuestionRepository.delete(q);
+        });
 
-        // masterIntroduce 저장
-        masterIntroduce = masterIntroduceRepository.save(masterIntroduce);
-
-        // 응답용 DTO 생성
-        List<QuestionDto> responseQuestionList = updatedQuestions.stream()
-                .map(question -> QuestionDto.builder()
-                        .title(question.getTitle())
-                        .content(question.getContent())
-                        .number(question.getNumber())
-                        .build())
-                .collect(Collectors.toList());
-
+        // updatedAt 수동 업데이트
         masterIntroduce.updateTimestamp();
+
+        // 응답 DTO 생성
+        List<QuestionDto> responseQuestionList = masterIntroduce.getMasterQuestion().stream()
+                .map(q -> QuestionDto.builder()
+                        .title(q.getTitle())
+                        .content(q.getContent())
+                        .number(q.getNumber())
+                        .build())
+                .sorted(Comparator.comparingInt(QuestionDto::getNumber))
+                .collect(Collectors.toList());
 
         return MasterIntroduceResponse.builder()
                 .masterIntroduce(masterIntroduce)
                 .questionList(responseQuestionList)
                 .build();
     }
+
 }
