@@ -134,9 +134,10 @@ public class RecordServiceImpl implements RecordService {
 
         // 파일
         List<FileResponse> files = fileRepository.findByMemberId(memberId).stream()
-                .filter(file -> !file.getFileTitle().startsWith("profileImage_"))
+                .filter(file -> file.getFileTitle() == null || !file.getFileTitle().startsWith("profileImage_"))
                 .map(FileResponse::new)
                 .collect(Collectors.toList());
+
 
         // 학력
         List<EducationResponse> educationList = educationRepository.findByMemberId(memberId)
