@@ -88,6 +88,10 @@ public class AuthService {
 
     @Transactional
     public Map<String, Object> handleNaverLogin(String code, String state) {
+        if( code == null || code.isBlank()){
+            throw new IllegalArgumentException("code 값이 누락되었습니다. 사용자가 인증을 거부했을 수 있습니다.");
+        }
+
         String naverAccessToken = getNaverAccessToken(code, state);
         Member member = processNaverUser(naverAccessToken);
 
@@ -201,10 +205,20 @@ public class AuthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
         try {
-            ResponseEntity<NaverUserResponse> response =
-                    restTemplate.exchange(naverUserInfoUri, HttpMethod.GET, request, NaverUserResponse.class);
-                log.info("네이버 사용자 정보 응답: {}", response.getBody());
-            return response.getBody().getNaverUserDetail();
+            ResponseEntity<NaverUserResponse> response = restTemplate.exchange(naverUserInfoUri, HttpMethod.GET, request, NaverUserResponse.class);
+            NaverUserResponse body = response.getBody();
+            log.info("네이버 사용자 정보 응답: {}", body);
+
+            if (body == null) {
+                throw new RuntimeException("네이버 사용자 정보 응답이 null입니다.");
+            }
+            if(!"00".equals(body.getResultCode())){
+                throw new RuntimeException("네이버 사용자 정보 요청 실패: " + body.getMessage());
+            }
+            if (body.getNaverUserDetail() == null) {
+                throw new RuntimeException("네이버 사용자 정보가 존재하지 않습니다.");
+            }
+            return body.getNaverUserDetail();
 
         } catch (Exception e) {
             log.error("네이버 사용자 정보 요청 실패: {}", e.getMessage());
