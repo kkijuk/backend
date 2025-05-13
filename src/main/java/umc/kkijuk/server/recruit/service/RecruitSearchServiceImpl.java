@@ -1,5 +1,7 @@
 package umc.kkijuk.server.recruit.service;
 
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,8 +28,9 @@ public class RecruitSearchServiceImpl implements RecruitSearchService {
     private final ReviewRepository reviewRepository;
 
     public RecruitReviewListByKeywordResponse findRecruitByKeyword(Member requestMember, String keyword) {
-        List<Recruit> recruits = recruitRepository.searchRecruitByKeyword(requestMember.getId(), keyword);
-        List<RecruitReviewDto> reviews = reviewRepository.findReviewByKeyword(requestMember.getId(), keyword);
+        String trimKeyword = Normalizer.normalize(keyword.trim(), Form.NFC);
+        List<Recruit> recruits = recruitRepository.searchRecruitByKeyword(requestMember.getId(), trimKeyword);
+        List<RecruitReviewDto> reviews = reviewRepository.findReviewByKeyword(requestMember.getId(), trimKeyword);
 
         Map<Recruit, String> reviewMap = new HashMap<>();
         for (Recruit recruit : recruits) {
@@ -38,7 +41,7 @@ public class RecruitSearchServiceImpl implements RecruitSearchService {
         }
 
         for (RecruitReviewDto review : reviews) {
-            log.info("keyword: {}, result: {}", keyword, review.getReviewContent());
+            log.info("keyword: {}, result: {}", trimKeyword, review.getReviewContent());
         }
 
 

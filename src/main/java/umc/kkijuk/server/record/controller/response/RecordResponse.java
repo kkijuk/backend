@@ -18,7 +18,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class RecordResponse {
-    private Long record_id;
+    private Long memberId;
+    private Long recordId;
     private String address;
     private String profileImageUrl;
     private String updatedAt;
@@ -44,7 +45,8 @@ public class RecordResponse {
                           List<BaseCareerResponse> projects, List<EduCareerResponse> eduCareers,
                           List<AwardResponse> awards, List<LicenseResponse> licenses,
                           List<SkillResponse> skills, List<FileResponse> files) {
-        this.record_id=record.getId();
+        this.memberId = member.getId();
+        this.recordId=record.getId();
         this.address = record.getAddress();
         this.profileImageUrl=record.getProfileImageUrl();
         this.educationList=educationList;
@@ -63,19 +65,6 @@ public class RecordResponse {
         this.updatedAt = formatUpdatedAt(record.getUpdatedAt());
     }
 
-    @Builder
-    public RecordResponse(Member member,
-                          List<EmploymentResponse> employments, List<BaseCareerResponse> activitiesAndExperiences,
-                          List<BaseCareerResponse> projects, List<EduCareerResponse> eduCareers) {
-        this.name = member.getName();
-        this.birthday=member.getBirthDate();
-        this.phone=member.getPhoneNumber();
-        this.email=member.getEmail();
-        this.employments = employments;
-        this.activitiesAndExperiences = activitiesAndExperiences;
-        this.projects = projects;
-        this.eduCareers = eduCareers;
-    }
 
     private String formatUpdatedAt(LocalDateTime updatedAt) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
