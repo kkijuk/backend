@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import umc.kkijuk.server.auth.dto.NaverTokenResponse;
@@ -104,6 +107,42 @@ public class AuthService {
         return tokens;
     }
 
+//    @Transactional
+//    public String getKakaoAccessToken(String code, String redirectUri) {
+//        String tokenUri = "https://kauth.kakao.com/oauth/token";
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//
+//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+//        params.add("grant_type", kakaoGrantType);
+//        params.add("client_id", kakaoClientId);
+//        params.add("redirect_uri",redirectUri);
+//        params.add("client_secret", kakaoClientSecret);
+//        params.add("code", code);
+//
+//        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
+//
+//        try {
+//            ResponseEntity<Map> response = restTemplate.exchange(
+//                    tokenUri,
+//                    HttpMethod.POST,
+//                    kakaoTokenRequest,
+//                    Map.class
+//            );
+//
+//            log.info("카카오 액세스 토큰 응답: {}", response.getBody());
+//            return (String) response.getBody().get("access_token");
+//        } catch (HttpClientErrorException e) {
+//        log.error("카카오 요청 실패: {} / {}", e.getStatusCode(), e.getResponseBodyAsString());
+//        throw new RuntimeException("카카오 요청 실패", e);
+//        }
+//        catch (Exception e) {
+//            log.error("카카오 액세스 토큰 요청 실패: {}", e.getMessage(), e);
+//            throw new RuntimeException("카카오 액세스 토큰 요청 실패", e);
+//        }
+//    }
+
     @Transactional
     public String getKakaoAccessToken(String code, String redirectUri) {
         String tokenUri = "https://kauth.kakao.com/oauth/token";
@@ -114,7 +153,7 @@ public class AuthService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", kakaoGrantType);
         params.add("client_id", kakaoClientId);
-        params.add("redirect_uri",redirectUri);
+        params.add("redirect_uri", redirectUri);
         params.add("client_secret", kakaoClientSecret);
         params.add("code", code);
 
@@ -128,11 +167,37 @@ public class AuthService {
                     Map.class
             );
 
-            log.info("카카오 액세스 토큰 응답: {}", response.getBody());
-            return (String) response.getBody().get("access_token");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> body = (Map<String, Object>) response.getBody();
+
+            if (body == null) {
+                log.error("카카오 응답 body가 null임. 응답 상태 코드: {}", response.getStatusCode());
+                throw new RuntimeException("카카오 응답 body가 null입니다.");
+            }
+
+            if (!body.containsKey("access_token")) {
+                log.error("카카오 응답에 access_token 없음. 전체 응답: {}", body);
+                throw new RuntimeException("카카오 access_token이 응답에 없습니다.");
+            }
+
+            log.info("카카오 액세스 토큰 응답: {}", body);
+            return (String) body.get("access_token");
+
+        } catch (HttpClientErrorException e) {
+            log.error("카카오 토큰 요청 실패 - 클라이언트 에러: 상태 코드 {}, 응답 내용 {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("카카오 토큰 요청 실패 (클라이언트 에러): " + e.getStatusCode(), e);
+
+        } catch (HttpServerErrorException e) {
+            log.error("카카오 토큰 요청 실패 - 서버 에러: 상태 코드 {}, 응답 내용 {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("카카오 토큰 요청 실패 (서버 에러): " + e.getStatusCode(), e);
+
+        } catch (ResourceAccessException e) {
+            log.error("카카오 토큰 요청 실패 - 연결 문제: {}", e.getMessage());
+            throw new RuntimeException("카카오 토큰 요청 실패 (연결/타임아웃 문제)", e);
+
         } catch (Exception e) {
-            log.error("카카오 액세스 토큰 요청 실패: {}", e.getMessage(), e);
-            throw new RuntimeException("카카오 액세스 토큰 요청 실패", e);
+            log.error("카카오 토큰 요청 실패 - 기타 예외: {}", e.getMessage(), e);
+            throw new RuntimeException("카카오 토큰 요청 실패 (알 수 없는 오류)", e);
         }
     }
 
