@@ -5,13 +5,21 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Data
+import lombok.Builder;
+import lombok.Getter;
+
+import java.time.LocalDate;
+
 @Getter
 @Builder
-@AllArgsConstructor
-public class FindMasterIntroduceResponse {
+public class FindMasterIntroduceResponse implements SearchResultResponse {
     private Long masterIntroId;
     private String title;
     private String content;
     private LocalDate createdDate;
+
+    @Override
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
 }

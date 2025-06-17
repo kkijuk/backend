@@ -228,12 +228,52 @@ public class IntroduceServiceImpl implements IntroduceService {
         return introduce.getId();
     }
 
+//    @Override
+//    public Map<String, Object> searchIntroduceAndMasterByKeyword(String keyword, Member requestMember) {
+//        List<FindIntroduceResponse> introduceList = introduceRepository.searchIntroduceByKeywordForMember(keyword, requestMember.getId())
+//                .stream()
+//                .flatMap(introduce -> introduce.getQuestions().stream()
+//                        .filter(q -> q.getContent().contains(keyword))
+//                        .map(q -> FindIntroduceResponse.builder()
+//                                .introId(introduce.getId())
+//                                .title(introduce.getRecruit().getTitle())
+//                                .content(q.getContent())
+//                                .createdDate(introduce.getCreatedAt().toLocalDate())
+//                                .build()))
+//                .collect(Collectors.toList());
+//
+//        List<FindMasterIntroduceResponse> masterIntroduceList = masterIntroduceRepository.searchMasterIntroduceByKeywordForMember(keyword, requestMember.getId())
+//                .stream()
+//                .flatMap(masterIntroduce -> masterIntroduce.getMasterQuestion().stream()
+//                        .filter(mq -> mq.getContent().contains(keyword))
+//                        .map(mq -> FindMasterIntroduceResponse.builder()
+//                                .masterIntroId(masterIntroduce.getId())
+//                                .title("Master")
+//                                .content(mq.getContent())
+//                                .createdDate(masterIntroduce.getCreatedAt().toLocalDate())
+//                                .build()))
+//                .collect(Collectors.toList());
+//
+//        List<Object> result = new ArrayList<>();
+//        result.addAll(masterIntroduceList);
+//        result.addAll(introduceList);
+//
+//        int count = result.size();
+//
+//        Map<String, Object> response = new LinkedHashMap<>();
+//        response.put("count", count);
+//        response.put("data", result);
+//
+//        return response;
+//    }
+
     @Override
     public Map<String, Object> searchIntroduceAndMasterByKeyword(String keyword, Member requestMember) {
+        // Introduce 검색
         List<FindIntroduceResponse> introduceList = introduceRepository.searchIntroduceByKeywordForMember(keyword, requestMember.getId())
                 .stream()
                 .flatMap(introduce -> introduce.getQuestions().stream()
-                        .filter(q -> q.getContent().contains(keyword))
+                        .filter(q -> q.getContent().contains(keyword)) // ✨ filter 먼저 적용
                         .map(q -> FindIntroduceResponse.builder()
                                 .introId(introduce.getId())
                                 .title(introduce.getRecruit().getTitle())
@@ -242,10 +282,11 @@ public class IntroduceServiceImpl implements IntroduceService {
                                 .build()))
                 .collect(Collectors.toList());
 
+        // MasterIntroduce 검색
         List<FindMasterIntroduceResponse> masterIntroduceList = masterIntroduceRepository.searchMasterIntroduceByKeywordForMember(keyword, requestMember.getId())
                 .stream()
                 .flatMap(masterIntroduce -> masterIntroduce.getMasterQuestion().stream()
-                        .filter(mq -> mq.getContent().contains(keyword))
+                        .filter(mq -> mq.getContent().contains(keyword)) // ✨ filter 먼저 적용
                         .map(mq -> FindMasterIntroduceResponse.builder()
                                 .masterIntroId(masterIntroduce.getId())
                                 .title("Master")
@@ -254,18 +295,21 @@ public class IntroduceServiceImpl implements IntroduceService {
                                 .build()))
                 .collect(Collectors.toList());
 
-        List<Object> result = new ArrayList<>();
+        // 공통 결과로 합치기 + 정렬 (최신순)
+        List<SearchResultResponse> result = new ArrayList<>();
         result.addAll(masterIntroduceList);
         result.addAll(introduceList);
 
-        int count = result.size();
+        result.sort(Comparator.comparing(SearchResultResponse::getCreatedDate).reversed()); // 최신순 정렬
 
+        // 응답 반환
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("count", count);
+        response.put("count", result.size());
         response.put("data", result);
 
         return response;
     }
+
 
     @Override
     @Transactional
