@@ -305,7 +305,34 @@ public class CareerSearchServiceImpl implements CareerSearchService{
 
     }
 
+    @Override
+    public List<CareerTitleResponse> findCareerForNewDetail(Member requestMember) {
+        Long memberId = requestMember.getId();
+        List<BaseCareer> careers = new ArrayList<>();
 
+        careers.addAll(activityRepository.findByMemberId(memberId));
+        careers.addAll(projectJpaRepository.findByMemberId(memberId));
+        careers.addAll(eduCareerJpaRepository.findByMemberId(memberId));
+        careers.addAll(employmentJpaRepository.findByMemberId(memberId));
+        careers.addAll(circleRepository.findByMemberId(memberId));
+        careers.addAll(competitionJpaRepository.findByMemberId(memberId));
+        careers.addAll(etcRepository.findByMemberId(memberId));
+
+        return careers.stream()
+            .sorted(Comparator.comparing(BaseCareer::getStartdate).reversed())
+            .map(career -> CareerTitleResponse.builder()
+                .careerId(career.getId())
+                .title(career.getName())
+                .alias(career.getAlias())
+                .category(new CategoryResponse(
+                    CareerType.fromClass(career).getId(),
+                    CareerType.fromClass(career).getDescription(),
+                    CareerType.fromClass(career).name()
+                ))
+                .build()
+            )
+            .collect(Collectors.toList());
+    }
 
 
     //타임라인 쪽에서 데이터 구별 하기 위함

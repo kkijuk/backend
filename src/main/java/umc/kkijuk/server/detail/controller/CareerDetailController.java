@@ -5,12 +5,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import umc.kkijuk.server.career.controller.response.FindDetailResponse;
 import umc.kkijuk.server.common.LoginUser;
 import umc.kkijuk.server.detail.controller.response.BaseCareerDetailResponse;
 import umc.kkijuk.server.detail.controller.response.CareerDetailResponse;
+import umc.kkijuk.server.detail.controller.response.RecentCareerDetailResponse;
 import umc.kkijuk.server.detail.dto.CareerDetailReqDto;
 import umc.kkijuk.server.detail.dto.CareerDetailUpdateReqDto;
 import umc.kkijuk.server.detail.service.BaseCareerDetailService;
@@ -76,6 +79,17 @@ public class CareerDetailController {
                 careerDetailService.updateDetail(requestMember, request, careerId ,detailId)
         );
 
+    }
+
+    @GetMapping("/dashboard")
+    @Operation(summary = "홈화면 활동 기록 조회", description = "홈 화면에서 가장 최근에 기록한 활동기록 3개를 조회합니다. ")
+    public CareerDetailResponse<List<RecentCareerDetailResponse>> board(@RequestHeader("Authorization") String token){
+        Member requestMember = loginUser.extractMemberId(token);
+        return CareerDetailResponse.success(
+            HttpStatus.OK,
+            "최근에 작성한 활동 기록 3개를 성공적으로 조회했습니다.",
+            careerDetailService.boardDetail(requestMember)
+        );
     }
 
 }

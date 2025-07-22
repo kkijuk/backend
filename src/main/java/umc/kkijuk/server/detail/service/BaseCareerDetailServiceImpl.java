@@ -1,14 +1,20 @@
 package umc.kkijuk.server.detail.service;
 
 
+import java.time.LocalDate;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import umc.kkijuk.server.career.controller.response.CategoryResponse;
+import umc.kkijuk.server.career.controller.response.FindDetailResponse;
 import umc.kkijuk.server.career.domain.*;
 import umc.kkijuk.server.career.repository.*;
 import umc.kkijuk.server.common.domian.exception.*;
 import umc.kkijuk.server.detail.controller.response.BaseCareerDetailResponse;
+import umc.kkijuk.server.detail.controller.response.RecentCareerDetailResponse;
+import umc.kkijuk.server.detail.controller.response.TagResponse;
 import umc.kkijuk.server.detail.domain.*;
 import umc.kkijuk.server.detail.domain.mapping.CareerDetailTag;
 import umc.kkijuk.server.detail.dto.CareerDetailReqDto;
@@ -90,6 +96,22 @@ public class BaseCareerDetailServiceImpl implements BaseCareerDetailService{
         List<CareerDetailTag> careerDetailTags = returnCareerTagList(request.getTagList());
         careerDetailTags.forEach(careerDetailTag -> careerDetailTag.setBaseCareerDetail(baseCareerDetail));
         return new BaseCareerDetailResponse(careerDetailRepository.save(baseCareerDetail));
+    }
+
+    @Override
+    public List<RecentCareerDetailResponse> boardDetail(Member requestMember) {
+        List<BaseCareerDetail> details = careerDetailRepository.findTop3ByMemberIdOrderByCreatedAtDesc(requestMember.getId());
+
+        return details.stream()
+            .map(detail -> {
+                CareerType type = detail.getCareerType();
+                Long careerId = detail.getCareerId();
+                BaseCareer baseCareer = findBaseCareerByType(type, careerId);
+                if (baseCareer == null) return null;
+                return BaseCareerDetailConverter.toResponse(detail, baseCareer, type);
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     private void validateOwner(BaseCareer career, Member requestMember) {

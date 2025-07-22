@@ -20,4 +20,5 @@ public interface CareerSearchService {
 
     List<FindCareerResponse> findCareerWithKeyword(Member requestMember, String keyword, String sort);
 
+    List<CareerTitleResponse> findCareerForNewDetail(Member requestMember);
 }

@@ -65,4 +65,6 @@ public interface CareerDetailJpaRepository extends JpaRepository<BaseCareerDetai
             "JOIN FETCH ct.tag t " +
             "WHERE EXISTS (SELECT 1 FROM CareerDetailTag ct2 WHERE ct2.baseCareerDetail=bcd AND ct2.tag.id=:tagId)" )
     List<BaseCareerDetail> findByTag(@Param("tagId") Long tagId);
+
+  List<BaseCareerDetail> findTop3ByMemberIdOrderByCreatedAtDesc(Long id);
 }

@@ -139,4 +139,19 @@ public class CareerSearchController {
 
     }
 
+    @GetMapping("/list")
+    @Operation(
+        summary = "활동 리스트",
+        description = "새로운 활동 기록 추가 모달에 필요한 활동 정보들을 조회합니다.")
+    public CareerResponse<List<CareerTitleResponse>> findCareerForNewDetail(
+        @RequestHeader("Authorization") String token
+    ){
+        Member requestMember = loginUser.extractMemberId(token);
+        return CareerResponse.success(
+            CareerResponseMessage.CAREER_FINDALL_SUCCESS,
+            careerSearchService.findCareerForNewDetail(requestMember)
+        );
+
+    }
+
 }
