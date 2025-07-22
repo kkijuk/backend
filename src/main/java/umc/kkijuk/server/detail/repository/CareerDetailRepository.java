@@ -18,4 +18,7 @@ public interface CareerDetailRepository {
     List<BaseCareerDetail> findByMemberIdAndKeyword(Long id, String keyword);
 
     List<BaseCareerDetail> findByTag(Long id);
+
+
+    List<BaseCareerDetail> findTop3ByMemberIdOrderByCreatedAtDesc(Long id);
 }

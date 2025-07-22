@@ -41,4 +41,9 @@ public class CareerDetailRepositoryImpl implements CareerDetailRepository{
     public List<BaseCareerDetail> findByTag(Long id) {
         return careerDetailJpaRepository.findByTag(id);
     }
+
+    @Override
+    public List<BaseCareerDetail> findTop3ByMemberIdOrderByCreatedAtDesc(Long id) {
+        return careerDetailJpaRepository.findTop3ByMemberIdOrderByCreatedAtDesc(id);
+    }
 }
