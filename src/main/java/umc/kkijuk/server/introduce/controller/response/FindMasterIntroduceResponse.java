@@ -16,7 +16,7 @@ public class FindMasterIntroduceResponse implements SearchResultResponse {
     private Long masterIntroId;
     private String title;
     private String content;
-    private LocalDate createdDate;
+    private LocalDate updatedDate;
 
 //    @Override
 //    public LocalDate getCreatedDate() {
@@ -25,6 +25,8 @@ public class FindMasterIntroduceResponse implements SearchResultResponse {
 
     @Override
     public LocalDate getUpdatedDate() {
-        return createdDate;
+        return updatedDate;
     }
+
+
 }
