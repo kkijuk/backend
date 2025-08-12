@@ -269,47 +269,43 @@ public class IntroduceServiceImpl implements IntroduceService {
 
     @Override
     public Map<String, Object> searchIntroduceAndMasterByKeyword(String keyword, Member requestMember) {
-        // Introduce 검색
-        List<FindIntroduceResponse> introduceList = introduceRepository.searchIntroduceByKeywordForMember(keyword, requestMember.getId())
-                .stream()
-                .flatMap(introduce -> introduce.getQuestions().stream()
-                        .filter(q -> q.getContent().contains(keyword)) // ✨ filter 먼저 적용
-                        .map(q -> FindIntroduceResponse.builder()
-                                .introId(introduce.getId())
-                                .title(introduce.getRecruit().getTitle())
-                                .content(q.getContent())
-                                .createdDate(introduce.getCreatedAt().toLocalDate())
-                                .build()))
-                .collect(Collectors.toList());
 
-        // MasterIntroduce 검색
-        List<FindMasterIntroduceResponse> masterIntroduceList = masterIntroduceRepository.searchMasterIntroduceByKeywordForMember(keyword, requestMember.getId())
-                .stream()
-                .flatMap(masterIntroduce -> masterIntroduce.getMasterQuestion().stream()
-                        .filter(mq -> mq.getContent().contains(keyword)) // ✨ filter 먼저 적용
-                        .map(mq -> FindMasterIntroduceResponse.builder()
-                                .masterIntroId(masterIntroduce.getId())
-                                .title("Master")
-                                .content(mq.getContent())
-                                .createdDate(masterIntroduce.getCreatedAt().toLocalDate())
-                                .build()))
-                .collect(Collectors.toList());
+        List<FindIntroduceResponse> introduceList =
+                introduceRepository.searchIntroduceByKeywordForMember(keyword, requestMember.getId())
+                        .stream()
+                        .flatMap(introduce -> introduce.getQuestions().stream()
+                                .map(q -> FindIntroduceResponse.builder()
+                                        .introId(introduce.getId())
+                                        .title(introduce.getRecruit().getTitle())
+                                        .content(q.getContent())
+                                        .updatedDate(introduce.getUpdatedAt().toLocalDate())
+                                        .build()))
+                        .collect(Collectors.toList());
 
-        // 공통 결과로 합치기 + 정렬 (최신순)
+        List<FindMasterIntroduceResponse> masterIntroduceList =
+                masterIntroduceRepository.searchMasterIntroduceByKeywordForMember(keyword, requestMember.getId())
+                        .stream()
+                        .flatMap(masterIntroduce -> masterIntroduce.getMasterQuestion().stream()
+                                .map(mq -> FindMasterIntroduceResponse.builder()
+                                        .masterIntroId(masterIntroduce.getId())
+                                        .title("Master")
+                                        .content(mq.getContent())
+                                        .updatedDate(masterIntroduce.getUpdatedAt().toLocalDate())
+                                        .build()))
+                        .collect(Collectors.toList());
+
+        // 합치기 + 최신순 정렬
         List<SearchResultResponse> result = new ArrayList<>();
         result.addAll(masterIntroduceList);
         result.addAll(introduceList);
 
-        result.sort(Comparator.comparing(SearchResultResponse::getCreatedDate).reversed()); // 최신순 정렬
+        result.sort(Comparator.comparing(SearchResultResponse::getUpdatedDate).reversed());
 
-        // 응답 반환
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("count", result.size());
         response.put("data", result);
-
         return response;
     }
-
 
     @Override
     @Transactional

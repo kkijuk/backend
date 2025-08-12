@@ -19,7 +19,13 @@ public interface IntroduceRepository extends JpaRepository<Introduce, Long> {
     Page<Introduce> findActiveIntroduces(@Param("memberId") Long memberId, @Param("state") int state, Pageable pageable);
 
 
-    @Query("SELECT i FROM Introduce i JOIN FETCH i.questions q WHERE i.memberId = :memberId AND q.content LIKE %:keyword%")
+    @Query("""
+    SELECT DISTINCT i
+    FROM Introduce i
+    JOIN FETCH i.questions q
+    WHERE i.memberId = :memberId
+      AND LOWER(CAST(q.content AS string)) LIKE CONCAT('%', LOWER(:keyword), '%')
+    """)
     List<Introduce> searchIntroduceByKeywordForMember(@Param("keyword") String keyword, @Param("memberId") Long memberId);
 
 
