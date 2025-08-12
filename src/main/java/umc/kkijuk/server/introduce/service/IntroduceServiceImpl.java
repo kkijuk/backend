@@ -273,12 +273,12 @@ public class IntroduceServiceImpl implements IntroduceService {
         List<FindIntroduceResponse> introduceList = introduceRepository.searchIntroduceByKeywordForMember(keyword, requestMember.getId())
                 .stream()
                 .flatMap(introduce -> introduce.getQuestions().stream()
-                        .filter(q -> q.getContent().contains(keyword)) // ✨ filter 먼저 적용
+                        .filter(q -> q.getContent().contains(keyword)) // filter 먼저 적용
                         .map(q -> FindIntroduceResponse.builder()
                                 .introId(introduce.getId())
                                 .title(introduce.getRecruit().getTitle())
                                 .content(q.getContent())
-                                .createdDate(introduce.getCreatedAt().toLocalDate())
+                                .updatedDate(introduce.getUpdatedAt().toLocalDate())
                                 .build()))
                 .collect(Collectors.toList());
 
@@ -286,12 +286,12 @@ public class IntroduceServiceImpl implements IntroduceService {
         List<FindMasterIntroduceResponse> masterIntroduceList = masterIntroduceRepository.searchMasterIntroduceByKeywordForMember(keyword, requestMember.getId())
                 .stream()
                 .flatMap(masterIntroduce -> masterIntroduce.getMasterQuestion().stream()
-                        .filter(mq -> mq.getContent().contains(keyword)) // ✨ filter 먼저 적용
+                        .filter(mq -> mq.getContent().contains(keyword)) // filter 먼저 적용
                         .map(mq -> FindMasterIntroduceResponse.builder()
                                 .masterIntroId(masterIntroduce.getId())
                                 .title("Master")
                                 .content(mq.getContent())
-                                .createdDate(masterIntroduce.getCreatedAt().toLocalDate())
+                                .createdDate(masterIntroduce.getUpdatedAt().toLocalDate())
                                 .build()))
                 .collect(Collectors.toList());
 
@@ -300,7 +300,7 @@ public class IntroduceServiceImpl implements IntroduceService {
         result.addAll(masterIntroduceList);
         result.addAll(introduceList);
 
-        result.sort(Comparator.comparing(SearchResultResponse::getCreatedDate).reversed()); // 최신순 정렬
+        result.sort(Comparator.comparing(SearchResultResponse::getUpdatedDate).reversed()); // 최신순 정렬
 
         // 응답 반환
         Map<String, Object> response = new LinkedHashMap<>();

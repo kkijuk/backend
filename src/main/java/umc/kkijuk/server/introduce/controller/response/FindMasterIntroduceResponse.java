@@ -18,8 +18,13 @@ public class FindMasterIntroduceResponse implements SearchResultResponse {
     private String content;
     private LocalDate createdDate;
 
+//    @Override
+//    public LocalDate getCreatedDate() {
+//        return createdDate;
+//    }
+
     @Override
-    public LocalDate getCreatedDate() {
+    public LocalDate getUpdatedDate() {
         return createdDate;
     }
 }
