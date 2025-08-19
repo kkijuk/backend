@@ -145,7 +145,6 @@ public class MemberController {
     public ResponseEntity<Map<String, Object>> addProfile(@RequestHeader("Authorization") String token,
                                                    @RequestBody @Valid ProfileInputDto profileInputDto){
         Member member = loginUser.extractMemberId(token);
-        Long memberId = member.getId();
         memberService.completeProfile(member, profileInputDto);
 
         Map<String, Object> tokens = new HashMap<>();

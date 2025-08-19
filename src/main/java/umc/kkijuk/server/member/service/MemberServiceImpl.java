@@ -14,6 +14,7 @@ import umc.kkijuk.server.common.domian.exception.*;
 import umc.kkijuk.server.common.domian.status.AuthErrorStatus;
 import umc.kkijuk.server.member.controller.response.MemberEmailResponse;
 import umc.kkijuk.server.member.controller.response.MemberInfoResponse;
+import umc.kkijuk.server.member.domain.MarketingAgree;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.domain.Role;
 import umc.kkijuk.server.member.domain.SocialType;
@@ -166,6 +167,10 @@ public class MemberServiceImpl implements MemberService {
         newMember.setSocialType(SocialType.KAKAO);
         newMember.setProfileComplete(false);
         newMember.setUserState(State.ACTIVATE);
+        newMember.setTermsAgree(true);
+        newMember.setPrivacyAgree(true);
+        newMember.setMarketingAgree(MarketingAgree.NONE);
+        newMember.setProfileComplete(true);
 
 
         log.info("신규 사용자 생성 - Kakao ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", kakaoId, email, name, phoneNumber, birthDate);
@@ -216,7 +221,10 @@ public class MemberServiceImpl implements MemberService {
         newMember.setRole(Role.ROLE_USER);
         newMember.setSocialType(SocialType.NAVER);
         newMember.setUserState(State.ACTIVATE);
-        newMember.setProfileComplete(false);
+        newMember.setTermsAgree(true);
+        newMember.setPrivacyAgree(true);
+        newMember.setMarketingAgree(MarketingAgree.NONE);
+        newMember.setProfileComplete(true);
 
 
         log.info("신규 사용자 생성 - Naver ID: {}, 이메일: {}, 이름: {}, 전화번호: {}, 생년월일: {}", naverId, email, name, phoneNumber, birthDate);
@@ -230,7 +238,6 @@ public class MemberServiceImpl implements MemberService {
         member.setPrivacyAgree(profileInputDto.getIsPrivacyAgreed());
         member.setMarketingAgree(profileInputDto.getIsMarketingAgreed());
         member.setMemberJob(profileInputDto.getMemberJob());
-        member.setProfileComplete(true);
         return memberRepository.save(member);
     }
 
