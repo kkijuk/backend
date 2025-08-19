@@ -12,15 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 public class ProfileInputDto {
 
-    @NotNull(message = "서비스 약관 동의 여부는 필수 값입니다.")
     @Schema(description = "서비스 약관 동의 여부", example = "true", type = "boolean")
     private Boolean isTermsAgreed;
 
-    @NotNull(message = "개인정보 처리 방침 동의 여부는 필수 값입니다.")
     @Schema(description = "개인정보 처리 방침 동의 여부", example = "true", type = "boolean")
     private Boolean isPrivacyAgreed;
 
-    @NotNull(message = "마케팅 정보 수신 동의 여부는 필수 값입니다.")
     @Schema(description = "마케팅 정보 수신 동의 여부", example = "BOTH", type = "string",allowableValues = {
             "BOTH",
             "EMAIL",
@@ -28,7 +25,6 @@ public class ProfileInputDto {
             "NONE" })
     private MarketingAgree isMarketingAgreed;
 
-    @NotNull(message = "회원 직업 정보는 필수 값입니다.")
     @Schema(description = "회원 직업 정보", example = "JOB_SEEKER", type = "array"/*, allowableValues = {
             "MIDDLE_OR_HIGH_SCHOOL", // 중/고등학생
             "JOB_SEEKER",            // 취준생
