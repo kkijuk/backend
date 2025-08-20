@@ -22,18 +22,23 @@ public class AuthController {
 
     @GetMapping("/kakao/login")
     @Operation(summary = "카카오 로그인", description = "카카오 OAuth 인증을 통해 사용자 정보를 처리하고 JWT 토큰을 생성하여 반환합니다.",
-    parameters = {
-        @Parameter(name = "code", description = "카카오에서 발급된 인증 코드", required = true),
-        @Parameter(name = "redirect_uri", description = "카카오에서 인가코드 받아오는 uri", required = true)
-    })
+        parameters = {
+                @Parameter(name = "code", description = "카카오에서 발급된 인증 코드", required = true),
+                @Parameter(name = "redirect_uri", description = "카카오에서 인가코드 받아오는 uri", required = true)
+        })
     public ResponseEntity<Map<String, Object>> kakaoCallback(@RequestParam("code") String code,
-                                                             @RequestParam("redirect_uri") String redirectUri) {
-
-            Map<String, Object> tokens = authService.handleKakaoLogin(code, redirectUri);
-            log.info("카카오 로그인 성공");
-            return ResponseEntity.ok(tokens);
-
+                                                         @RequestParam("redirect_uri") String redirectUri) {
+    try {
+        Map<String, Object> tokens = authService.handleKakaoLogin(code, redirectUri);
+        log.info("카카오 로그인 성공");
+        return ResponseEntity.ok(tokens);
+    } catch (Exception e) {
+        log.error("카카오 인증 처리 중 오류 발생 : {}", e.getMessage(), e);
+        return ResponseEntity.internalServerError()
+                .body(Map.of("error", "카카오 인증 처리 실패"));
     }
+}
+
 
 
     @GetMapping("/naver/login")
