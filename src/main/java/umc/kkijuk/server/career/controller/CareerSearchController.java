@@ -12,6 +12,7 @@ import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.member.service.MemberService;
 
 import java.util.List;
+import umc.kkijuk.server.tag.dto.TagUsageResponseDto;
 
 @Tag(name="Search Career", description = "활동 조회 및 검색 관련 API")
 @RestController
@@ -89,6 +90,20 @@ public class CareerSearchController {
         return CareerResponse.success(
                 CareerResponseMessage.CAREER_SEARCH_SUCCESS,
                 careerSearchService.findAllTag(requestMember, keyword)
+        );
+    }
+
+    @GetMapping("/find/taglist/count")
+    @Operation(
+        summary = "활동 검색 - 태그 ( 사용량이 많은 태그 순으로 조회 )",
+        description = "특정 사용자의 활동 태그들을 사용량 순으로 조회합니다.  ")
+    public CareerResponse<List<TagUsageResponseDto>> findTagWithCount(
+        @RequestHeader("Authorization") String token
+    ) {
+        Member requestMember = loginUser.extractMemberId(token);
+        return CareerResponse.success(
+            CareerResponseMessage.CAREER_SEARCH_SUCCESS,
+            careerSearchService.findAllTagWithCount(requestMember)
         );
     }
 
