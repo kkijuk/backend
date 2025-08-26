@@ -338,8 +338,8 @@ public class CareerSearchServiceImpl implements CareerSearchService{
     }
 
     @Override
-    public List<TagUsageResponseDto> findAllTagWithCount(Member requestMember, String keyword) {
-        List<TagUsageResponseDto> tags = tagRepository.findPopularTagsByMemberAndKeyword(requestMember.getId(),keyword, PageRequest.of(0, 10));
+    public List<TagUsageResponseDto> findAllTagWithCount(Member requestMember) {
+        List<TagUsageResponseDto> tags = tagRepository.findTopPopularTagsByMember(requestMember.getId(), PageRequest.of(0, 10));
         return tags;
     }
 

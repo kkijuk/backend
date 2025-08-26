@@ -46,7 +46,7 @@ public class TagRepositoryImpl implements TagRepository{
     }
 
     @Override
-    public List<TagUsageResponseDto> findPopularTagsByMemberAndKeyword(Long memberId, String keyword, Pageable pageable) {
-        return tagJpaRepository.findPopularTagsByMemberAndKeyword(memberId, keyword, pageable);
+    public List<TagUsageResponseDto> findTopPopularTagsByMember(Long memberId, Pageable pageable) {
+        return tagJpaRepository.findTopPopularTagsByMember(memberId, pageable);
     }
 }

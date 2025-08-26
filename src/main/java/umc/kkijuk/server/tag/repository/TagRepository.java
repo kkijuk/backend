@@ -19,5 +19,5 @@ public interface TagRepository {
     void delete(Tag deleteTag);
 
     List<Tag> findByKeywordAndMemberId(String keyword, Long id);
-    List<TagUsageResponseDto> findPopularTagsByMemberAndKeyword(Long memberId, String keyword, Pageable pageable);
+    List<TagUsageResponseDto> findTopPopularTagsByMember(Long memberId, Pageable pageable);
 }

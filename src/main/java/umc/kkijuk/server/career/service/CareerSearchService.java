@@ -24,5 +24,5 @@ public interface CareerSearchService {
 
     List<CareerTitleResponse> findCareerForNewDetail(Member requestMember);
 
-    List<TagUsageResponseDto> findAllTagWithCount(Member requestMember, String keyword);
+    List<TagUsageResponseDto> findAllTagWithCount(Member requestMember);
 }

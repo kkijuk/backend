@@ -96,16 +96,14 @@ public class CareerSearchController {
     @GetMapping("/find/taglist/count")
     @Operation(
         summary = "활동 검색 - 태그 ( 사용량이 많은 태그 순으로 조회 )",
-        description = "검색어를 포함하는 활동 태그들을 사용량 순으로 조회합니다.  " +
-            "query 값으로 검색어(keyword)를 요청해주세요. " )
+        description = "특정 사용자의 활동 태그들을 사용량 순으로 조회합니다.  ")
     public CareerResponse<List<TagUsageResponseDto>> findTagWithCount(
-        @RequestHeader("Authorization") String token,
-        @RequestParam(name="keyword")String keyword
+        @RequestHeader("Authorization") String token
     ) {
         Member requestMember = loginUser.extractMemberId(token);
         return CareerResponse.success(
             CareerResponseMessage.CAREER_SEARCH_SUCCESS,
-            careerSearchService.findAllTagWithCount(requestMember, keyword)
+            careerSearchService.findAllTagWithCount(requestMember)
         );
     }
 

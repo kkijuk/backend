@@ -29,16 +29,15 @@ public interface TagJpaRepository extends JpaRepository<Tag,Long> {
       left join CareerDetailTag cdt on cdt.tag = t
       left join cdt.baseCareerDetail bcd
       where t.memberId = :memberId
-        and t.name like concat('%', :keyword, '%')
         and (bcd is null or bcd.memberId = :memberId)
       group by t.id, t.name
       order by count(cdt.id) desc, t.name asc
     """)
-    List<TagUsageResponseDto> findPopularTagsByMemberAndKeyword(
+    List<TagUsageResponseDto> findTopPopularTagsByMember(
         @Param("memberId") Long memberId,
-        @Param("keyword") String keyword,
         Pageable pageable
     );
+
 
 
 }
