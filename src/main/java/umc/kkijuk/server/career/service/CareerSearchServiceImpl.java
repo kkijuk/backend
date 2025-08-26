@@ -2,9 +2,11 @@ package umc.kkijuk.server.career.service;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.kkijuk.server.career.controller.response.*;
+import umc.kkijuk.server.career.controller.response.FindTagResponse.SearchTagResponse;
 import umc.kkijuk.server.career.domain.*;
 import umc.kkijuk.server.career.dto.converter.BaseCareerConverter;
 import umc.kkijuk.server.career.repository.*;
@@ -16,6 +18,7 @@ import umc.kkijuk.server.detail.domain.CareerType;
 import umc.kkijuk.server.detail.repository.CareerDetailRepository;
 import umc.kkijuk.server.member.domain.Member;
 import umc.kkijuk.server.tag.domain.Tag;
+import umc.kkijuk.server.tag.dto.TagUsageResponseDto;
 import umc.kkijuk.server.tag.repository.TagRepository;
 
 import java.time.LocalDate;
@@ -332,6 +335,12 @@ public class CareerSearchServiceImpl implements CareerSearchService{
                 .build()
             )
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TagUsageResponseDto> findAllTagWithCount(Member requestMember, String keyword) {
+        List<TagUsageResponseDto> tags = tagRepository.findPopularTagsByMemberAndKeyword(requestMember.getId(),keyword, PageRequest.of(0, 10));
+        return tags;
     }
 
 

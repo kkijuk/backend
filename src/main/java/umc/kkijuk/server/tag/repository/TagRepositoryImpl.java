@@ -1,11 +1,14 @@
 package umc.kkijuk.server.tag.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import umc.kkijuk.server.tag.domain.Tag;
 
 import java.util.List;
 import java.util.Optional;
+import umc.kkijuk.server.tag.dto.TagUsageResponseDto;
 
 @Repository
 @RequiredArgsConstructor
@@ -40,5 +43,10 @@ public class TagRepositoryImpl implements TagRepository{
     @Override
     public List<Tag> findByKeywordAndMemberId(String keyword, Long id) {
         return tagJpaRepository.findByKeywordAndMemberId(keyword,id);
+    }
+
+    @Override
+    public List<TagUsageResponseDto> findPopularTagsByMemberAndKeyword(Long memberId, String keyword, Pageable pageable) {
+        return tagJpaRepository.findPopularTagsByMemberAndKeyword(memberId, keyword, pageable);
     }
 }

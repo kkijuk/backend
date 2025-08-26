@@ -1,10 +1,12 @@
 package umc.kkijuk.server.career.service;
 
 import umc.kkijuk.server.career.controller.response.*;
+import umc.kkijuk.server.career.controller.response.FindTagResponse.SearchTagResponse;
 import umc.kkijuk.server.member.domain.Member;
 
 import java.util.List;
 import java.util.Map;
+import umc.kkijuk.server.tag.dto.TagUsageResponseDto;
 
 public interface CareerSearchService {
     List<TimelineResponse> findCareerForTimeline(Member requestMember);
@@ -21,4 +23,6 @@ public interface CareerSearchService {
     List<FindCareerResponse> findCareerWithKeyword(Member requestMember, String keyword, String sort);
 
     List<CareerTitleResponse> findCareerForNewDetail(Member requestMember);
+
+    List<TagUsageResponseDto> findAllTagWithCount(Member requestMember, String keyword);
 }
