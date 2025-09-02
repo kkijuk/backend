@@ -16,6 +16,7 @@ public class FindIntroduceResponse implements SearchResultResponse {
     private Long introId;
     private String title;
     private String content;
+    private int state;
     private LocalDate updatedDate;
 
 //    @Override
