@@ -278,6 +278,7 @@ public class IntroduceServiceImpl implements IntroduceService {
                                         .introId(introduce.getId())
                                         .title(introduce.getRecruit().getTitle())
                                         .content(q.getContent())
+                                        .state(introduce.getState())
                                         .updatedDate(introduce.getUpdatedAt().toLocalDate())
                                         .build()))
                         .collect(Collectors.toList());
